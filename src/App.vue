@@ -5,10 +5,10 @@
       <div class="header-content">
         <div class="logo-section">
           <div class="logo-icon">
-            <img :src="logoPath" alt="PRISM Platform Logo" width="40" height="40" />
+            <img :src="logoPath" alt="PRISM Logo" width="40" height="40" />
           </div>
           <div class="title-group">
-            <h1>PRISM Platform</h1>
+            <h1>PRISM</h1>
             <p class="subtitle">Platform for Research Infrastructure Smart Manufacturing</p>
           </div>
         </div>
