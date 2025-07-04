@@ -9,7 +9,8 @@
     "build": "vite build",
     "build-with-type-check": "vue-tsc && vite build",
     "preview": "vite preview",
-    "type-check": "vue-tsc --noEmit"
+    "type-check": "vue-tsc --noEmit",
+    "deploy": "npm run build && gh-pages -d dist"
   },
   "dependencies": {
     "@vitejs/plugin-legacy": "^6.0.0",
@@ -29,6 +30,7 @@
     "@vue/compiler-sfc": "^3.5.17",
     "@vue/tsconfig": "^0.5.1",
     "css-loader": "^6.11.0",
+    "gh-pages": "^6.1.1",
     "html-webpack-plugin": "^5.5.0",
     "style-loader": "^3.3.4",
     "ts-loader": "^9.4.2",

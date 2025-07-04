@@ -22,5 +22,12 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true
+  },
+  // GitHub Pages部署配置 - 基于分支部署
+  base: process.env.NODE_ENV === 'production' ? '/prism/' : '/',
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    sourcemap: false
   }
 })
