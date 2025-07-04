@@ -21,13 +21,21 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true
+    open: true,
+    // 确保静态文件正确服务
+    fs: {
+      strict: false
+    }
   },
+  // 确保public文件夹内容正确暴露
+  publicDir: 'public',
   // GitHub Pages部署配置 - 基于分支部署
   base: process.env.NODE_ENV === 'production' ? '/prism/' : '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
-    sourcemap: false
+    sourcemap: false,
+    // 确保public文件夹内容复制到构建输出
+    copyPublicDir: true
   }
 })

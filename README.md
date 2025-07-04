@@ -1,4 +1,4 @@
-# PRISM Platform
+# PRISM
 
 **Platform for Research Infrastructure Smart Manufacturing**
 
@@ -27,7 +27,7 @@ PRISM是一个现代化的Web应用程序，旨在标准化和自动化临床研
 
 ```mermaid
 graph TB
-    subgraph "PRISM Platform Architecture"
+    subgraph "PRISM Architecture"
         A[Excel Metadata File] -->|Upload| B[Excel Processor]
         B --> C[Data Parser & Validator]
         C --> D[Metadata Store]
@@ -339,7 +339,7 @@ npm run dev
 
 <div align="center">
 
-**PRISM Platform - 让临床研究代码生成更智能、更高效**
+**PRISM - 让临床研究代码生成更智能、更高效**
 
 Made with ❤️ by Clinical Programming Team
 

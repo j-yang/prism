@@ -66,35 +66,87 @@ export class TemplateStorageService {
       }
     ];
 
+    // 尝试多种URL格式来加载模板
     for (const templateInfo of templateFiles) {
       try {
-        // 对文件名进行URL编码以处理空格
-        const encodedFilename = encodeURIComponent(templateInfo.filename);
-        const response = await fetch(`/templates/${encodedFilename}`);
+        let content = '';
+        let loaded = false;
 
-        if (!response.ok) {
-          console.warn(`Failed to load template: ${templateInfo.filename} (status: ${response.status})`);
-          continue;
+        // 尝试不同的URL格式
+        const urlVariants = [
+          `/templates/${templateInfo.filename}`,
+          `/templates/${templateInfo.filename.replace(/ /g, '%20')}`,
+          `/templates/${encodeURIComponent(templateInfo.filename)}`,
+          `./templates/${templateInfo.filename}`,
+          `./templates/${templateInfo.filename.replace(/ /g, '%20')}`,
+        ];
+
+        console.log(`🔍 尝试加载模板: ${templateInfo.filename}`);
+
+        for (const url of urlVariants) {
+          try {
+            console.log(`   尝试URL: ${url}`);
+            const response = await fetch(url);
+
+            if (response.ok) {
+              content = await response.text();
+              loaded = true;
+              console.log(`   ✅ 成功加载: ${url}`);
+              break;
+            } else {
+              console.log(`   ❌ 失败 (${response.status}): ${url}`);
+            }
+          } catch (fetchError) {
+            console.log(`   ❌ 网络错误: ${url} - ${fetchError}`);
+          }
         }
-        const content = await response.text();
 
+        if (loaded && content.trim()) {
+          templates.push({
+            id: templateInfo.id,
+            name: templateInfo.name,
+            description: templateInfo.description,
+            type: templateInfo.type,
+            filename: templateInfo.filename,
+            isDefault: true,
+            content: content,
+            created: new Date('2024-01-01'),
+            updated: new Date('2024-01-15')
+          });
+          console.log(`✅ 模板添加成功: ${templateInfo.name}`);
+        } else {
+          console.warn(`❌ 无法加载模板: ${templateInfo.filename}`);
+          // 添加一个空模板作为占位符，避免完全失败
+          templates.push({
+            id: templateInfo.id,
+            name: templateInfo.name,
+            description: templateInfo.description + ' (模板文件加载失败)',
+            type: templateInfo.type,
+            filename: templateInfo.filename,
+            isDefault: true,
+            content: `/* 模板文件 ${templateInfo.filename} 加载失败 */\n/* 请检查 public/templates/ 文件夹 */`,
+            created: new Date('2024-01-01'),
+            updated: new Date('2024-01-15')
+          });
+        }
+      } catch (error) {
+        console.error(`❌ 加载模板时发生错误 ${templateInfo.filename}:`, error);
+        // 即使出错也添加占位符模板
         templates.push({
           id: templateInfo.id,
           name: templateInfo.name,
-          description: templateInfo.description,
+          description: templateInfo.description + ' (加载出错)',
           type: templateInfo.type,
           filename: templateInfo.filename,
           isDefault: true,
-          content: content,
+          content: `/* 模板文件 ${templateInfo.filename} 加载出错 */\n/* 错误: ${error} */`,
           created: new Date('2024-01-01'),
           updated: new Date('2024-01-15')
         });
-      } catch (error) {
-        console.warn(`Error loading template ${templateInfo.filename}:`, error);
       }
     }
 
-    console.log(`✅ 成功从 public/templates/ 文件夹加载了 ${templates.length} 个默认模板`);
+    console.log(`📋 模板加载完成: ${templates.length} 个模板 (包含 ${templates.filter(t => t.content.includes('加载失败') || t.content.includes('加载出错')).length} 个有问题的模板)`);
     return templates;
   }
 
