@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Template Test</title>
+</head>
+<body>
+    <h1>Template File Test</h1>
+    <div id="results"></div>
+    <script>
+        async function testTemplateAccess() {
+            const results = document.getElementById('results');
+            const templates = [
+                'adam%20production%20template.sas',
+                'adam%20validation%20template.sas',
+                'sdtm%20production%20template.sas',
+                'sdtm%20validation%20template.sas',
+                'tlf_dev_template_code.sas',
+                'tlf_val_template_code.sas'
+            ];
+
+            for (const template of templates) {
+                try {
+                    const response = await fetch(`/templates/${template}`);
+                    const status = response.ok ? '✅ Success' : `❌ Failed (${response.status})`;
+                    results.innerHTML += `<p>${template}: ${status}</p>`;
+                } catch (error) {
+                    results.innerHTML += `<p>${template}: ❌ Error - ${error.message}</p>`;
+                }
+            }
+        }
+
+        testTemplateAccess();
+    </script>
+</body>
+</html>
+
