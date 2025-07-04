@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Input light beam gradient (bright white) -->
+    <linearGradient id="inputBeam" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
+      <stop offset="70%" style="stop-color:#ffffff;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#f1f5f9;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Prism gradient (bright, crystalline) -->
+    <linearGradient id="prismBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e2e8f0;stop-opacity:0.9" />
+      <stop offset="50%" style="stop-color:#cbd5e1;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#94a3b8;stop-opacity:0.9" />
+    </linearGradient>
+
+    <!-- Prism highlight -->
+    <linearGradient id="prismHighlight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.2" />
+    </linearGradient>
+
+    <!-- Three output beams - representing SDTM, ADaM, TLF -->
+    <linearGradient id="sdtmBeam" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0" />
+    </linearGradient>
+
+    <linearGradient id="adamBeam" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#10b981;stop-opacity:0" />
+    </linearGradient>
+
+    <linearGradient id="tlfBeam" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:0" />
+    </linearGradient>
+
+    <!-- Glow effects -->
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="1" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="dropShadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- Background circle (very subtle) -->
+  <circle cx="60" cy="60" r="55" fill="rgba(248,250,252,0.5)" stroke="rgba(203,213,225,0.3)" stroke-width="1"/>
+
+  <!-- Input light beam (bright white light from left) -->
+  <g>
+    <!-- Main beam -->
+    <rect x="10" y="58" width="35" height="4" fill="url(#inputBeam)" filter="url(#softGlow)"/>
+    <!-- Bright core -->
+    <rect x="10" y="59" width="35" height="2" fill="rgba(255,255,255,0.9)"/>
+    <!-- Sparkle effect -->
+    <circle cx="15" cy="60" r="0.5" fill="#ffffff" opacity="0.8"/>
+    <circle cx="25" cy="60" r="0.5" fill="#ffffff" opacity="0.6"/>
+    <circle cx="35" cy="60" r="0.5" fill="#ffffff" opacity="0.4"/>
+  </g>
+
+  <!-- Main triangular prism (bright and crystalline) -->
+  <g filter="url(#dropShadow)">
+    <!-- Prism main body -->
+    <path d="M45 45 L75 60 L45 75 Z"
+          fill="url(#prismBody)"
+          stroke="rgba(255,255,255,0.6)"
+          stroke-width="1.5"/>
+
+    <!-- Prism top facet (highlight) -->
+    <path d="M45 45 L75 60 L60 52.5 Z"
+          fill="url(#prismHighlight)"/>
+
+    <!-- Prism edge lines -->
+    <path d="M45 45 L75 60 M45 75 L75 60"
+          stroke="rgba(255,255,255,0.8)"
+          stroke-width="1"/>
+
+    <!-- Inner reflection line -->
+    <path d="M50 52.5 L70 60 L50 67.5"
+          stroke="rgba(255,255,255,0.4)"
+          stroke-width="0.8"
+          fill="none"/>
+  </g>
+
+  <!-- Three output spectrum beams (SDTM, ADaM, TLF) -->
+  <g>
+    <!-- SDTM beam (Blue - representing structured data) -->
+    <g filter="url(#softGlow)">
+      <rect x="75" y="52" width="35" height="3" fill="url(#sdtmBeam)"/>
+      <rect x="75" y="52.5" width="35" height="2" fill="rgba(59,130,246,0.8)"/>
+    </g>
+
+    <!-- ADaM beam (Green - representing analysis data) -->
+    <g filter="url(#softGlow)">
+      <rect x="75" y="58.5" width="35" height="3" fill="url(#adamBeam)"/>
+      <rect x="75" y="59" width="35" height="2" fill="rgba(16,185,129,0.8)"/>
+    </g>
+
+    <!-- TLF beam (Amber - representing reports/outputs) -->
+    <g filter="url(#softGlow)">
+      <rect x="75" y="65" width="35" height="3" fill="url(#tlfBeam)"/>
+      <rect x="75" y="65.5" width="35" height="2" fill="rgba(245,158,11,0.8)"/>
+    </g>
+  </g>
+
+  <!-- Output beam sparkles -->
+  <g opacity="0.8">
+    <!-- SDTM sparkles -->
+    <circle cx="85" cy="53.5" r="1" fill="#3b82f6" opacity="0.7"/>
+    <circle cx="95" cy="53.5" r="0.8" fill="#60a5fa" opacity="0.6"/>
+    <circle cx="105" cy="53.5" r="0.6" fill="#93c5fd" opacity="0.5"/>
+
+    <!-- ADaM sparkles -->
+    <circle cx="85" cy="60" r="1" fill="#10b981" opacity="0.7"/>
+    <circle cx="95" cy="60" r="0.8" fill="#34d399" opacity="0.6"/>
+    <circle cx="105" cy="60" r="0.6" fill="#6ee7b7" opacity="0.5"/>
+
+    <!-- TLF sparkles -->
+    <circle cx="85" cy="66.5" r="1" fill="#f59e0b" opacity="0.7"/>
+    <circle cx="95" cy="66.5" r="0.8" fill="#fbbf24" opacity="0.6"/>
+    <circle cx="105" cy="66.5" r="0.6" fill="#fcd34d" opacity="0.5"/>
+  </g>
+
+  <!-- Platform labels (very subtle) -->
+  <g opacity="0.4" font-family="Arial, sans-serif" font-size="6" font-weight="500">
+    <text x="112" y="55" fill="#64748b">SDTM</text>
+    <text x="112" y="62" fill="#64748b">ADaM</text>
+    <text x="112" y="69" fill="#64748b">TLF</text>
+  </g>
+
+  <!-- PRISM brand mark -->
+  <g opacity="0.6" transform="translate(48,85)">
+    <text x="0" y="0" font-family="Arial, sans-serif" font-size="9" font-weight="bold" fill="#475569">PRISM</text>
+  </g>
+
+  <!-- Smart manufacturing elements (minimal) -->
+  <g opacity="0.3">
+    <!-- Data flow indicator -->
+    <circle cx="30" cy="35" r="1" fill="#64748b"/>
+    <circle cx="30" cy="35" r="2" fill="none" stroke="#64748b" stroke-width="0.5"/>
+
+    <!-- Processing indicator -->
+    <circle cx="90" cy="85" r="1" fill="#64748b"/>
+    <circle cx="90" cy="85" r="2" fill="none" stroke="#64748b" stroke-width="0.5"/>
+  </g>
+</svg>
