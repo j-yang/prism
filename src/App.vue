@@ -5,7 +5,7 @@
       <div class="header-content">
         <div class="logo-section">
           <div class="logo-icon">
-            <img src="/prism-logo.svg" alt="PRISM Platform Logo" width="40" height="40" />
+            <img :src="logoPath" alt="PRISM Platform Logo" width="40" height="40" />
           </div>
           <div class="title-group">
             <h1>PRISM Platform</h1>
@@ -323,6 +323,12 @@ const availableTemplates = computed(() => {
 
 // 计算属性
 const hasSelectedSheets = computed(() => selectedSheets.value.length > 0);
+
+// Logo路径计算 - 考虑生产环境的base路径
+const logoPath = computed(() => {
+  const basePath = import.meta.env.BASE_URL || '/';
+  return `${basePath}prism-logo.svg`;
+});
 
 const currentSheetData = computed(() => {
   if (!activeSheet.value) return [];
