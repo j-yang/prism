@@ -298,5 +298,5 @@ export class TemplateStorageService {
   }
 }
 
-// 导出单例实例
+// 创建单例实例
 export const templateStorage = new TemplateStorageService();

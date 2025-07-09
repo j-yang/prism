@@ -8,7 +8,7 @@
             <img :src="logoPath" alt="PRISM Logo" width="40" height="40" />
           </div>
           <div class="title-group">
-            <h1>PRISM</h1>
+            <h1 class="sparkle-text">PRISM</h1>
             <p class="subtitle">Platform for Research Infrastructure Smart Manufacturing</p>
           </div>
         </div>
@@ -41,12 +41,12 @@
     <div class="main-container">
       <!-- Generator Tab -->
       <div v-if="activeMainTab === 'home'" class="generator-view">
-        <div class="page-header">
-          <h2 class="page-title">
+        <div class="page-header glass-effect">
+          <h2 class="page-title glow-text">
             <svg class="page-icon" width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" fill="currentColor"/>
             </svg>
-            <span>Smart Manufacturing Hub</span>
+            <span class="sparkle-text">Smart Manufacturing Hub</span>
           </h2>
           <p class="page-description">Upload Excel metadata, configure templates, and manufacture standardized research programs</p>
         </div>
@@ -55,13 +55,13 @@
           <!-- Left Column -->
           <div class="left-column">
             <!-- Upload Section -->
-            <div class="section-card upload-section">
+            <div class="section-card upload-section glass-effect">
               <div class="section-header">
-                <h3 class="section-title">
+                <h3 class="section-title glow-text">
                   <svg class="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path d="M10,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V8C22,6.89 21.1,6 20,6H12L10,4Z" fill="currentColor"/>
                   </svg>
-                  <span>Upload Excel File</span>
+                  <span class="sparkle-text">Upload Excel File</span>
                 </h3>
               </div>
               <div class="section-body">
@@ -99,13 +99,13 @@
             </div>
 
             <!-- Data Preview -->
-            <div v-if="hasSelectedSheets" class="section-card data-section">
+            <div v-if="hasSelectedSheets" class="section-card data-section glass-effect">
               <div class="section-header">
-                <h3 class="section-title">
+                <h3 class="section-title glow-text">
                   <svg class="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path d="M19,3H5C3.9,3 3,3.9 3,5V19C3,20.1 3.9,21 5,21H19C20.1,21 21,20.1 21,19V5C21,3.9 20.1,3 19,3M19,19H5V5H19V19Z" fill="currentColor"/>
                   </svg>
-                  <span>Data Preview</span>
+                  <span class="sparkle-text">Data Preview</span>
                 </h3>
                 <div class="sheet-selector-container" v-if="selectedSheets.length > 1">
                   <label class="sheet-label">Current Worksheet:</label>
@@ -204,13 +204,13 @@
           <!-- Right Column -->
           <div class="right-column">
             <!-- Generation Controls -->
-            <div v-if="hasSelectedSheets" class="section-card generation-section">
+            <div v-if="hasSelectedSheets" class="section-card generation-section glass-effect">
               <div class="section-header">
-                <h3 class="section-title">
+                <h3 class="section-title glow-text">
                   <svg class="section-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
                     <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.22,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.68 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" fill="currentColor"/>
                   </svg>
-                  <span>Program Configuration</span>
+                  <span class="sparkle-text">Program Configuration</span>
                 </h3>
               </div>
 
@@ -452,10 +452,13 @@ function deselectAllSheets() {
 
 function toggleSelectAll() {
   if (isAllSelected.value) {
+    // 如果当前全选，则取消全选
     selectedDataIndices.value.clear();
   } else {
+    // 如果当前未全选，则全选所有
     selectedDataIndices.value = new Set(Array.from({ length: currentSheetData.value.length }, (_, i) => i));
   }
+  console.log('Toggle select all:', selectedDataIndices.value.size, 'items selected');
 }
 
 function toggleDataSelection(index: number) {
@@ -464,6 +467,19 @@ function toggleDataSelection(index: number) {
   } else {
     selectedDataIndices.value.add(index);
   }
+  console.log('Toggle row', index, '- Total selected:', selectedDataIndices.value.size);
+}
+
+// 添加全选所有数据的方法
+function selectAllData() {
+  selectedDataIndices.value = new Set(Array.from({ length: currentSheetData.value.length }, (_, i) => i));
+  console.log('Select all data:', selectedDataIndices.value.size, 'items selected');
+}
+
+// 添加取消全选的方法
+function deselectAllData() {
+  selectedDataIndices.value.clear();
+  console.log('Deselect all data');
 }
 
 function getProgramName(item: any) {
@@ -684,6 +700,75 @@ function onTabChange(tab: string) {
   gap: 4px;
 }
 
+/* Page title and section title effects */
+.page-title.glow-text {
+  position: relative;
+  display: inline-block;
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.page-title.glow-text::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+  transform: translate(-50%, -50%) rotate(30deg);
+  z-index: 0;
+}
+
+.page-title.glow-text span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Sparkle text effect */
+.sparkle-text {
+  color: #007bff;
+  position: relative;
+  display: inline-block;
+  font-weight: 600;
+}
+
+.sparkle-text::before,
+.sparkle-text::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
+}
+
+.sparkle-text::before {
+  transform: translate(-2px, -2px) rotate(-2deg);
+}
+
+.sparkle-text::after {
+  transform: translate(2px, 2px) rotate(2deg);
+}
+
+.sparkle-text:hover::before,
+.sparkle-text:hover::after {
+  opacity: 1;
+}
+
+/* Glassmorphism effect for cards and sections */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.5rem;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 /* Table styling for TLF data */
 .data-table {
   width: 100%;
@@ -850,5 +935,93 @@ function onTabChange(tab: string) {
     width: 20%;
     min-width: 100px;
   }
+}
+
+/* Worksheet selector styling - match template dropdown */
+.sheet-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+}
+
+.sheet-label {
+  font-size: 0.9rem;
+  color: var(--text-primary, #333);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.sheet-select {
+  width: 200px;
+  padding: 12px 16px;
+  background: var(--glass-bg-medium, rgba(255, 255, 255, 0.1));
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.2));
+  border-radius: 12px;
+  color: var(--text-primary, #333);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  text-shadow: var(--text-shadow-light, 0 1px 2px rgba(0, 0, 0, 0.1));
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+.sheet-select:focus {
+  outline: none;
+  border-color: var(--prism-indigo, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  background: var(--surface-2, rgba(255, 255, 255, 0.15));
+}
+
+.sheet-select option {
+  background: var(--bg-surface, #ffffff);
+  color: var(--text-primary, #333);
+  padding: 10px;
+  border: none;
+}
+
+/* Form select styling for template dropdown to ensure consistency */
+.form-select {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--glass-bg-medium, rgba(255, 255, 255, 0.1));
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.2));
+  border-radius: 12px;
+  color: var(--text-primary, #333);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  text-shadow: var(--text-shadow-light, 0 1px 2px rgba(0, 0, 0, 0.1));
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--prism-indigo, #6366f1);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  background: var(--surface-2, rgba(255, 255, 255, 0.15));
+}
+
+.form-select option {
+  background: var(--bg-surface, #ffffff);
+  color: var(--text-primary, #333);
+  padding: 10px;
+  border: none;
 }
 </style>
