@@ -105,7 +105,7 @@ const onKeyUp = (event: KeyboardEvent) => {
   }
 };
 
-// 插入文本
+// 插入文��
 const insertText = (text: string) => {
   const textarea = textareaRef.value!;
   const start = textarea.selectionStart;
@@ -196,107 +196,262 @@ watch(() => props.modelValue, (newValue) => {
   position: relative;
   width: 100%;
   height: 100%;
-  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
-  font-size: 14px;
-  line-height: 1.5;
-  border-radius: 8px;
+  background: var(--glass-bg-medium);
+  border-radius: 16px;
+  border: 1px solid var(--glass-border-bright);
   overflow: hidden;
-  background: #fafafa;
+  box-shadow: var(--glass-shadow-strong);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  transition: all 0.3s ease;
+}
+
+.sas-code-editor::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--rainbow-gradient);
+  opacity: 0.8;
+  z-index: 1;
+  border-radius: 16px 16px 0 0;
+}
+
+.sas-code-editor::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(139, 92, 246, 0.1),
+    rgba(99, 102, 241, 0.12),
+    rgba(59, 130, 246, 0.1),
+    rgba(6, 182, 212, 0.12),
+    rgba(20, 184, 166, 0.1),
+    transparent);
+  transition: left 1s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.sas-code-editor:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow:
+    var(--glass-shadow-strong),
+    0 0 30px rgba(99, 102, 241, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.sas-code-editor:hover::after {
+  left: 100%;
 }
 
 .code-textarea {
   width: 100%;
-  height: 100%;
-  padding: 20px;
-  margin: 0;
+  height: calc(100% - 50px);
   border: none;
   outline: none;
+  padding: 20px;
+  font-family: 'JetBrains Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text-primary);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   resize: none;
-  background: #fafafa;
-  color: #2d3748;
-  font-family: inherit;
-  font-size: inherit;
-  line-height: inherit;
-  white-space: pre;
-  word-wrap: break-word;
-  overflow: auto;
-  box-sizing: border-box;
   tab-size: 4;
-  -moz-tab-size: 4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+  border-radius: 0 0 16px 16px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
 }
 
 .code-textarea:focus {
-  background: #ffffff;
-  box-shadow: inset 0 0 0 2px rgba(102, 126, 234, 0.2);
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow:
+    inset 0 0 0 2px rgba(99, 102, 241, 0.4),
+    inset 0 4px 8px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(99, 102, 241, 0.2);
+  color: var(--text-light);
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.9),
+    0 0 10px rgba(99, 102, 241, 0.3);
 }
 
-/* 代码信息面板 */
+.code-textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  font-style: italic;
+}
+
+.code-textarea::selection {
+  background: rgba(99, 102, 241, 0.3);
+  color: var(--text-light);
+}
+
 .code-info {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
-  right: 10px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: var(--surface-3);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-top: 1px solid var(--border-glass-bright);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  font-size: 12px;
-  z-index: 10;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 3;
+  border-radius: 0 0 16px 16px;
+}
+
+.code-info::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--accent-gradient);
+  opacity: 0.6;
 }
 
 .line-count,
 .char-count {
-  color: #4a5568;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-shadow: var(--text-shadow-light);
+  transition: all 0.3s ease;
+}
+
+.line-count:hover,
+.char-count:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-light);
+  transform: scale(1.05);
 }
 
 .sas-indicator {
-  font-weight: 500;
-  color: #007bff;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  font-weight: 700;
+  padding: 8px 16px;
+  background: var(--accent-gradient);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 4px 12px rgba(6, 182, 212, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  animation: pulse 2s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
 }
 
-/* 滚动条样式 */
+.sas-indicator::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent);
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* SAS语法高亮效果 */
+.code-textarea:focus {
+  /* 模拟基本的SAS关键词高亮 */
+  background:
+    linear-gradient(transparent, transparent),
+    rgba(0, 0, 0, 0.3);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .code-textarea {
+    font-size: 13px;
+    padding: 16px;
+  }
+
+  .code-info {
+    height: 45px;
+    padding: 0 16px;
+  }
+
+  .line-count,
+  .char-count,
+  .sas-indicator {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+}
+
+/* 暗色主题专属优化 */
+@media (prefers-color-scheme: dark) {
+  .code-textarea {
+    background: rgba(0, 0, 0, 0.4);
+    color: #f8fafc;
+  }
+
+  .code-textarea:focus {
+    background: rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+  }
+}
+
+/* 键盘导航优化 */
+.code-textarea:focus-visible {
+  outline: 3px solid rgba(99, 102, 241, 0.6);
+  outline-offset: 2px;
+}
+
+/* 滚动条样式 - Webkit */
 .code-textarea::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 .code-textarea::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
-}
-
-.code-textarea::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 4px;
 }
 
+.code-textarea::-webkit-scrollbar-thumb {
+  background: var(--accent-gradient);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .code-textarea::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--primary-gradient);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
 }
 
-.code-textarea::placeholder {
-  color: #a0aec0;
-  font-style: italic;
-}
-
-/* 选中文本样式 */
-.code-textarea::selection {
-  background: rgba(102, 126, 234, 0.3);
-}
-
-/* 微妙的网格背景 */
+/* Firefox滚动条 */
 .code-textarea {
-  background-image:
-    linear-gradient(rgba(102, 126, 234, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(102, 126, 234, 0.03) 1px, transparent 1px);
-  background-size: 20px 20px;
-  background-position: 19px 19px;
-}
-
-.code-textarea:focus {
-  background-image: none;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(6, 182, 212, 0.6) rgba(0, 0, 0, 0.2);
 }
 </style>
