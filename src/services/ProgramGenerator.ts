@@ -43,21 +43,48 @@ export default class ProgramGenerator {
             let JSZip: any;
             let saveAs: any;
 
+            // Try to load JSZip
             try {
-                JSZip = (await import('jszip')).default;
-                console.log('JSZip loaded successfully');
+                // 首先尝试从npm包导入
+                try {
+                    const jszipModule = await import('jszip');
+                    JSZip = jszipModule.default || jszipModule;
+                    console.log('JSZip loaded from npm package');
+                } catch (npmError) {
+                    console.log('npm package failed, loading JSZip from CDN...', npmError);
+                    // 如果npm包不可用，从CDN动态加载
+                    await this.loadScriptFromCDN('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+                    JSZip = (window as any).JSZip;
+                    if (!JSZip) {
+                        throw new Error('JSZip failed to load from CDN');
+                    }
+                    console.log('JSZip loaded from CDN successfully');
+                }
             } catch (error) {
                 console.error('Failed to load JSZip:', error);
-                throw new Error('JSZip library not available');
+                throw new Error('JSZip library not available. Please check your internet connection or install it locally: npm install jszip');
             }
 
+            // Try to load file-saver
             try {
-                const fileSaver = await import('file-saver');
-                saveAs = fileSaver.saveAs;
-                console.log('file-saver loaded successfully');
+                // 首先尝试从npm包导入
+                try {
+                    const fileSaverModule = await import('file-saver');
+                    saveAs = fileSaverModule.saveAs || fileSaverModule.default?.saveAs;
+                    console.log('file-saver loaded from npm package');
+                } catch (npmError) {
+                    console.log('npm package failed, loading FileSaver from CDN...', npmError);
+                    // 如果npm包不可用，从CDN动态加载
+                    await this.loadScriptFromCDN('https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js');
+                    saveAs = (window as any).saveAs;
+                    if (!saveAs) {
+                        throw new Error('FileSaver failed to load from CDN');
+                    }
+                    console.log('FileSaver loaded from CDN successfully');
+                }
             } catch (error) {
                 console.error('Failed to load file-saver:', error);
-                throw new Error('file-saver library not available');
+                throw new Error('file-saver library not available. Please check your internet connection or install it locally: npm install file-saver');
             }
 
             // Create ZIP file
@@ -394,7 +421,7 @@ export default class ProgramGenerator {
                 }
             }
         } else {
-            // 标准ADAM：生成通用描述
+            // 标准ADAM：生成通用���述
             const action = outputType === 'Production' ? 'Create' : 'Validate';
             const domainName = item.domain.toUpperCase();
             return `${action} ${domainName} dataset`;
@@ -512,5 +539,31 @@ run;
         }
         // 普通数据或TLF数据缺少字段时，返回domain
         return item.domain || '-';
+    }
+
+    /**
+     * 从CDN加载脚本
+     */
+    private loadScriptFromCDN(url: string): Promise<void> {
+        return new Promise((resolve, reject) => {
+            // 检查是否已经加载过
+            const existingScript = document.querySelector(`script[src="${url}"]`);
+            if (existingScript) {
+                resolve();
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = url;
+            script.onload = () => {
+                console.log(`Script loaded successfully from: ${url}`);
+                resolve();
+            };
+            script.onerror = (error) => {
+                console.error(`Failed to load script from: ${url}`, error);
+                reject(new Error(`Failed to load script from CDN: ${url}`));
+            };
+            document.head.appendChild(script);
+        });
     }
 }
