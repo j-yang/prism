@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRISM 服务器文件浏览器演示</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .header h1 {
+            color: #4f46e5;
+            font-size: 2.5rem;
+            margin: 0;
+            background: linear-gradient(45deg, #4f46e5, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header p {
+            color: #6b7280;
+            font-size: 1.1rem;
+            margin: 10px 0;
+        }
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        .feature-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+        .feature-card h3 {
+            color: #4f46e5;
+            margin-top: 0;
+            font-size: 1.3rem;
+        }
+        .feature-card ul {
+            padding-left: 20px;
+        }
+        .feature-card li {
+            margin: 8px 0;
+            color: #555;
+        }
+        .demo-section {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        .demo-section h2 {
+            color: #4f46e5;
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+        .step {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-left: 4px solid #4f46e5;
+            border-radius: 8px;
+        }
+        .step-number {
+            display: inline-block;
+            width: 25px;
+            height: 25px;
+            background: #4f46e5;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 14px;
+            line-height: 25px;
+        }
+        .code-block {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        .highlight {
+            background: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .warning {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .file-structure {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .btn {
+            background: #4f46e5;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px 10px 10px 0;
+        }
+        .btn:hover {
+            background: #3730a3;
+        }
+        .btn-secondary {
+            background: #6b7280;
+        }
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🌟 PRISM 服务器文件浏览器</h1>
+        <p>类似 WinSCP 的网页文件管理工具</p>
+        <p>在您的网页应用中实现服务器文件浏览、上传和管理功能</p>
+    </div>
+
+    <div class="features">
+        <div class="feature-card">
+            <h3>🔐 服务器连接</h3>
+            <ul>
+                <li>支持 SFTP 和 FTP 协议</li>
+                <li>安全的用户认证</li>
+                <li>连接状态管理</li>
+                <li>自动重连机制</li>
+            </ul>
+        </div>
+        <div class="feature-card">
+            <h3>📁 文件浏览</h3>
+            <ul>
+                <li>类似 Windows 资源管理器的界面</li>
+                <li>文件和文件夹图标识别</li>
+                <li>面包屑导航</li>
+                <li>文件大小和修改时间显示</li>
+            </ul>
+        </div>
+        <div class="feature-card">
+            <h3>📤 文件上传</h3>
+            <ul>
+                <li>拖拽上传支持</li>
+                <li>多文件同时上传</li>
+                <li>上传进度显示</li>
+                <li>错误处理和重试</li>
+            </ul>
+        </div>
+        <div class="feature-card">
+            <h3>🛠️ 文件管理</h3>
+            <ul>
+                <li>创建新文件夹</li>
+                <li>删除文件和文件夹</li>
+                <li>文件下载</li>
+                <li>文件操作历史</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>📋 使用说明</h2>
+
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>启动应用</strong>
+            <div class="code-block">npm run dev</div>
+            <p>在浏览器中打开 <span class="highlight">http://localhost:5173</span></p>
+        </div>
+
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>切换到文件浏览器</strong>
+            <p>点击顶部导航栏的 <span class="highlight">"File Browser"</span> 标签</p>
+        </div>
+
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>连接服务器</strong>
+            <p>填写服务器连接信息：</p>
+            <ul>
+                <li><strong>协议：</strong>选择 SFTP 或 FTP</li>
+                <li><strong>主机：</strong>服务器IP地址或域名</li>
+                <li><strong>端口：</strong>默认22（SFTP）或21（FTP）</li>
+                <li><strong>用户名：</strong>您的服务器用户名</li>
+                <li><strong>密码：</strong>您的服务器密码</li>
+            </ul>
+            <p>点击"连接"按钮建立连接</p>
+        </div>
+
+        <div class="step">
+            <span class="step-number">4</span>
+            <strong>浏览文件</strong>
+            <p>连接成功后，您可以：</p>
+            <ul>
+                <li>双击文件夹进入子目录</li>
+                <li>使用面包屑导航快速跳转</li>
+                <li>查看文件详细信息</li>
+                <li>选择多个文件进行操作</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <span class="step-number">5</span>
+            <strong>上传程序文件</strong>
+            <p>将生成的 SAS 程序上传到服务器：</p>
+            <ul>
+                <li>拖拽文件到上传区域</li>
+                <li>或点击"选择文件"按钮</li>
+                <li>查看上传进度</li>
+                <li>确认上传成功</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>🏗️ 模拟服务器文件系统</h2>
+        <p>为了演示功能，我们创建了一个模拟的服务器文件系统结构：</p>
+
+        <div class="file-structure">
+/
+├── home/
+│   ├── sasuser/
+│   │   ├── programs/
+│   │   │   ├── sdtm/
+│   │   │   │   ├── production/
+│   │   │   │   └── validation/
+│   │   │   ├── adam/
+│   │   │   └── tlf/
+│   │   ├── data/
+│   │   └── output/
+│   └── projects/
+├── var/
+└── tmp/
+        </div>
+
+        <div class="info">
+            <strong>提示：</strong> 这个结构模拟了典型的 SAS 程序开发环境，您可以将生成的程序上传到相应的文件夹中。
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>⚙️ 技术实现</h2>
+
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>服务器文件管理器</strong>
+            <p>核心服务类 <code>ServerFileManager</code> 处理所有文件操作：</p>
+            <ul>
+                <li>连接管理</li>
+                <li>文件列表获取</li>
+                <li>文件上传下载</li>
+                <li>目录操作</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>Vue 组件</strong>
+            <p><code>ServerFileBrowser.vue</code> 提供用户界面：</p>
+            <ul>
+                <li>响应式设计</li>
+                <li>实时状态更新</li>
+                <li>拖拽支持</li>
+                <li>错误处理</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>模拟 API 服务</strong>
+            <p><code>MockServerAPI.ts</code> 模拟后端功能：</p>
+            <ul>
+                <li>文件系统模拟</li>
+                <li>API 请求拦截</li>
+                <li>异步操作处理</li>
+                <li>错误模拟</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h2>🚀 生产环境部署</h2>
+
+        <div class="warning">
+            <strong>重要提醒：</strong> 当前实现使用模拟服务器进行演示。在生产环境中，您需要实现真实的后端服务。
+        </div>
+
+        <div class="step">
+            <span class="step-number">1</span>
+            <strong>后端服务器</strong>
+            <p>创建支持以下功能的后端 API：</p>
+            <ul>
+                <li>SFTP/FTP 连接管理</li>
+                <li>文件系统操作</li>
+                <li>用户认证和授权</li>
+                <li>文件上传下载处理</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <span class="step-number">2</span>
+            <strong>安全配置</strong>
+            <p>确保以下安全措施：</p>
+            <ul>
+                <li>HTTPS 加密传输</li>
+                <li>CORS 策略配置</li>
+                <li>文件类型限制</li>
+                <li>访问权限控制</li>
+            </ul>
+        </div>
+
+        <div class="step">
+            <span class="step-number">3</span>
+            <strong>性能优化</strong>
+            <p>考虑以下优化策略：</p>
+            <ul>
+                <li>文件分片上传</li>
+                <li>断点续传</li>
+                <li>连接池管理</li>
+                <li>缓存策略</li>
+            </ul>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="http://localhost:5173" class="btn">🎯 开始使用</a>
+        <a href="https://github.com/your-repo" class="btn btn-secondary">📚 查看源码</a>
+    </div>
+</body>
+</html>

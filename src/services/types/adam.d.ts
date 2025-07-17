@@ -11,6 +11,10 @@ export interface ADaMItem {
     outputNumber?: string;
     outputTitle?: string;
     outputName?: string; // 新增：直接来自Excel的Output Name字段
+    // 引用模板支持
+    useReferenceTemplate?: boolean;
+    referenceTemplatePath?: string;
+    referenceTemplateContent?: string;
 }
 
 export type OutputType = 'Production' | 'Validation';

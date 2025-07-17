@@ -8,6 +8,48 @@ export default class ProgramGenerator {
         console.log('Template set successfully:', content.length, 'characters');
     }
 
+    // 新增：为单个项目生成代码，支持引用模板
+    generateCode(item: ADaMItem, outputType: OutputType): string {
+        // 如果使用引用模板且有引用模板内容，使用引用模板
+        if (item.useReferenceTemplate && item.referenceTemplateContent) {
+            console.log(`Using reference template for ${item.domain}`);
+            return this.processTemplate(item.referenceTemplateContent, item, outputType);
+        }
+
+        // 否则使用通用模板
+        console.log(`Using general template for ${item.domain}`);
+        return this.processTemplate(this.currentTemplate, item, outputType);
+    }
+
+    private processTemplate(template: string, item: ADaMItem, outputType: OutputType): string {
+        let result = template;
+
+        // 基本替换
+        const programmer = outputType === 'Production' ? item.prodProgrammer : item.valProgrammer;
+        const programName = this.getFileName(item, outputType).replace('.sas', '');
+
+        result = result.replace(/@@program_name/g, programName);
+        result = result.replace(/@@author/g, programmer || 'Unknown');
+        result = result.replace(/@@date/g, new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        }));
+
+        // 根据数据类型进行特定替换
+        if (item.hasTitle) {
+            // TLF数据的替换
+            result = result.replace(/@@purpose/g, item.title || item.outputTitle || `Generate ${item.outputType} ${item.outputNumber}`);
+            result = result.replace(/@@output/g, item.outputName || `${item.outputType}_${item.outputNumber}.rtf`);
+        } else {
+            // 普通ADaM数据的替换
+            result = result.replace(/@@purpose/g, `Create ${item.domain.toUpperCase()} dataset`);
+            result = result.replace(/@@output/g, `${item.domain.toLowerCase()}.xpt`);
+        }
+
+        return result;
+    }
+
     getFileName(item: ADaMItem, outputType: OutputType): string {
         // 对于TLF数据，使用Excel中的Program Name或QC Program
         if (item.hasTitle) {
@@ -23,176 +65,6 @@ export default class ProgramGenerator {
                 ? `${item.domain.toLowerCase()}.sas`
                 : `v_${item.domain.toLowerCase()}.sas`;
         }
-    }
-
-    async generateZip(
-        items: ADaMItem[],
-        outputType: OutputType,
-        customZipName?: string, // 新增自定义ZIP名称参数
-        onProgress?: (percent: number) => void
-    ): Promise<void> {
-        console.log('=== Starting ZIP generation ===');
-        console.log('Items to process:', items.length);
-        console.log('Output type:', outputType);
-
-        try {
-            // Test if we have the required dependencies
-            console.log('Loading dependencies...');
-
-            // Import dependencies with error handling
-            let JSZip: any;
-            let saveAs: any;
-
-            // Try to load JSZip
-            try {
-                // 首先尝试从npm包导入
-                try {
-                    const jszipModule = await import('jszip');
-                    JSZip = jszipModule.default || jszipModule;
-                    console.log('JSZip loaded from npm package');
-                } catch (npmError) {
-                    console.log('npm package failed, loading JSZip from CDN...', npmError);
-                    // 如果npm包不可用，从CDN动态加载
-                    await this.loadScriptFromCDN('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
-                    JSZip = (window as any).JSZip;
-                    if (!JSZip) {
-                        throw new Error('JSZip failed to load from CDN');
-                    }
-                    console.log('JSZip loaded from CDN successfully');
-                }
-            } catch (error) {
-                console.error('Failed to load JSZip:', error);
-                throw new Error('JSZip library not available. Please check your internet connection or install it locally: npm install jszip');
-            }
-
-            // Try to load file-saver
-            try {
-                // 首先尝试从npm包导入
-                try {
-                    const fileSaverModule = await import('file-saver');
-                    saveAs = fileSaverModule.saveAs || fileSaverModule.default?.saveAs;
-                    console.log('file-saver loaded from npm package');
-                } catch (npmError) {
-                    console.log('npm package failed, loading FileSaver from CDN...', npmError);
-                    // 如果npm包不可用，从CDN动态加载
-                    await this.loadScriptFromCDN('https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js');
-                    saveAs = (window as any).saveAs;
-                    if (!saveAs) {
-                        throw new Error('FileSaver failed to load from CDN');
-                    }
-                    console.log('FileSaver loaded from CDN successfully');
-                }
-            } catch (error) {
-                console.error('Failed to load file-saver:', error);
-                throw new Error('file-saver library not available. Please check your internet connection or install it locally: npm install file-saver');
-            }
-
-            // Create ZIP file
-            console.log('Creating ZIP archive...');
-            const zip = new JSZip();
-
-            // 使用自定义名称或默认名称作为文件夹名
-            const folderName = customZipName || `ADaM_Programs_${outputType}`;
-            const programsFolder = zip.folder(folderName);
-            if (!programsFolder) {
-                throw new Error('Failed to create programs folder');
-            }
-
-            // Generate files for each item
-            console.log('Generating program files...');
-            items.forEach((item, index) => {
-                try {
-                    const content = this.generateFileContent(item, outputType, items); // 传递所有items
-                    const fileName = this.getFileName(item, outputType);
-
-                    console.log(`Creating file ${index + 1}/${items.length}: ${fileName}`);
-                    console.log(`File content preview: ${content.substring(0, 100)}...`);
-
-                    programsFolder.file(fileName, content);
-
-                    // Update progress
-                    if (onProgress) {
-                        const progressPercent = Math.round(((index + 1) / items.length) * 50);
-                        onProgress(progressPercent);
-                    }
-                } catch (error) {
-                    console.error(`Error creating file for ${item.domain}:`, error);
-                }
-            });
-
-            console.log('All files added to ZIP. Generating blob...');
-
-            // Generate ZIP blob
-            const zipBlob = await zip.generateAsync({
-                type: 'blob',
-                compression: 'DEFLATE',
-                compressionOptions: {
-                    level: 6
-                }
-            }, (metadata) => {
-                const progressPercent = 50 + Math.round(metadata.percent / 2);
-                console.log(`ZIP generation progress: ${metadata.percent}% (${progressPercent}% total)`);
-                if (onProgress) {
-                    onProgress(progressPercent);
-                }
-            });
-
-            // Create filename with timestamp
-            const timestamp = new Date().toISOString().slice(0, 10);
-            const fileName = customZipName
-                ? (customZipName.endsWith('.zip') ? customZipName : `${customZipName}.zip`)
-                : `ADaM_Programs_${outputType}_${timestamp}.zip`;
-
-            console.log('ZIP blob created successfully');
-            console.log('Blob size:', zipBlob.size, 'bytes');
-            console.log('Starting download:', fileName);
-
-            // Trigger download
-            saveAs(zipBlob, fileName);
-
-            // Final progress update
-            if (onProgress) {
-                onProgress(100);
-            }
-
-            console.log('=== ZIP generation completed successfully ===');
-
-            // Additional verification
-            setTimeout(() => {
-                console.log('Download should have started. Check your browser downloads.');
-            }, 1000);
-
-        } catch (error) {
-            console.error('=== ZIP generation failed ===');
-            console.error('Error details:', error);
-            console.error('Error stack:', (error as Error).stack);
-            throw new Error(`Failed to generate ZIP file: ${(error as Error).message}`);
-        }
-    }
-
-    private generateFileContent(item: ADaMItem, outputType: OutputType, allItems?: ADaMItem[]): string {
-        let template = this.currentTemplate;
-
-        // Use default template if none provided
-        if (!template) {
-            console.log(`Using default ${outputType} template for ${item.domain}`);
-            template = outputType === 'Production'
-                ? this.getDefaultProductionTemplate()
-                : this.getDefaultValidationTemplate();
-        }
-
-        // 创建完整的占位符替换映射
-        const replacements = this.createReplacementMap(item, outputType, allItems);
-
-        // 替换所有占位符
-        let replacedContent = template;
-        for (const [placeholder, value] of Object.entries(replacements)) {
-            const regex = new RegExp(`@@${placeholder}`, 'g');
-            replacedContent = replacedContent.replace(regex, value);
-        }
-
-        console.log(`Generated content for ${item.domain}: ${replacedContent.length} characters`);
-        return replacedContent;
     }
 
     /**
@@ -565,5 +437,133 @@ run;
             };
             document.head.appendChild(script);
         });
+    }
+
+    // 新增：生成单独的文件（不打包成ZIP），用于上传到服务器
+    async generateFiles(
+        items: ADaMItem[],
+        outputType: OutputType,
+        onProgress?: (percent: number) => void
+    ): Promise<{ name: string; content: string }[]> {
+        console.log('=== Starting files generation ===');
+        console.log('Items to process:', items.length);
+        console.log('Output type:', outputType);
+
+        const files: { name: string; content: string }[] = [];
+
+        try {
+            // 生成所有文件
+            items.forEach((item, index) => {
+                try {
+                    const content = this.generateCode(item, outputType);
+                    const fileName = this.getFileName(item, outputType);
+
+                    console.log(`Creating file ${index + 1}/${items.length}: ${fileName}`);
+                    files.push({
+                        name: fileName,
+                        content: content
+                    });
+
+                    if (onProgress) {
+                        const progressPercent = Math.round(((index + 1) / items.length) * 100);
+                        onProgress(progressPercent);
+                    }
+                } catch (error) {
+                    console.error(`Error creating file for ${item.domain}:`, error);
+                }
+            });
+
+            console.log(`Generated ${files.length} files successfully`);
+            return files;
+
+        } catch (error) {
+            console.error('Files generation failed:', error);
+            throw new Error(`Failed to generate files: ${(error as Error).message}`);
+        }
+    }
+
+    async generateZip(
+        items: ADaMItem[],
+        outputType: OutputType,
+        customZipName?: string,
+        onProgress?: (percent: number) => void
+    ): Promise<void> {
+        console.log('=== Starting ZIP generation ===');
+        console.log('Items to process:', items.length);
+        console.log('Output type:', outputType);
+
+        try {
+            // Load dependencies
+            console.log('Loading dependencies...');
+            let JSZip: any;
+            let saveAs: any;
+
+            try {
+                const jszipModule = await import('jszip');
+                JSZip = jszipModule.default || jszipModule;
+                console.log('JSZip loaded from npm package');
+            } catch (npmError) {
+                console.log('Loading JSZip from CDN...');
+                await this.loadScriptFromCDN('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js');
+                JSZip = (window as any).JSZip;
+                if (!JSZip) throw new Error('JSZip failed to load from CDN');
+            }
+
+            try {
+                const fileSaverModule = await import('file-saver');
+                saveAs = fileSaverModule.saveAs || fileSaverModule.default?.saveAs;
+            } catch (npmError) {
+                await this.loadScriptFromCDN('https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js');
+                saveAs = (window as any).saveAs;
+                if (!saveAs) throw new Error('FileSaver failed to load from CDN');
+            }
+
+            // Create ZIP file
+            const zip = new JSZip();
+            const folderName = customZipName || `ADaM_Programs_${outputType}`;
+            const programsFolder = zip.folder(folderName);
+            if (!programsFolder) throw new Error('Failed to create programs folder');
+
+            // Generate files using the new generateCode method
+            items.forEach((item, index) => {
+                try {
+                    const content = this.generateCode(item, outputType);
+                    const fileName = this.getFileName(item, outputType);
+
+                    console.log(`Creating file ${index + 1}/${items.length}: ${fileName}`);
+                    programsFolder.file(fileName, content);
+
+                    if (onProgress) {
+                        const progressPercent = Math.round(((index + 1) / items.length) * 50);
+                        onProgress(progressPercent);
+                    }
+                } catch (error) {
+                    console.error(`Error creating file for ${item.domain}:`, error);
+                }
+            });
+
+            // Generate ZIP blob
+            const zipBlob = await zip.generateAsync({
+                type: 'blob',
+                compression: 'DEFLATE',
+                compressionOptions: { level: 6 }
+            }, (metadata) => {
+                const progressPercent = 50 + Math.round(metadata.percent / 2);
+                if (onProgress) onProgress(progressPercent);
+            });
+
+            // Download
+            const timestamp = new Date().toISOString().slice(0, 10);
+            const fileName = customZipName
+                ? (customZipName.endsWith('.zip') ? customZipName : `${customZipName}.zip`)
+                : `ADaM_Programs_${outputType}_${timestamp}.zip`;
+
+            saveAs(zipBlob, fileName);
+            if (onProgress) onProgress(100);
+
+        } catch (error) {
+            console.error('ZIP generation failed:', error);
+            throw new Error(`Failed to generate ZIP file: ${(error as Error).message}`);
+        }
     }
 }

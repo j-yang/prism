@@ -25,6 +25,14 @@ export default defineConfig({
     // 确保静态文件正确服务
     fs: {
       strict: false
+    },
+    // 添加代理配置
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        secure: false
+      }
     }
   },
   // 确保public文件夹内容正确暴露
