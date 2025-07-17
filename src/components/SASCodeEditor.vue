@@ -151,7 +151,7 @@ const toggleComment = () => {
       const uncommented = selectedText.substring(2, selectedText.length - 2);
       localContent.value = localContent.value.substring(0, start) + uncommented + localContent.value.substring(end);
     } else {
-      // 添加注释
+      // ���加注释
       const commented = `/*${selectedText}*/`;
       localContent.value = localContent.value.substring(0, start) + commented + localContent.value.substring(end);
     }
@@ -196,13 +196,11 @@ watch(() => props.modelValue, (newValue) => {
   position: relative;
   width: 100%;
   height: 100%;
-  background: var(--glass-bg-medium);
+  background: #1a1a1a; /* 改为黑色背景 */
   border-radius: 16px;
-  border: 1px solid var(--glass-border-bright);
+  border: 1px solid rgba(99, 102, 241, 0.3);
   overflow: hidden;
-  box-shadow: var(--glass-shadow-strong);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
 }
 
@@ -261,9 +259,9 @@ watch(() => props.modelValue, (newValue) => {
   font-family: 'JetBrains Mono', 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 14px;
   line-height: 1.6;
-  background: rgba(0, 0, 0, 0.2);
-  color: var(--text-primary);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  background: #000000; /* 纯黑色背景 */
+  color: #e5e7eb; /* 浅灰色文字 */
+  text-shadow: none;
   resize: none;
   tab-size: 4;
   white-space: pre-wrap;
@@ -272,32 +270,29 @@ watch(() => props.modelValue, (newValue) => {
   position: relative;
   z-index: 2;
   border-radius: 0 0 16px 16px;
-  font-weight: 500;
+  font-weight: 400;
   letter-spacing: 0.3px;
 }
 
 .code-textarea:focus {
-  background: rgba(0, 0, 0, 0.3);
+  background: #000000; /* 保持黑色背景 */
   box-shadow:
     inset 0 0 0 2px rgba(99, 102, 241, 0.4),
-    inset 0 4px 8px rgba(0, 0, 0, 0.3),
     0 0 20px rgba(99, 102, 241, 0.2);
-  color: var(--text-light);
-  text-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.9),
-    0 0 10px rgba(99, 102, 241, 0.3);
+  color: #ffffff; /* 聚焦时文字���亮 */
+  text-shadow: none;
 }
 
 .code-textarea::placeholder {
-  color: var(--text-muted);
-  opacity: 0.7;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  color: #6b7280; /* 中性灰色 */
+  opacity: 0.8;
+  text-shadow: none;
   font-style: italic;
 }
 
 .code-textarea::selection {
-  background: rgba(99, 102, 241, 0.3);
-  color: var(--text-light);
+  background: rgba(99, 102, 241, 0.4);
+  color: #ffffff;
 }
 
 .code-info {
@@ -306,10 +301,8 @@ watch(() => props.modelValue, (newValue) => {
   left: 0;
   right: 0;
   height: 50px;
-  background: var(--surface-3);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border-top: 1px solid var(--border-glass-bright);
+  background: #1f1f1f; /* 深灰色底部信息栏 */
+  border-top: 1px solid rgba(99, 102, 241, 0.2);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -338,7 +331,7 @@ watch(() => props.modelValue, (newValue) => {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  text-shadow: var(--text-shadow-light);
+  text-shadow: none; /* Remove shadow */
   transition: all 0.3s ease;
 }
 
@@ -360,7 +353,7 @@ watch(() => props.modelValue, (newValue) => {
   box-shadow:
     0 4px 12px rgba(6, 182, 212, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  text-shadow: none; /* Remove heavy shadow */
   animation: pulse 2s ease-in-out infinite;
   position: relative;
   overflow: hidden;

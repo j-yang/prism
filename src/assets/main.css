@@ -3,111 +3,91 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&display=swap');
 
 :root {
-  /* PRISM 棱镜光谱配色方案 - 增强版 */
-  --prism-violet: #8b5cf6;
-  --prism-indigo: #6366f1;
-  --prism-blue: #3b82f6;
-  --prism-cyan: #06b6d4;
-  --prism-teal: #14b8a6;
-  --prism-emerald: #10b981;
-  --prism-green: #22c55e;
-  --prism-lime: #84cc16;
-  --prism-yellow: #eab308;
-  --prism-amber: #f59e0b;
-  --prism-orange: #f97316;
-  --prism-red: #ef4444;
-  --prism-rose: #f43f5e;
-  --prism-pink: #ec4899;
+  /* 素雅配色方案 - 专业简约 */
+  --prism-primary: #475569;      /* 深灰蓝 - 主色调 */
+  --prism-secondary: #64748b;    /* 中性灰 */
+  --prism-accent: #334155;       /* 深灰 - 强调色 */
+  --prism-success: #059669;      /* 深绿色 */
+  --prism-warning: #d97706;      /* 深橙色 */
+  --prism-danger: #dc2626;       /* 深红色 */
 
-  /* 主要渐变 - 模拟光谱折射 */
+  /* 素雅色彩 */
+  --prism-cyan: #0891b2;         /* 深青色 */
+  --prism-blue: #1e40af;         /* 深蓝色 */
+  --prism-indigo: #4338ca;       /* 深靛蓝 */
+  --prism-teal: #0f766e;         /* 深青绿色 */
+  --prism-emerald: #047857;      /* 深翠绿色 */
+
+  /* 简洁渐变 - 低调优雅 */
   --primary-gradient: linear-gradient(135deg,
-    var(--prism-violet) 0%,
-    var(--prism-indigo) 15%,
-    var(--prism-blue) 30%,
-    var(--prism-cyan) 45%,
-    var(--prism-teal) 60%,
-    var(--prism-emerald) 75%,
-    var(--prism-green) 90%,
-    var(--prism-lime) 100%);
-
-  --secondary-gradient: linear-gradient(135deg,
-    var(--prism-pink) 0%,
-    var(--prism-rose) 20%,
-    var(--prism-red) 40%,
-    var(--prism-orange) 60%,
-    var(--prism-amber) 80%,
-    var(--prism-yellow) 100%);
+    #f8fafc 0%,
+    #f1f5f9 100%);
 
   --accent-gradient: linear-gradient(135deg,
-    var(--prism-cyan) 0%,
-    var(--prism-teal) 33%,
-    var(--prism-emerald) 66%,
-    var(--prism-green) 100%);
+    var(--prism-primary) 0%,
+    var(--prism-secondary) 100%);
+
+  --surface-gradient: linear-gradient(135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(248, 250, 252, 0.9) 100%);
+
+  --secondary-gradient: linear-gradient(135deg,
+    var(--prism-secondary) 0%,
+    var(--prism-primary) 100%);
 
   --rainbow-gradient: linear-gradient(90deg,
-    var(--prism-violet) 0%,
-    var(--prism-indigo) 14%,
-    var(--prism-blue) 28%,
-    var(--prism-cyan) 42%,
-    var(--prism-teal) 57%,
-    var(--prism-green) 71%,
-    var(--prism-yellow) 85%,
-    var(--prism-orange) 100%);
+    var(--prism-primary) 0%,
+    var(--prism-secondary) 50%,
+    var(--prism-accent) 100%);
 
-  /* 背景 - 更深的棱镜环境 */
-  --bg-primary: #0a0a12;
-  --bg-secondary: #111121;
-  --bg-tertiary: #1a1a2e;
-  --bg-quaternary: #16213e;
-  --bg-surface: #1e2139;
-  --bg-elevated: #252545;
+  /* 背景 - 更清淡的层次 */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-quaternary: #e2e8f0;
+  --bg-surface: #cbd5e1;
+  --bg-elevated: #94a3b8;
 
-  /* 玻璃效果 - 增强的棱镜材质 */
-  --glass-bg: rgba(255, 255, 255, 0.03);
-  --glass-bg-light: rgba(255, 255, 255, 0.06);
-  --glass-bg-medium: rgba(255, 255, 255, 0.08);
-  --glass-bg-strong: rgba(255, 255, 255, 0.12);
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-border-bright: rgba(255, 255, 255, 0.15);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
-  --glass-shadow-strong: 0 16px 64px 0 rgba(0, 0, 0, 0.8);
-  --dark-glass-bg: rgba(255, 255, 255, 0.05);
+  /* 简约玻璃效果 */
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-bg-light: rgba(255, 255, 255, 0.9);
+  --glass-bg-medium: rgba(248, 250, 252, 0.9);
+  --glass-bg-strong: rgba(241, 245, 249, 0.95);
+  --glass-border: rgba(148, 163, 184, 0.2);
+  --glass-border-bright: rgba(148, 163, 184, 0.3);
+  --glass-shadow: 0 4px 16px 0 rgba(0, 0, 0, 0.05);
+  --glass-shadow-strong: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
 
-  /* 文字颜色 - 高对比度保证可读性 */
-  --text-primary: #f8fafc;
-  --text-secondary: #e2e8f0;
-  --text-tertiary: #cbd5e1;
-  --text-accent: #a5b4fc;
-  --text-light: #ffffff;
-  --text-muted: #64748b;
-  --text-dark: #1e293b;
-  --text-spectrum: transparent;
+  /* 文字颜色 - 高雅对比 */
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-tertiary: #64748b;
+  --text-accent: var(--prism-primary);
+  --text-light: #94a3b8;
+  --text-muted: #cbd5e1;
+  --text-dark: #0f172a;
 
   /* 表面颜色 */
-  --surface-1: rgba(255, 255, 255, 0.05);
-  --surface-2: rgba(255, 255, 255, 0.08);
-  --surface-3: rgba(255, 255, 255, 0.12);
-  --border-glass: rgba(255, 255, 255, 0.1);
-  --border-glass-bright: rgba(255, 255, 255, 0.2);
+  --surface-1: rgba(255, 255, 255, 0.7);
+  --surface-2: rgba(248, 250, 252, 0.8);
+  --surface-3: rgba(241, 245, 249, 0.9);
+  --border-glass: rgba(148, 163, 184, 0.15);
+  --border-glass-bright: rgba(148, 163, 184, 0.25);
 
-  /* 棱镜光谱文字阴影 */
-  --text-shadow-prism: 0 0 10px var(--prism-cyan),
-                       0 0 20px var(--prism-blue),
-                       0 0 30px var(--prism-indigo);
+  /* 简约阴影系统 */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 8px -2px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 8px 16px -4px rgba(0, 0, 0, 0.1);
+  --shadow-2xl: 0 16px 32px -8px rgba(0, 0, 0, 0.12);
 
-  --text-shadow-spectrum: 0 0 5px var(--prism-violet),
-                          0 0 10px var(--prism-blue),
-                          0 0 15px var(--prism-cyan),
-                          0 0 20px var(--prism-teal);
-
-  --text-shadow-light: 0 1px 3px rgba(0, 0, 0, 0.5);
-  --text-shadow-medium: 0 2px 6px rgba(0, 0, 0, 0.6);
-  --text-shadow-strong: 0 3px 9px rgba(0, 0, 0, 0.7);
-  --text-shadow-glow: 0 0 20px rgba(99, 102, 241, 0.6);
-  --text-shadow-rainbow: 0 0 10px var(--prism-violet),
-                         0 0 20px var(--prism-blue),
-                         0 0 30px var(--prism-cyan),
-                         0 0 40px var(--prism-teal);
+  /* 去除文字阴影 */
+  --text-shadow-subtle: none;
+  --text-shadow-soft: none;
+  --text-shadow-glow: none;
+  --text-shadow-light: none;
+  --text-shadow-medium: none;
+  --text-shadow-prism: none;
 }
 
 * {
@@ -119,8 +99,12 @@ body {
   margin: 0;
   padding: 0;
   line-height: 1.6;
-  background: radial-gradient(ellipse at top left, var(--bg-tertiary) 0%, var(--bg-secondary) 30%, var(--bg-primary) 70%),
-              radial-gradient(ellipse at bottom right, var(--bg-quaternary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
+  background: linear-gradient(135deg,
+    #cbd5e1 0%,
+    #94a3b8 25%,
+    #e2e8f0 50%,
+    #f1f5f9 75%,
+    #f8fafc 100%);
   background-attachment: fixed;
   min-height: 100vh;
   font-weight: 400;
@@ -129,7 +113,7 @@ body {
   position: relative;
 }
 
-/* 增强的棱镜光谱背景动画 */
+/* 优雅的背景动画 */
 body::before {
   content: '';
   position: fixed;
@@ -138,71 +122,22 @@ body::before {
   width: 100%;
   height: 100%;
   background:
-    linear-gradient(45deg,
-      transparent 0%,
-      rgba(139, 92, 246, 0.02) 20%,
-      rgba(99, 102, 241, 0.03) 40%,
-      rgba(59, 130, 246, 0.02) 60%,
-      rgba(6, 182, 212, 0.03) 80%,
-      transparent 100%),
-    linear-gradient(-45deg,
-      transparent 0%,
-      rgba(20, 184, 166, 0.02) 25%,
-      rgba(16, 185, 129, 0.03) 50%,
-      rgba(34, 197, 94, 0.02) 75%,
-      transparent 100%);
-  animation: prism-shift 25s ease-in-out infinite;
+    radial-gradient(circle at 20% 80%, rgba(79, 70, 229, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(6, 182, 212, 0.04) 0%, transparent 50%);
+  animation: gentleFloat 30s ease-in-out infinite;
   pointer-events: none;
   z-index: -1;
 }
 
-body::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background:
-    radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.03) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, rgba(16, 185, 129, 0.02) 0%, transparent 50%);
-  animation: prism-float 30s ease-in-out infinite;
-  pointer-events: none;
-  z-index: -1;
-}
-
-@keyframes prism-shift {
+@keyframes gentleFloat {
   0%, 100% {
-    transform: translateX(-50%) translateY(-50%) rotate(0deg);
-    opacity: 0.4;
-  }
-  25% {
-    transform: translateX(0%) translateY(-25%) rotate(90deg);
+    transform: scale(1) rotate(0deg);
     opacity: 0.6;
   }
   50% {
-    transform: translateX(50%) translateY(0%) rotate(180deg);
+    transform: scale(1.05) rotate(2deg);
     opacity: 0.8;
-  }
-  75% {
-    transform: translateX(0%) translateY(25%) rotate(270deg);
-    opacity: 0.6;
-  }
-}
-
-@keyframes prism-float {
-  0%, 100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 0.3;
-  }
-  33% {
-    transform: scale(1.1) rotate(120deg);
-    opacity: 0.5;
-  }
-  66% {
-    transform: scale(0.9) rotate(240deg);
-    opacity: 0.4;
   }
 }
 
@@ -774,23 +709,21 @@ body::after {
 .stat-number {
   font-size: 1.8rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-dark) !important; /* 使用更深的颜色确保可读性 */
   margin: 0;
-  background: var(--primary-gradient);
-  background-size: 200% 200%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  animation: spectrum-shift 4s ease infinite;
-  text-shadow: var(--text-shadow-glow);
+  /* 移除渐变背景和透明文字效果，改用深色文字 */
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2); /* 添加文字阴影增强对比度 */
 }
 
+/* 使用更高优先级选择器确保stat-label样式生效 */
+.data-stats .stat-card .stat-label,
+.stat-card .stat-label,
 .stat-label {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  margin: 0;
-  font-weight: 600;
-  text-shadow: var(--text-shadow-light);
+  font-size: 0.85rem !important;
+  color: var(--text-primary) !important; /* 强制使用深色，提高可读性 */
+  margin: 0 !important;
+  font-weight: 700 !important; /* 强制加粗，提高可读性 */
+  text-shadow: var(--text-shadow-medium) !important;
 }
 
 /* 表格样式 */
@@ -1049,123 +982,58 @@ body::after {
   background: var(--surface-2);
 }
 
+/* 让worksheet选择框与template选择框样式完全一致 */
 .sheet-select {
-  min-width: 200px;
-  background: var(--glass-bg-strong);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-glass-bright);
-  border-radius: 12px;
-  padding: 10px 16px;
-  color: var(--text-primary);
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-shadow: var(--text-shadow-light);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-.sheet-select::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
   width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg,
-    transparent,
-    rgba(139, 92, 246, 0.1),
-    rgba(99, 102, 241, 0.12),
-    rgba(6, 182, 212, 0.1),
-    transparent);
-  transition: left 0.8s ease;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.sheet-select:hover::before {
-  left: 100%;
-}
-
-.sheet-select:hover {
-  background: var(--surface-2);
-  border-color: rgba(99, 102, 241, 0.4);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-  color: var(--text-light);
+  padding: 12px 16px;
+  background: var(--glass-bg-medium);
+  backdrop-filter: blur(15px);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  text-shadow: var(--text-shadow-light);
+  font-weight: 500; /* 与form-select保持一致 */
 }
 
 .sheet-select:focus {
   outline: none;
   border-color: var(--prism-indigo);
-  box-shadow:
-    0 0 0 3px rgba(99, 102, 241, 0.3),
-    0 8px 25px rgba(0, 0, 0, 0.4);
-  background: var(--surface-3);
-  color: var(--text-light);
-  text-shadow: var(--text-shadow-medium);
-}
-
-.sheet-select option {
-  background: var(--bg-surface);
-  color: var(--text-primary);
-  padding: 12px 16px;
-  font-weight: 600;
-  text-shadow: var(--text-shadow-light);
-  border: none;
-}
-
-.sheet-select option:hover {
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
   background: var(--surface-2);
-  color: var(--text-light);
 }
 
-.sheet-select option:checked {
-  background: var(--accent-gradient);
-  color: var(--text-light);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+.sheet-select:hover {
+  background: var(--glass-bg-strong);
+  border-color: rgba(99, 102, 241, 0.4);
 }
 
+/* 移除之前的自定义样式，确保与form-select完全一致 */
+.sheet-select::before {
+  display: none;
+}
+
+/* 更新sheet-selector-container以配合新样式 */
 .sheet-selector-container {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 8px 16px;
-  background: var(--glass-bg-light);
-  border-radius: 12px;
-  border: 1px solid var(--border-glass);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  transition: all 0.3s ease;
+  /* 移除背景和边框，让select本身处理样式 */
 }
 
-.sheet-selector-container:hover {
-  background: var(--glass-bg-medium);
-  border-color: rgba(99, 102, 241, 0.3);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
+/* 简化sheet-label样式 */
 .sheet-label {
   color: var(--text-secondary);
   font-size: 0.9rem;
   font-weight: 700;
   text-shadow: var(--text-shadow-light);
   white-space: nowrap;
-  position: relative;
+  /* 移除伪元素装饰 */
 }
 
 .sheet-label::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--accent-gradient);
-  opacity: 0.5;
+  display: none;
 }
 
 /* 单选按钮组 */
@@ -1385,4 +1253,22 @@ body::after {
   .upload-zone {
     padding: 30px 15px;
   }
+}
+
+/* 确保worksheet选择框样式与template选择框完全一致 */
+.sheet-select,
+.sheet-selector-container .sheet-select {
+  min-width: 200px !important;
+  background: var(--glass-bg-medium) !important; /* 强制与template选择框一致的背景 */
+  backdrop-filter: blur(15px) !important; /* 强制与form-select保持一致 */
+  -webkit-backdrop-filter: blur(15px) !important;
+  border: 1px solid var(--border-glass) !important; /* 强制与form-select保持一致的边框 */
+  border-radius: 12px !important;
+  padding: 12px 16px !important; /* 强制与form-select保持一致的内边距 */
+  color: var(--text-primary) !important;
+  font-size: 0.95rem !important; /* 强制与form-select保持一致的字体大小 */
+  font-weight: 600 !important;
+  text-shadow: var(--text-shadow-light) !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
 }
