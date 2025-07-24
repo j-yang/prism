@@ -1,0 +1,35 @@
+	%setup(version=260,
+localsetup=root/cdar/%scan(&_exec_programpath.,3,/)/%scan(&_exec_programpath.,4,/)/ar/%scan(&_exec_programpath.,6,/)/common/dev/macro/localsetup.sas);
+%localsetup;
+ 
+%runpgm(pgm=ta, error_override=y);
+%runpgm(pgm=te, error_override=y);
+%runpgm(pgm=ti, error_override=y);
+%runpgm(pgm=ts, error_override=y);
+%runpgm(pgm=tv, error_override=y);
+%runpgm(pgm=dm, error_override=y);
+%runpgm(pgm=se, error_override=y);
+%runpgm(pgm=sv, error_override=y);
+%runpgm(pgm=ae, error_override=y);
+%runpgm(pgm=ce, error_override=y);
+%runpgm(pgm=cm, error_override=y);
+%runpgm(pgm=dd, error_override=y);
+%runpgm(pgm=ds, error_override=y);
+%runpgm(pgm=dv, error_override=y);
+%runpgm(pgm=ec, error_override=y);
+%runpgm(pgm=eg, error_override=y);
+%runpgm(pgm=ex, error_override=y);
+%runpgm(pgm=fa, error_override=y);
+%runpgm(pgm=ft, error_override=y);
+%runpgm(pgm=ho, error_override=y);
+%runpgm(pgm=ie, error_override=y);
+%runpgm(pgm=mh, error_override=y);
+%runpgm(pgm=mi, error_override=y);
+%runpgm(pgm=oe, error_override=y);
+%runpgm(pgm=pr, error_override=y);
+%runpgm(pgm=rp, error_override=y);
+%runpgm(pgm=vs, error_override=y);
+%runpgm(pgm=co, error_override=y);
+%runpgm(pgm=pc, error_override=y);
+%runpgm(pgm=lb, error_override=y);
+%runpgm(pgm=qs, error_override=y);

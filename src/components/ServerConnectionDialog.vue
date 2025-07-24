@@ -180,9 +180,9 @@ const closeDialog = () => {
 
 // 重置表单
 const resetForm = () => {
-  connectionForm.host = 'sesklsasgrnprd06.emea.astrazeneca.net';
+  connectionForm.host = ' ';
   connectionForm.username = 'ktxv525';
-  connectionForm.password = 'AZq71911';
+  connectionForm.password = ' ';
   // 删除 remotePath 重置，保留用户最后选择的文件夹
   // connectionForm.remotePath = '/SASDATA2/SafetyNet/root/cdar/';
   connectionError.value = '';
