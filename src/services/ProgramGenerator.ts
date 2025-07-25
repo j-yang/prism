@@ -124,7 +124,7 @@ export default class ProgramGenerator {
             'output_files': allOutputFiles,
             'OUTPUT_FILES': allOutputFiles.toUpperCase(),
 
-            // 程序目的和描述
+            // 程序目的���描述
             'purpose': purpose,
             'PURPOSE': purpose.toUpperCase(),
             'description': purpose,
@@ -180,7 +180,7 @@ export default class ProgramGenerator {
                 // Validation程序输出.lst文件
                 return `${prefix}${item.domain.toLowerCase()}.lst`;
             } else {
-                // Production程序保持原来的.sas7bdat格式
+                // Production程序���持原来的.sas7bdat格式
                 return `${prefix}${item.domain.toLowerCase()}.sas7bdat`;
             }
         }
@@ -293,7 +293,7 @@ export default class ProgramGenerator {
                 }
             }
         } else {
-            // 标准ADAM：生成通用���述
+            // ��准ADAM：生成通用���述
             const action = outputType === 'Production' ? 'Create' : 'Validate';
             const domainName = item.domain.toUpperCase();
             return `${action} ${domainName} dataset`;
@@ -409,7 +409,7 @@ run;
             const parts = [item.outputType, item.outputNumber, item.outputTitle].filter(part => part && part.length > 0);
             return parts.join(' ');
         }
-        // 普通数据或TLF数据缺少字段时，返回domain
+        // 普通数据或TLF数��缺少字段时，返回domain
         return item.domain || '-';
     }
 
@@ -552,18 +552,305 @@ run;
                 if (onProgress) onProgress(progressPercent);
             });
 
-            // Download
+            // Download using enhanced method for better compatibility
             const timestamp = new Date().toISOString().slice(0, 10);
             const fileName = customZipName
                 ? (customZipName.endsWith('.zip') ? customZipName : `${customZipName}.zip`)
                 : `ADaM_Programs_${outputType}_${timestamp}.zip`;
 
-            saveAs(zipBlob, fileName);
+            // Enhanced download method for better file:// protocol compatibility
+            await this.downloadBlobWithCompatibility(zipBlob, fileName, saveAs);
+
             if (onProgress) onProgress(100);
 
         } catch (error) {
             console.error('ZIP generation failed:', error);
             throw new Error(`Failed to generate ZIP file: ${(error as Error).message}`);
         }
+    }
+
+    /**
+     * Enhanced download method with better compatibility for file:// protocol
+     */
+    private async downloadBlobWithCompatibility(blob: Blob, fileName: string, saveAs: any): Promise<void> {
+        const isFileProtocol = window.location.protocol === 'file:';
+
+        if (isFileProtocol) {
+            console.log('Using file:// protocol compatible download method');
+
+            try {
+                // Method 1: Use a more trusted approach - create a safe blob with text content first
+                const safeBlob = new Blob([blob], {
+                    type: 'application/octet-stream'  // Use generic binary type to avoid Windows filtering
+                });
+
+                const url = URL.createObjectURL(safeBlob);
+                const link = document.createElement('a');
+                link.href = url;
+
+                // Use a safer filename approach
+                const safeFileName = fileName.replace(/[<>:"/\\|?*]/g, '_');
+                link.download = safeFileName;
+
+                // Don't use target="_blank" which can trigger security warnings
+                link.style.display = 'none';
+
+                // Add to DOM temporarily
+                document.body.appendChild(link);
+
+                // Use mouse event to make it more "user-initiated"
+                const event = new MouseEvent('click', {
+                    view: window,
+                    bubbles: true,
+                    cancelable: true
+                });
+
+                // Trigger download with synthetic user event
+                link.dispatchEvent(event);
+
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                }, 1000);
+
+                console.log('File download initiated successfully');
+                return;
+            } catch (error) {
+                console.warn('Primary download method failed, trying data URL method:', error);
+            }
+
+            try {
+                // Method 2: Use data URL approach for smaller files (more trusted by Windows)
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const dataUrl = e.target?.result as string;
+                    const link = document.createElement('a');
+                    link.href = dataUrl;
+                    link.download = fileName;
+                    link.style.display = 'none';
+
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                };
+                reader.readAsDataURL(blob);
+
+                console.log('Data URL download method used successfully');
+                return;
+            } catch (error) {
+                console.warn('Data URL method failed:', error);
+            }
+
+            try {
+                // Method 3: Fallback using FileSaver with safe options
+                if (saveAs) {
+                    // Create a new blob with safe MIME type
+                    const compatibleBlob = new Blob([blob], {
+                        type: 'application/octet-stream'
+                    });
+                    saveAs(compatibleBlob, fileName, { autoBom: false });
+                    console.log('FileSaver fallback method used successfully');
+                    return;
+                }
+            } catch (error) {
+                console.warn('FileSaver fallback failed:', error);
+            }
+
+            // Method 4: Enhanced manual download with security tips
+            this.showEnhancedDownloadInstructions(blob, fileName);
+
+        } else {
+            // Use normal download method for http/https protocols
+            console.log('Using standard download method');
+            if (saveAs) {
+                saveAs(blob, fileName);
+            } else {
+                // Fallback for normal protocols
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                link.click();
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+            }
+        }
+    }
+
+    /**
+     * Show enhanced manual download instructions with security bypass tips
+     */
+    private showEnhancedDownloadInstructions(blob: Blob, fileName: string): void {
+        const url = URL.createObjectURL(blob);
+
+        const instructions = `下载准备完成！由于浏览器安全限制，请按以下步骤操作：
+
+🔒 如果Windows显示安全警告：
+1. 点击"更多信息"或"详细信息"
+2. 选择"仍要运行"或"保留"
+3. 如果没有这些选项，请继续下面的步骤
+
+📁 手动下载步骤：
+1. 右键点击下面的下载链接
+2. 选择"链接另存为..."或"目标另存为..."
+3. 选择保存位置，确保文件名为: ${fileName}
+4. 点击"保存"
+
+⚠️ 如果文件被阻止：
+1. 找到下载的文件位置
+2. 右键点击文件 → 属性
+3. 在"常规"标签页底部，勾选"解除阻止"
+4. 点击"应用"和"确定"
+
+💡 或者尝试：
+• 将文件重命名为 .txt 后缀，然后再改回 .zip
+• 使用不同的解压缩软件（如7-Zip、WinRAR）
+• 将文件复制到不同的文件夹`;
+
+        // Create a more robust modal interface
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        `;
+
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: left;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid #e0e0e0;
+        `;
+
+        const content = document.createElement('div');
+        content.innerHTML = `
+            <div style="text-align: center; margin-bottom: 30px;">
+                <h3 style="color: #333; margin: 0 0 10px 0; font-size: 24px;">🛡️ 安全下载指南</h3>
+                <p style="color: #666; margin: 0; font-size: 14px;">帮助您安全下载和使用生成的文件</p>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 25px; border-left: 4px solid #007bff;">
+                <pre style="color: #333; line-height: 1.6; white-space: pre-wrap; margin: 0; font-family: inherit; font-size: 14px;">${instructions}</pre>
+            </div>
+            
+            <div style="text-align: center; margin: 25px 0;">
+                <a href="${url}" download="${fileName}" style="
+                    display: inline-block;
+                    padding: 15px 30px;
+                    background: linear-gradient(135deg, #007bff, #0056b3);
+                    color: white;
+                    text-decoration: none;
+                    border-radius: 8px;
+                    margin: 10px;
+                    font-weight: 600;
+                    font-size: 16px;
+                    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+                    transition: all 0.3s ease;
+                " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 123, 255, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0, 123, 255, 0.3)';">
+                    📥 立即下载 ${fileName}
+                </a>
+            </div>
+            
+            <div style="text-align: center; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                <button id="closeModal" style="
+                    padding: 10px 20px;
+                    background: #6c757d;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    transition: background 0.3s ease;
+                " onmouseover="this.style.background='#545b62';" onmouseout="this.style.background='#6c757d';">
+                    关闭窗口
+                </button>
+                
+                <button id="copyInstructions" style="
+                    padding: 10px 20px;
+                    background: #28a745;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    margin-left: 10px;
+                    transition: background 0.3s ease;
+                " onmouseover="this.style.background='#1e7e34';" onmouseout="this.style.background='#28a745';">
+                    复制说明
+                </button>
+            </div>
+        `;
+
+        modal.appendChild(content);
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        // Add event listeners
+        const closeBtn = content.querySelector('#closeModal');
+        const copyBtn = content.querySelector('#copyInstructions');
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                document.body.removeChild(overlay);
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+            });
+        }
+
+        if (copyBtn) {
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(instructions).then(() => {
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = '✓ 已复制';
+                    setTimeout(() => {
+                        copyBtn.textContent = originalText;
+                    }, 2000);
+                }).catch(() => {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = instructions;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+
+                    const originalText = copyBtn.textContent;
+                    copyBtn.textContent = '✓ 已复制';
+                    setTimeout(() => {
+                        copyBtn.textContent = originalText;
+                    }, 2000);
+                });
+            });
+        }
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                document.body.removeChild(overlay);
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+            }
+        });
+
+        // Add keyboard support
+        const handleKeyPress = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                document.body.removeChild(overlay);
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                document.removeEventListener('keydown', handleKeyPress);
+            }
+        };
+        document.addEventListener('keydown', handleKeyPress);
     }
 }

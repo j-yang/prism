@@ -14,6 +14,10 @@ export interface TemplateMatch {
 export class ReferenceTemplateService {
     private referenceTemplates: Map<string, ReferenceTemplate> = new Map();
 
+    constructor() {
+        // 构造函数保持简单
+    }
+
     async loadReferenceTemplates(): Promise<void> {
         try {
             // 加载SDTM引用模板 - 使用预定义的模板列表
@@ -60,13 +64,14 @@ export class ReferenceTemplateService {
 
     private async loadTemplateContent(path: string): Promise<string> {
         try {
+            // 通过fetch获取模板内容
             const response = await fetch(path);
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}`);
             }
             return await response.text();
         } catch (error) {
-            // 如果文件不存在，返回默认模板
+            // 如果文件不存在，抛出错误
             throw error;
         }
     }
