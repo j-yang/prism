@@ -11,7 +11,7 @@
     "build-with-type-check": "vue-tsc && vite build",
     "preview": "vite preview",
     "type-check": "vue-tsc --noEmit",
-    "deploy": "npm run build && gh-pages -d dist -r https://github.com/azu-oncology-rd/prism.git"
+    "deploy": "npm run build && gh-pages -d dist -r https://github.com/azu-oncology-rd/prism.git -b gh-pages"
   },
   "dependencies": {
     "@vitejs/plugin-legacy": "^6.0.0",
