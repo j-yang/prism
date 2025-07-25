@@ -14,7 +14,6 @@
     "deploy": "npm run build && gh-pages -d dist -r https://github.com/azu-oncology-rd/prism.git -b gh-pages"
   },
   "dependencies": {
-    "@vitejs/plugin-legacy": "^6.0.0",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1",
     "pinia": "^3.0.3",
