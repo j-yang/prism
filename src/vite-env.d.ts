@@ -16,4 +16,10 @@ interface ImportMetaEnv {
 interface ImportMeta {
     readonly env: ImportMetaEnv
 }
-q
+
+declare global {
+  interface Window {
+    PRISM_TEMPLATES?: Record<string, string>;
+    PRISM_REFERENCES?: Record<string, string>;
+  }
+}

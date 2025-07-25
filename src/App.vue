@@ -113,7 +113,7 @@
                     </svg>
                   </div>
                   <h4>模板管理</h4>
-                  <p>创建、编辑和管理SAS程序�����板，支持自定义模板</p>
+                  <p>创建、编辑和管理SAS程序����板，支持自定义模板</p>
                 </div>
                 <div class="feature-card">
                   <div class="feature-icon">
@@ -522,13 +522,13 @@ import { TemplateStorageService, type Template } from './services/TemplateStorag
 import { referenceTemplateService, type TemplateMatch } from './services/ReferenceTemplateService';
 import TemplateManager from './components/TemplateManager.vue';
 import TemplateSelectionDialog from './components/TemplateSelectionDialog.vue';
-import ServerFileBrowser from './components/ServerFileBrowser.vue';
 import ServerConnectionDialog from './components/ServerConnectionDialog.vue';
 import FileConflictDialog from './components/FileConflictDialog.vue';
 
 // 导入模拟服务器API
 import './services/MockServerAPI';
 import { serverFileManager, type FileConflict, type ConflictResolution } from './services/ServerFileManager';
+
 
 const programStore = useProgramStore();
 const templateService = new TemplateStorageService();
@@ -600,7 +600,7 @@ const availableTemplates = computed(() => {
 // 计算属性
 const hasSelectedSheets = computed(() => selectedSheets.value.length > 0);
 
-// Logo路径计算 - 考虑生产环境的base路径
+// Logo路径计算 - 考虑生产环境的base���径
 const logoPath = computed(() => {
   const basePath = import.meta.env.BASE_URL || '/';
   return `${basePath}prism-logo.svg`;
@@ -789,7 +789,7 @@ function getTemplateName(templateId: string) {
 // 获取显示内容的函数
 function getDisplayContent(item: any) {
   if (item.hasTitle && item.outputType && item.outputNumber && item.outputTitle) {
-    // TLF类型数据：拼接 Output Type + Output # + Title
+    // TLF类型数据��拼接 Output Type + Output # + Title
     const parts = [item.outputType, item.outputNumber, item.outputTitle].filter(part => part && part.length > 0);
     return parts.join(' ');
   }
@@ -1179,7 +1179,7 @@ async function uploadFilesToServer(filesToUpload: Array<{file: File, remotePath:
     uploadProgress.value = 100;
     uploadStatus.value = `上传完成！���功上传 ${uploadedFiles.value} 个文件`;
 
-    // 3秒后自动关闭进度对话框
+    // 3秒后��动关闭进度对话框
     setTimeout(() => {
       showUploadProgress.value = false;
     }, 3000);
@@ -1381,17 +1381,17 @@ async function handleConflictResolution(resolution: ConflictResolution) {
 }
 
 @keyframes sophisticatedFlow {
-  0% { background-position: 0% 50%; }
-  33% { background-position: 100% 25%; }
-  66% { background-position: 0% 75%; }
-  100% { background-position: 0% 50%; }
+   0% { background-position: 0% 50%; }
+ 33% { background-position: 100% 25%; }
+ 66% { background-position: 0% 75%; }
+ 100% { background-position: 0% 50%; }
 }
 
 .app-header {
   padding: 2rem 1rem;
   background: var(--glass-bg-strong);
   backdrop-filter: blur(40px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 0.3);
   box-shadow: var(--shadow-lg);
   position: relative;
 }
