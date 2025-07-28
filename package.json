@@ -8,11 +8,12 @@
     "dev:client": "vite",
     "dev:server": "node server/server.js",
     "build": "vite build",
+    "build:frontend-only": "cross-env NODE_ENV=production VITE_BUILD_TARGET=frontend vite build",
     "build-with-type-check": "vue-tsc && vite build",
     "preview": "vite preview",
     "type-check": "vue-tsc --noEmit",
-    "deploy": "npm run build && gh-pages -d dist -r https://github.com/azu-oncology-rd/prism.git -b gh-pages",
-    "deploy:manual": "cross-env GITHUB_ACTIONS=true npm run build && gh-pages -d dist -r https://github.com/azu-oncology-rd/prism.git -b gh-pages"
+    "deploy": "npm run build:frontend-only && gh-pages -d dist -r https://github.com/azu-oncology-rd/prism.git -b gh-pages",
+    "deploy:manual": "cross-env GITHUB_ACTIONS=true npm run build:frontend-only && gh-pages -d dist -r https://github.com/azu-oncology-rd/prism.git -b gh-pages"
   },
   "dependencies": {
     "file-saver": "^2.0.5",
