@@ -12,7 +12,7 @@
     "build-with-type-check": "vue-tsc && vite build",
     "preview": "vite preview",
     "type-check": "vue-tsc --noEmit",
-    "deploy": "npm run build:frontend-only && gh-pages -d dist -r https://github.com/azu-oncology-rd/prism.git -b gh-pages",
+    "deploy": "npm run build:frontend-only && gh-pages -d dist -r https://github.com/azu-oncology-rd/prism.git",
     "deploy:manual": "cross-env GITHUB_ACTIONS=true npm run build:frontend-only && gh-pages -d dist -r https://github.com/azu-oncology-rd/prism.git -b gh-pages"
   },
   "dependencies": {
