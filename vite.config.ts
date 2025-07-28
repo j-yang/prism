@@ -37,8 +37,8 @@ export default defineConfig({
   },
   // 确保public文件夹内容正确暴露
   publicDir: 'public',
-  // Fix base path for GitHub Pages - always use /prism/ for production
-  base: process.env.NODE_ENV === 'production' ? '/prism/' : '/',
+  // 根据环境设置base路径
+  base: process.env.GITHUB_ACTIONS ? '/prism/' : '/',
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
@@ -47,23 +47,23 @@ export default defineConfig({
     copyPublicDir: true,
     // 清理dist目录
     emptyOutDir: true,
-    // 优化构建配置以减少文件大小和改善加载性能
+    // 优化构建配置
     rollupOptions: {
       output: {
-        // 简化文件命名，避免复杂的分包导致404
+        // 简化文件命名以避免路径问题
         manualChunks: undefined,
-        chunkFileNames: 'assets/js/[name].[hash].js',
-        entryFileNames: 'assets/js/[name].[hash].js',
+        chunkFileNames: 'js/[name]-[hash].js',
+        entryFileNames: 'js/[name]-[hash].js',
         assetFileNames: (assetInfo) => {
-          if (!assetInfo.name) return 'assets/[name].[hash].[ext]'
-
-          if (/\.(css)$/.test(assetInfo.name)) {
-            return 'assets/css/[name].[hash].[ext]'
+          const info = assetInfo.name!.split('.')
+          const extType = info[info.length - 1]
+          if (/css/.test(extType)) {
+            return `css/[name]-[hash].[ext]`
           }
-          if (/\.(png|jpe?g|gif|svg|ico|webp)$/.test(assetInfo.name)) {
-            return 'assets/images/[name].[hash].[ext]'
+          if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
+            return `images/[name]-[hash].[ext]`
           }
-          return 'assets/[name].[hash].[ext]'
+          return `assets/[name]-[hash].[ext]`
         }
       }
     },

@@ -10,7 +10,7 @@ const { EventEmitter } = require('events');
 // 增加最大监听器数量以防止内存泄漏警告
 EventEmitter.defaultMaxListeners = 20;
 
-// 设置进程级别的优化
+// 设置��程级别的优化
 process.env.UV_THREADPOOL_SIZE = 128; // 增加线程池大小
 process.setMaxListeners(20);
 
@@ -57,10 +57,14 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// 设置服务器超时
+// Set a longer server timeout and add keep-alive headers
 app.use((req, res, next) => {
-  req.setTimeout(120000); // 2分钟超时
-  res.setTimeout(120000);
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('Keep-Alive', 'timeout=300, max=1000'); // 5-minute timeout
+  req.setTimeout(300000, () => { // 5-minute timeout for request
+    res.status(504).send('Request timed out.');
+  });
+  res.setTimeout(300000); // 5-minute timeout for response
   next();
 });
 
@@ -193,7 +197,7 @@ app.post('/api/server/connect', async (req, res) => {
       await cleanupConnection(currentConnectionId);
     }
 
-    // 连接配置 - 增加超时和重试设置
+    // 连接配�� - 增加超时和重试设置
     const config = {
       host: host,
       port: port || 22,

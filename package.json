@@ -11,7 +11,8 @@
     "build-with-type-check": "vue-tsc && vite build",
     "preview": "vite preview",
     "type-check": "vue-tsc --noEmit",
-    "deploy": "npm run build && gh-pages -d dist -r https://github.com/azu-oncology-rd/prism.git -b gh-pages"
+    "deploy": "npm run build && gh-pages -d dist -r https://github.com/azu-oncology-rd/prism.git -b gh-pages",
+    "deploy:manual": "cross-env GITHUB_ACTIONS=true npm run build && gh-pages -d dist -r https://github.com/azu-oncology-rd/prism.git -b gh-pages"
   },
   "dependencies": {
     "file-saver": "^2.0.5",
@@ -28,6 +29,7 @@
     "@vitejs/plugin-vue": "^5.2.0",
     "@vue/tsconfig": "^0.5.1",
     "concurrently": "^9.1.0",
+    "cross-env": "^10.0.0",
     "gh-pages": "^6.2.0",
     "typescript": "^5.7.2",
     "vite": "^5.4.0",
