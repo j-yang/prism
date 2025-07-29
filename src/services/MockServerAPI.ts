@@ -5,9 +5,22 @@
 const uploadedFiles = new Map<string, any>();
 const serverFileCache = new Map<string, Set<string>>(); // path -> Set of filenames
 
+// Helper function to detect if we're in GitHub Pages environment
+function isGitHubPagesEnvironment(): boolean {
+  return window.location.hostname.includes('github.io') ||
+         window.location.hostname.includes('pages.github.io') ||
+         !window.location.origin.includes('localhost');
+}
+
 // Helper function to get actual server file list
 async function getServerFileList(directoryPath: string): Promise<string[]> {
   try {
+    // If in GitHub Pages, return empty list since server isn't available
+    if (isGitHubPagesEnvironment()) {
+      console.warn('GitHub Pages环境中无法获取服务器文件列表');
+      return [];
+    }
+
     // Extract directory from full path
     const directory = directoryPath.substring(0, directoryPath.lastIndexOf('/')) || directoryPath;
 
@@ -18,8 +31,13 @@ async function getServerFileList(directoryPath: string): Promise<string[]> {
 
     console.log('🔍 Fetching actual server file list for directory:', directory);
 
+    // Use correct API URL for local development
+    const apiUrl = window.location.origin.includes('localhost')
+      ? `http://localhost:3001/api/server/files?path=${encodeURIComponent(directory)}`
+      : `/api/server/files?path=${encodeURIComponent(directory)}`;
+
     // Make actual API call to get server files
-    const response = await fetch(`/api/server/files?path=${encodeURIComponent(directory)}`);
+    const response = await fetch(apiUrl);
 
     if (response.ok) {
       const files = await response.json();

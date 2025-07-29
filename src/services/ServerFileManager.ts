@@ -43,7 +43,15 @@ export class ServerFileManager {
   // 连接到服务器
   async connect(connection: ServerConnection): Promise<boolean> {
     try {
-      // 强制使用生产环境API，不再检查NODE_ENV
+      // 检查是否在GitHub Pages环境中
+      const isGitHubPages = window.location.hostname.includes('github.io') ||
+                            window.location.hostname.includes('pages.github.io');
+
+      if (isGitHubPages) {
+        console.warn('当前在GitHub Pages环境中，服务器连接功能不可用');
+        throw new Error('服务器连接功能在GitHub Pages环境中不可用，请在本地环境中使用此功能');
+      }
+
       console.log('正在连接到服务器:', connection.host);
 
       // 添加重试逻辑
@@ -57,7 +65,12 @@ export class ServerFileManager {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 60000); // 60秒超时
 
-          const response = await fetch('/api/server/connect', {
+          // 使用绝对URL来避免路径问题
+          const apiUrl = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1')
+            ? 'http://localhost:3001/api/server/connect'
+            : '/api/server/connect';
+
+          const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

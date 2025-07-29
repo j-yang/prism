@@ -1,5 +1,18 @@
 <template>
   <div id="app">
+    <!-- Environment Warning Banner -->
+    <div v-if="environmentInfo.isGitHubPages" class="environment-banner">
+      <div class="banner-content">
+        <svg class="banner-icon" width="20" height="20" viewBox="0 0 24 24" fill="none">
+          <path d="M12,2L13.09,8.26L22,9L17.74,12.74L19,22L12,18.26L5,22L6.26,12.74L2,9L10.91,8.26L12,2Z" fill="currentColor"/>
+        </svg>
+        <span class="banner-text">
+          <strong>演示模式:</strong> 您正在查看 GitHub Pages 版本。服务器连接功能需要在本地环境中使用。
+        </span>
+        <button class="banner-close" @click="dismissBanner = true">×</button>
+      </div>
+    </div>
+
     <!-- Header -->
     <div class="app-header">
       <div class="header-content">
@@ -529,9 +542,15 @@ import FileConflictDialog from './components/FileConflictDialog.vue';
 import './services/MockServerAPI';
 import { serverFileManager, type FileConflict, type ConflictResolution } from './services/ServerFileManager';
 
+// 导入环境检测工具
+import { detectEnvironment, showServerUnavailableWarning, type EnvironmentInfo } from './utils/environment';
 
 const programStore = useProgramStore();
 const templateService = new TemplateStorageService();
+
+// 环境检测相关状态
+const environmentInfo = ref<EnvironmentInfo>(detectEnvironment());
+const dismissBanner = ref(false);
 
 // 主要状态
 const activeMainTab = ref('about');
@@ -2101,5 +2120,48 @@ async function handleConflictResolution(resolution: ConflictResolution) {
   .about-content {
     padding: 0 1rem;
   }
+}
+
+/* Environment warning banner */
+.environment-banner {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-md);
+  backdrop-filter: blur(10px);
+}
+
+.banner-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.banner-icon {
+  color: var(--prism-warning);
+}
+
+.banner-text {
+  color: var(--text-warning);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.banner-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+}
+
+.banner-close:hover {
+  color: var(--text-primary);
 }
 </style>

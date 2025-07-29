@@ -7,6 +7,9 @@ export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
   const isFrontendOnly = process.env.VITE_BUILD_TARGET === 'frontend' || process.env.GITHUB_ACTIONS;
 
+  // Determine base path - use repository name for GitHub Pages
+  const baseUrl = isFrontendOnly ? '/prism/' : '/';
+
   return {
     plugins: [
       vue({
@@ -28,11 +31,18 @@ export default defineConfig(({ mode }) => {
       open: true,
       fs: {
         strict: false
+      },
+      // Add proxy for development to handle API calls
+      proxy: isFrontendOnly ? {} : {
+        '/api': {
+          target: 'http://localhost:3001',
+          changeOrigin: true,
+          secure: false
+        }
       }
     },
     publicDir: 'public',
-    // 修复base路径 - 对于GitHub Pages，仓库名需要匹配
-    base: isFrontendOnly ? '/prism/' : '/',
+    base: baseUrl,
     build: {
       outDir: 'dist',
       assetsDir: 'assets',
@@ -52,19 +62,19 @@ export default defineConfig(({ mode }) => {
         ] : [],
         output: {
           manualChunks: undefined,
-          // 简化文件命名，避免特殊字符
-          chunkFileNames: 'js/[name].[hash].js',
-          entryFileNames: 'js/[name].[hash].js',
+          // Ensure proper asset naming for GitHub Pages
+          chunkFileNames: 'assets/js/[name]-[hash].js',
+          entryFileNames: 'assets/js/[name]-[hash].js',
           assetFileNames: (assetInfo) => {
             const info = assetInfo.name!.split('.')
             const extType = info[info.length - 1]
             if (/css/.test(extType)) {
-              return `css/[name].[hash].[ext]`
+              return `assets/css/[name]-[hash].[ext]`
             }
             if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
-              return `images/[name].[hash].[ext]`
+              return `assets/images/[name]-[hash].[ext]`
             }
-            return `assets/[name].[hash].[ext]`
+            return `assets/[name]-[hash].[ext]`
           }
         }
       },
@@ -76,6 +86,11 @@ export default defineConfig(({ mode }) => {
           drop_debugger: true
         }
       } : undefined
+    },
+    // Add define to pass environment variables to the app
+    define: {
+      __IS_GITHUB_PAGES__: JSON.stringify(isFrontendOnly),
+      __BASE_URL__: JSON.stringify(baseUrl)
     }
   }
 })
