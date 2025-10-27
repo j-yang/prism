@@ -55,6 +55,96 @@ graph TB
     style O fill:#fce4ec
 ```
 
+## 📁 项目结构
+
+```
+prism/
+├── .github/                    # GitHub配置文件
+│   └── workflows/             # GitHub Actions工作流
+├── .vscode/                    # VS Code编辑器配置
+├── public/                     # 静态资源目录
+│   ├── references/            # 参考程序库
+│   │   └── sdtm/             # SDTM参考程序
+│   │       └── prod/         # SDTM生产程序示例
+│   ├── templates/             # 默认SAS模板文件
+│   │   ├── adam production template.sas
+│   │   ├── adam validation template.sas
+│   │   ├── sdtm production template.sas
+│   │   ├── sdtm validation template.sas
+│   │   ├── tlf_dev_template_code.sas
+│   │   └── tlf_val_template_code.sas
+│   ├── prism-logo.svg         # 项目Logo
+│   └── vite.svg               # Vite图标
+├── server/                     # 服务端代码目录
+│   ├── .env                   # 服务端环境变量
+│   ├── package.json           # 服务端依赖配置
+│   └── server.js              # Express服务器主文件
+├── src/                        # 前端源代码目录
+│   ├── assets/                # 静态资源（图片、样式等）
+│   ├── components/            # Vue组件
+│   │   ├── FileConflictDialog.vue        # 文件冲突处理对话框
+│   │   ├── SASCodeEditor.vue             # SAS代码编辑器
+│   │   ├── ServerConnectionDialog.vue    # 服务器连接对话框
+│   │   ├── ServerFileBrowser.vue         # 服务器文件浏览器
+│   │   ├── TemplateManager.vue           # 模板管理器
+│   │   └── TemplateSelectionDialog.vue   # 模板选择对话框
+│   ├── services/              # 业务逻辑服务
+│   │   ├── types/            # TypeScript类型定义
+│   │   ├── ExcelProcessor.ts           # Excel文件处理服务
+│   │   ├── MockServerAPI.ts            # 模拟服务器API
+│   │   ├── ProgramGenerator.ts         # 程序生成服务
+│   │   ├── ReferenceTemplateService.ts # 参考模板服务
+│   │   ├── ServerFileManager.ts        # 服务器文件管理
+│   │   └── TemplateStorageService.ts   # 模板存储服务
+│   ├── stores/                # Pinia状态管理
+│   │   └── templateStore.ts  # 模板状态存储
+│   ├── utils/                 # 工具函数
+│   │   └── environment.ts    # 环境配置工具
+│   ├── App.vue                # 主应用组件
+│   ├── main.ts                # 应用入口文件
+│   └── vite-env.d.ts          # Vite环境类型声明
+├── .gitignore                  # Git忽略文件配置
+├── BRANCH_DEPLOYMENT.md        # 分支部署文档
+├── CHANGELOG.md                # 变更日志
+├── DEPLOYMENT.md               # 部署指南
+├── DEPLOYMENT_TROUBLESHOOTING.md # 部署故障排除
+├── GITHUB_PAGES_FIX.md         # GitHub Pages修复指南
+├── PRODUCTION_DEPLOYMENT.md    # 生产环境部署
+├── README.md                   # 项目说明文档（本文件）
+├── RELEASE_NOTES.md            # 版本发布说明
+├── TROUBLESHOOTING.md          # 故障排除指南
+├── demo.html                   # 演示页面
+├── index.html                  # 应用入口HTML
+├── package.json                # 项目依赖配置
+├── package-lock.json           # 依赖版本锁定
+├── tsconfig.json               # TypeScript配置
+├── tsconfig.app.json           # 应用TypeScript配置
+├── tsconfig.node.json          # Node.js TypeScript配置
+└── vite.config.ts              # Vite构建配置
+```
+
+### 核心目录说明
+
+#### `/src` - 前端源代码
+- **components/**: 可复用的Vue组件，包括文件管理、代码编辑、模板管理等功能组件
+- **services/**: 核心业务逻辑，处理Excel解析、程序生成、模板管理等
+- **stores/**: 使用Pinia进行状态管理，存储应用全局状态
+- **utils/**: 通用工具函数和环境配置
+- **App.vue**: 主应用组件，包含整体界面布局和逻辑
+
+#### `/public` - 静态资源
+- **templates/**: 预设的SAS程序模板，支持SDTM、ADaM和TLF
+- **references/**: SDTM参考程序示例库，提供标准程序参考
+
+#### `/server` - 服务端
+- **server.js**: Express服务器，提供文件上传、下载和管理API
+- **package.json**: 服务端独立的依赖管理
+
+#### 配置文件
+- **vite.config.ts**: Vite构建工具配置，定义开发服务器和构建选项
+- **tsconfig.*.json**: TypeScript编译配置，确保类型安全
+- **package.json**: 项目依赖和脚本命令管理
+
 ## 📋 使用流程
 
 ```mermaid
