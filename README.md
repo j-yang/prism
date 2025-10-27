@@ -55,6 +55,153 @@ graph TB
     style O fill:#fce4ec
 ```
 
+## 📁 项目结构
+
+```
+prism/
+├── .github/                 # GitHub 配置和工作流
+│   └── agents/             # GitHub Copilot 代理配置
+├── .vscode/                # VS Code 编辑器配置
+├── public/                 # 静态资源文件
+│   ├── references/         # 参考文档和示例
+│   ├── templates/          # 预置代码模板
+│   ├── prism-logo.svg      # 项目Logo
+│   ├── vite.svg            # Vite图标
+│   ├── .nojekyll           # GitHub Pages配置
+│   └── 404.html            # 404错误页面
+├── server/                 # 后端服务器
+│   ├── uploads/            # 文件上传临时目录
+│   ├── server.js           # Express服务器主文件
+│   ├── package.json        # 服务器依赖配置
+│   └── .env                # 服务器环境变量配置
+├── src/                    # 前端源代码
+│   ├── assets/             # 资源文件（图片、样式等）
+│   ├── components/         # Vue组件
+│   │   ├── TemplateManager.vue           # 模板管理器组件
+│   │   ├── SASCodeEditor.vue             # SAS代码编辑器组件
+│   │   ├── ServerConnectionDialog.vue    # 服务器连接对话框
+│   │   ├── ServerFileBrowser.vue         # 服务器文件浏览器
+│   │   ├── TemplateSelectionDialog.vue   # 模板选择对话框
+│   │   └── FileConflictDialog.vue        # 文件冲突处理对话框
+│   ├── services/           # 业务逻辑服务
+│   │   ├── types/          # TypeScript类型定义
+│   │   │   ├── adam.d.ts   # ADaM数据类型定义
+│   │   │   └── jszip.d.ts  # JSZip类型定义
+│   │   ├── ExcelProcessor.ts              # Excel文件解析服务
+│   │   ├── ProgramGenerator.ts            # 程序生成服务
+│   │   ├── ReferenceTemplateService.ts    # 参考模板服务
+│   │   ├── ServerFileManager.ts           # 服务器文件管理服务
+│   │   ├── MockServerAPI.ts               # 模拟服务器API
+│   │   └── TemplateStorageService.ts      # 模板存储服务
+│   ├── stores/             # 状态管理（Pinia）
+│   │   └── templateStore.ts               # 模板状态管理
+│   ├── utils/              # 工具函数
+│   │   └── environment.ts                 # 环境配置工具
+│   ├── App.vue             # 根Vue组件
+│   ├── main.ts             # 应用入口文件
+│   └── vite-env.d.ts       # Vite环境类型定义
+├── index.html              # HTML入口文件
+├── demo.html               # 演示页面
+├── package.json            # 项目依赖和脚本配置
+├── package-lock.json       # 依赖版本锁定文件
+├── vite.config.ts          # Vite构建配置
+├── tsconfig.json           # TypeScript基础配置
+├── tsconfig.app.json       # TypeScript应用配置
+├── tsconfig.node.json      # TypeScript Node环境配置
+├── .gitignore              # Git忽略文件配置
+├── README.md               # 项目说明文档
+├── CHANGELOG.md            # 变更日志
+├── DEPLOYMENT.md           # 部署指南
+├── PRODUCTION_DEPLOYMENT.md # 生产环境部署指南
+├── BRANCH_DEPLOYMENT.md    # 分支部署指南
+├── DEPLOYMENT_TROUBLESHOOTING.md # 部署故障排除
+├── GITHUB_PAGES_FIX.md     # GitHub Pages修复指南
+├── TROUBLESHOOTING.md      # 故障排除指南
+└── RELEASE_NOTES.md        # 版本发布说明
+```
+
+### 核心目录说明
+
+#### `/src` - 前端源代码
+包含所有前端应用的源代码，采用Vue 3 + TypeScript开发。
+
+- **`/src/components`** - Vue组件库
+  - 所有可重用的UI组件
+  - 包含模板管理、代码编辑、文件浏览等核心功能组件
+
+- **`/src/services`** - 业务逻辑层
+  - `ExcelProcessor.ts` - 处理Excel文件的解析和验证
+  - `ProgramGenerator.ts` - 负责根据模板生成SAS程序
+  - `TemplateStorageService.ts` - 管理模板的本地存储
+  - `ServerFileManager.ts` - 处理服务器文件操作
+  - `ReferenceTemplateService.ts` - 管理预置参考模板
+
+- **`/src/stores`** - 状态管理
+  - 使用Pinia进行全局状态管理
+  - `templateStore.ts` - 管理模板相关的全局状态
+
+- **`/src/utils`** - 工具函数
+  - 通用工具函数和辅助方法
+  - 环境配置和变量管理
+
+#### `/public` - 静态资源
+存放不需要编译处理的静态文件。
+
+- **`/public/templates`** - 预置模板文件
+  - 包含默认的SAS程序模板
+  - 用于快速开始和参考
+
+- **`/public/references`** - 参考文档
+  - 示例文件和使用指南
+  - 帮助文档和最佳实践
+
+#### `/server` - 后端服务
+基于Express.js的Node.js后端服务。
+
+- **`server.js`** - 主服务器文件
+  - 提供文件上传API
+  - SFTP连接管理
+  - 文件浏览和操作接口
+
+- **`/server/uploads`** - 上传临时目录
+  - 存储通过API上传的临时文件
+  - 自动清理机制
+
+#### 配置文件
+
+- **`vite.config.ts`** - Vite构建工具配置
+  - 开发服务器设置
+  - 构建优化选项
+  - 插件配置
+
+- **`tsconfig.*.json`** - TypeScript编译配置
+  - `tsconfig.json` - 基础配置
+  - `tsconfig.app.json` - 应用代码配置
+  - `tsconfig.node.json` - Node.js环境配置
+
+- **`package.json`** - 项目配置
+  - 依赖管理
+  - 脚本命令
+  - 项目元数据
+
+### 文件组织规范
+
+#### 组件命名
+- Vue组件使用PascalCase命名：`TemplateManager.vue`
+- 组件文件名与组件名保持一致
+
+#### 服务文件命名
+- 服务类使用PascalCase + 描述性后缀：`ExcelProcessor.ts`
+- 一个文件对应一个主要服务类
+
+#### 类型定义
+- 类型定义文件使用`.d.ts`扩展名
+- 存放在`src/services/types/`目录下
+
+#### 样式组织
+- 全局样式放在`src/assets/`目录
+- 组件特定样式写在组件的`<style>`标签内
+
 ## 📋 使用流程
 
 ```mermaid
