@@ -57,6 +57,8 @@ graph TB
 
 ## 📁 项目结构
 
+> 📖 **详细文档**: 如需了解更详细的项目结构说明，请参阅 [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md)
+
 ```
 prism/
 ├── .github/                 # GitHub 配置和工作流
