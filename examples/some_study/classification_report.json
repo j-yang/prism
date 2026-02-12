@@ -1,0 +1,1814 @@
+{
+  "static": [
+    {
+      "form_oid": "SC",
+      "form_name": "Participant Information",
+      "visits": [
+        "Subject"
+      ],
+      "reason": "Single visit or no visit matrix"
+    },
+    {
+      "form_oid": "MH1",
+      "form_name": "IIM/SSc Medications Assessment(Do Not Use)",
+      "visits": [],
+      "reason": "Single visit or no visit matrix"
+    },
+    {
+      "form_oid": "MH2",
+      "form_name": "IIM/SSc Procedures(Do Not Use)",
+      "visits": [],
+      "reason": "Single visit or no visit matrix"
+    },
+    {
+      "form_oid": "CP1",
+      "form_name": "Syphilis screening(Do Not Use)",
+      "visits": [],
+      "reason": "Single visit or no visit matrix"
+    },
+    {
+      "form_oid": "CP17",
+      "form_name": "Aldolase Testing(Do Not Use)",
+      "visits": [],
+      "reason": "Single visit or no visit matrix"
+    },
+    {
+      "form_oid": "CP2",
+      "form_name": "Viral markers(Do Not Use)",
+      "visits": [],
+      "reason": "Single visit or no visit matrix"
+    },
+    {
+      "form_oid": "CP3",
+      "form_name": "HCV-RNA(Do Not Use)",
+      "visits": [],
+      "reason": "Single visit or no visit matrix"
+    },
+    {
+      "form_oid": "CP4",
+      "form_name": "HBV-DNA(Do Not Use)",
+      "visits": [],
+      "reason": "Single visit or no visit matrix"
+    }
+  ],
+  "longitudinal": [
+    {
+      "form_oid": "DS1_IC",
+      "form_name": "Informed Consent",
+      "visits": [
+        "Subject",
+        "SCR"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "DM",
+      "form_name": "Demographics",
+      "visits": [
+        "Subject",
+        "SCR"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "MH",
+      "form_name": "Medical History",
+      "visits": [
+        "Subject",
+        "SCR"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "CM1",
+      "form_name": "IIM/SSc Medications Assessment",
+      "visits": [
+        "Subject",
+        "SCR"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "PR2",
+      "form_name": "IIM/SSc Procedures",
+      "visits": [
+        "Subject",
+        "SCR"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "SU",
+      "form_name": "Allergy History",
+      "visits": [
+        "Subject",
+        "SCR"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "PR1",
+      "form_name": "Surgical History",
+      "visits": [
+        "Subject",
+        "SCR"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "HEI",
+      "form_name": "Height",
+      "visits": [
+        "Subject",
+        "SCR",
+        "UNSCH"
+      ],
+      "reason": "Appears in 3 visits"
+    },
+    {
+      "form_oid": "WEI",
+      "form_name": "Weight",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "COL2",
+        "LFU4",
+        "SFU11",
+        "WS",
+        "SFU8",
+        "COL1",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "Subject",
+        "SFU12",
+        "EC1"
+      ],
+      "reason": "Appears in 24 visits"
+    },
+    {
+      "form_oid": "CV1",
+      "form_name": "Chest X-ray",
+      "visits": [
+        "Subject",
+        "SCR",
+        "UNSCH"
+      ],
+      "reason": "Appears in 3 visits"
+    },
+    {
+      "form_oid": "CV2",
+      "form_name": "Chest CT",
+      "visits": [
+        "LFU1",
+        "LFUC",
+        "UNSCH",
+        "LFU6",
+        "LFU4",
+        "SFU11",
+        "SFU10",
+        "LFU3",
+        "LFU5",
+        "SFU9",
+        "WS",
+        "EOS1",
+        "BASE",
+        "SCR",
+        "SFU8",
+        "LFU2",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 18 visits"
+    },
+    {
+      "form_oid": "CV4",
+      "form_name": "Chest HRCT",
+      "visits": [
+        "LFU1",
+        "LFUC",
+        "SFU12",
+        "LFU4",
+        "LFU6",
+        "SFU11",
+        "SFU10",
+        "LFU3",
+        "LFU5",
+        "SFU9",
+        "WS",
+        "EOS1",
+        "SCR",
+        "BASE",
+        "SFU8",
+        "LFU2",
+        "Subject",
+        "UNSCH"
+      ],
+      "reason": "Appears in 18 visits"
+    },
+    {
+      "form_oid": "CV5",
+      "form_name": "Muscle MRI",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 21 visits"
+    },
+    {
+      "form_oid": "CV3",
+      "form_name": "FAPI PET/CT",
+      "visits": [
+        "Subject",
+        "SFU7",
+        "BASE",
+        "UNSCH"
+      ],
+      "reason": "Appears in 4 visits"
+    },
+    {
+      "form_oid": "MK6",
+      "form_name": "Muscle biopsy pathology",
+      "visits": [
+        "SFU7",
+        "SCR",
+        "SFU8",
+        "Subject",
+        "UNSCH"
+      ],
+      "reason": "Appears in 5 visits"
+    },
+    {
+      "form_oid": "MK7",
+      "form_name": "Skin biopsy pathology",
+      "visits": [
+        "SFU7",
+        "SCR",
+        "SFU8",
+        "Subject",
+        "UNSCH"
+      ],
+      "reason": "Appears in 5 visits"
+    },
+    {
+      "form_oid": "EG1",
+      "form_name": "Electrocardiogram",
+      "visits": [
+        "SFU5",
+        "UNSCH",
+        "SFU12",
+        "SFU11",
+        "SFU4",
+        "SFU10",
+        "SFU9",
+        "SFU7",
+        "WS",
+        "BASE",
+        "SCR",
+        "SFU8",
+        "EOS1",
+        "Subject",
+        "EC2",
+        "SFU2",
+        "SFU6"
+      ],
+      "reason": "Appears in 17 visits"
+    },
+    {
+      "form_oid": "ECHO",
+      "form_name": "Echocardiogram",
+      "visits": [
+        "WS",
+        "EOS1",
+        "SCR",
+        "Subject",
+        "UNSCH"
+      ],
+      "reason": "Appears in 5 visits"
+    },
+    {
+      "form_oid": "SR",
+      "form_name": "Ultrasound elastography of skin",
+      "visits": [
+        "SFU5",
+        "LFUC",
+        "UNSCH",
+        "SFU11",
+        "SFU10",
+        "SFU7",
+        "WS",
+        "BASE",
+        "EOS1",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 11 visits"
+    },
+    {
+      "form_oid": "EG2",
+      "form_name": "ECG Monitoring",
+      "visits": [
+        "Subject",
+        "EC2",
+        "UNSCH"
+      ],
+      "reason": "Appears in 3 visits"
+    },
+    {
+      "form_oid": "VS1",
+      "form_name": "Vital Signs-1",
+      "visits": [
+        "LFU6",
+        "SFU1",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "COL2",
+        "SFU3",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "COL1",
+        "SFU2",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12",
+        "EC1"
+      ],
+      "reason": "Appears in 28 visits"
+    },
+    {
+      "form_oid": "VS2",
+      "form_name": "Vital Signs-2",
+      "visits": [
+        "Subject",
+        "EC2"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "PE",
+      "form_name": "Physical Examination",
+      "visits": [
+        "WS",
+        "EOS1",
+        "SCR",
+        "Subject",
+        "UNSCH"
+      ],
+      "reason": "Appears in 5 visits"
+    },
+    {
+      "form_oid": "RE",
+      "form_name": "Pulmonary function tests",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 21 visits"
+    },
+    {
+      "form_oid": "LB8_RP",
+      "form_name": "Pregnancy Test",
+      "visits": [
+        "WS",
+        "EOS1",
+        "BASE",
+        "SCR",
+        "Subject",
+        "UNSCH"
+      ],
+      "reason": "Appears in 6 visits"
+    },
+    {
+      "form_oid": "LB9_PAT",
+      "form_name": "IIM Pathogenic antibodies",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 23 visits"
+    },
+    {
+      "form_oid": "LB13_VAC",
+      "form_name": "Vaccine Antibody Test",
+      "visits": [
+        "LFU6",
+        "SFU1",
+        "SFU9",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "SFU3",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "SFU2",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 25 visits"
+    },
+    {
+      "form_oid": "LB14_SER",
+      "form_name": "Serum SSc-specific autoantibodies",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 23 visits"
+    },
+    {
+      "form_oid": "LB19_SYP",
+      "form_name": "Syphilis screening",
+      "visits": [
+        "SCR",
+        "Subject",
+        "COL1",
+        "UNSCH",
+        "COL2"
+      ],
+      "reason": "Appears in 5 visits"
+    },
+    {
+      "form_oid": "LB16_VIR",
+      "form_name": "Viral markers",
+      "visits": [
+        "SCR",
+        "Subject",
+        "COL1",
+        "UNSCH",
+        "COL2"
+      ],
+      "reason": "Appears in 5 visits"
+    },
+    {
+      "form_oid": "LB17_HCV",
+      "form_name": "HCV-RNA",
+      "visits": [
+        "SCR",
+        "Subject",
+        "COL1",
+        "UNSCH",
+        "COL2"
+      ],
+      "reason": "Appears in 5 visits"
+    },
+    {
+      "form_oid": "LB18_HBV",
+      "form_name": "HBV-DNA",
+      "visits": [
+        "SCR",
+        "Subject",
+        "COL1",
+        "UNSCH",
+        "COL2"
+      ],
+      "reason": "Appears in 5 visits"
+    },
+    {
+      "form_oid": "LB10_ESR",
+      "form_name": "ESR",
+      "visits": [
+        "LFU1",
+        "SFU5",
+        "LFUC",
+        "UNSCH",
+        "LFU6",
+        "LFU4",
+        "SFU11",
+        "SFU10",
+        "LFU3",
+        "LFU5",
+        "WS",
+        "EOS1",
+        "BASE",
+        "SCR",
+        "SFU8",
+        "LFU2",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 18 visits"
+    },
+    {
+      "form_oid": "LB11_HC",
+      "form_name": "High-sensitivity C-reactive protein",
+      "visits": [
+        "LFU1",
+        "SFU5",
+        "LFUC",
+        "UNSCH",
+        "LFU6",
+        "LFU4",
+        "SFU11",
+        "SFU10",
+        "LFU3",
+        "LFU5",
+        "WS",
+        "EOS1",
+        "BASE",
+        "SCR",
+        "SFU8",
+        "LFU2",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 18 visits"
+    },
+    {
+      "form_oid": "LB12_TUB",
+      "form_name": "Tuberculosis screening",
+      "visits": [
+        "Subject",
+        "SCR",
+        "UNSCH"
+      ],
+      "reason": "Appears in 3 visits"
+    },
+    {
+      "form_oid": "LB1_HEM",
+      "form_name": "Hematology",
+      "visits": [
+        "LFU6",
+        "SFU1",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "COL2",
+        "SFU3",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "COL1",
+        "SFU2",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 28 visits"
+    },
+    {
+      "form_oid": "LB2_BLO",
+      "form_name": "Blood chemistry",
+      "visits": [
+        "LFU6",
+        "SFU1",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "COL2",
+        "SFU3",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "COL1",
+        "SFU2",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 28 visits"
+    },
+    {
+      "form_oid": "LB3_COA",
+      "form_name": "Coagulation Function",
+      "visits": [
+        "WS",
+        "EOS1",
+        "BASE",
+        "SCR",
+        "Subject",
+        "COL1",
+        "UNSCH",
+        "COL2"
+      ],
+      "reason": "Appears in 8 visits"
+    },
+    {
+      "form_oid": "LB15_MUE",
+      "form_name": "Muscle enzymes",
+      "visits": [
+        "LFU6",
+        "SFU1",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "COL2",
+        "SFU3",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "COL1",
+        "SFU2",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 28 visits"
+    },
+    {
+      "form_oid": "LB4_FE",
+      "form_name": "Ferritin",
+      "visits": [
+        "LFU6",
+        "SFU1",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "SFU3",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "SFU2",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 26 visits"
+    },
+    {
+      "form_oid": "LB5_SER1",
+      "form_name": "Serum immunoglobulin",
+      "visits": [
+        "LFU6",
+        "SFU1",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "SFU3",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "SFU2",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 26 visits"
+    },
+    {
+      "form_oid": "LB6_SER2",
+      "form_name": "Serum cytokines",
+      "visits": [
+        "SFU3",
+        "SFU5",
+        "UNSCH",
+        "SFU1",
+        "SFU4",
+        "SFU7",
+        "WS",
+        "BASE",
+        "EOS1",
+        "Subject",
+        "EC2",
+        "SFU2",
+        "SFU6"
+      ],
+      "reason": "Appears in 13 visits"
+    },
+    {
+      "form_oid": "LB7_PER",
+      "form_name": "Peripheral blood lymphocyte subsets",
+      "visits": [
+        "LFU6",
+        "SFU1",
+        "SFU9",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "SFU3",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "SFU2",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 25 visits"
+    },
+    {
+      "form_oid": "FA",
+      "form_name": "Other Test",
+      "visits": [
+        "Subject",
+        "UNSCH"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "GF1",
+      "form_name": "Sequencing Testing",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "SFU3",
+        "LFU4",
+        "SFU11",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 21 visits"
+    },
+    {
+      "form_oid": "GF2",
+      "form_name": "GC012F CAR gene copy number in peripheral blood",
+      "visits": [
+        "LFU6",
+        "SFU1",
+        "SFU9",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "SFU3",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "SFU2",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 25 visits"
+    },
+    {
+      "form_oid": "CP16",
+      "form_name": "GC012F CAR-T cell count in peripheral blood",
+      "visits": [
+        "LFU6",
+        "SFU1",
+        "SFU9",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "SFU3",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "SFU2",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 25 visits"
+    },
+    {
+      "form_oid": "CP5",
+      "form_name": "Peripheral blood T cell typing",
+      "visits": [
+        "LFU6",
+        "SFU1",
+        "SFU9",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "SFU3",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "SFU2",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 25 visits"
+    },
+    {
+      "form_oid": "CP6",
+      "form_name": "Peripheral blood B cell-related tests",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 20 visits"
+    },
+    {
+      "form_oid": "CP7",
+      "form_name": "Free BCMA in peripheral blood",
+      "visits": [
+        "LFU6",
+        "SFU1",
+        "SFU9",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "SFU3",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "SFU2",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 25 visits"
+    },
+    {
+      "form_oid": "CP8",
+      "form_name": "Cytokine APRIL",
+      "visits": [
+        "LFU6",
+        "SFU1",
+        "SFU9",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "SFU3",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "SFU2",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 25 visits"
+    },
+    {
+      "form_oid": "CP9",
+      "form_name": "Cytokine BAFF",
+      "visits": [
+        "LFU6",
+        "SFU1",
+        "SFU9",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "SFU3",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "SFU2",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 25 visits"
+    },
+    {
+      "form_oid": "CP10",
+      "form_name": "Serum cytokines (central laboratory)",
+      "visits": [
+        "SFU3",
+        "SFU5",
+        "UNSCH",
+        "SFU1",
+        "SFU4",
+        "SFU7",
+        "WS",
+        "BASE",
+        "EOS1",
+        "Subject",
+        "EC2",
+        "SFU2",
+        "SFU6"
+      ],
+      "reason": "Appears in 13 visits"
+    },
+    {
+      "form_oid": "CP11",
+      "form_name": "Peripheral blood lymphocyte subsets (central laboratory)",
+      "visits": [
+        "LFU6",
+        "SFU1",
+        "SFU9",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "EC2",
+        "SFU6",
+        "SFU3",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "SFU2",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 25 visits"
+    },
+    {
+      "form_oid": "CP12",
+      "form_name": "Anti-GC012F antibody in peripheral blood",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 20 visits"
+    },
+    {
+      "form_oid": "CP13",
+      "form_name": "Tissue or bone marrow cell subset-related tests",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 22 visits"
+    },
+    {
+      "form_oid": "GF3",
+      "form_name": "Tissue or bone marrow GC012F CAR-T gene-related tests",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "SFU4",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 22 visits"
+    },
+    {
+      "form_oid": "CP14",
+      "form_name": "RCL monitoring",
+      "visits": [
+        "SFU3",
+        "SFU5",
+        "SFU11",
+        "SFU10",
+        "SFU7",
+        "BASE",
+        "SFU8",
+        "Subject",
+        "GF",
+        "SFU12"
+      ],
+      "reason": "Appears in 10 visits"
+    },
+    {
+      "form_oid": "CP15",
+      "form_name": "Lentiviral integration site testing",
+      "visits": [
+        "SFU3",
+        "SFU5",
+        "SFU11",
+        "SFU10",
+        "SFU7",
+        "BASE",
+        "SFU8",
+        "Subject",
+        "GF",
+        "SFU12"
+      ],
+      "reason": "Appears in 10 visits"
+    },
+    {
+      "form_oid": "QRS1",
+      "form_name": "Revised Combined Response Index for Systemic Sclerosis (rCRISS) remission assessment",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 21 visits"
+    },
+    {
+      "form_oid": "QRS2",
+      "form_name": "Modified Rodnan Skin Score(mRSS)",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 21 visits"
+    },
+    {
+      "form_oid": "DIS",
+      "form_name": "Disease Progression",
+      "visits": [
+        "LFU1",
+        "LFUC",
+        "LFU6",
+        "LFU4",
+        "SFU11",
+        "SFU10",
+        "LFU3",
+        "LFU5",
+        "SFU9",
+        "SFU7",
+        "WS",
+        "BASE",
+        "SCR",
+        "SFU8",
+        "LFU2",
+        "EOS1",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 18 visits"
+    },
+    {
+      "form_oid": "QRS5",
+      "form_name": "Health Assessment Questionnaire-Disability Index (HAQ-DI)",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 21 visits"
+    },
+    {
+      "form_oid": "QRS3",
+      "form_name": "Physician Global Activity Assessment (PhGA)",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 21 visits"
+    },
+    {
+      "form_oid": "QRS4",
+      "form_name": "Patient Global Activity Assessment (PtGA)",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 21 visits"
+    },
+    {
+      "form_oid": "MK1",
+      "form_name": "Manual Muscle Testing",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 21 visits"
+    },
+    {
+      "form_oid": "MK2",
+      "form_name": "Myositis Disease Activity Assessment Tool",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 21 visits"
+    },
+    {
+      "form_oid": "MK3",
+      "form_name": "Cutaneous Dermatomyositis Disease Area and Severity Index(CDASI)",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 21 visits"
+    },
+    {
+      "form_oid": "MK4",
+      "form_name": "Myositis Damage Index",
+      "visits": [
+        "LFU1",
+        "LFUC",
+        "SFU12",
+        "LFU4",
+        "LFU6",
+        "SFU11",
+        "SFU10",
+        "LFU3",
+        "LFU5",
+        "SFU7",
+        "WS",
+        "SCR",
+        "BASE",
+        "EOS1",
+        "LFU2",
+        "Subject",
+        "UNSCH"
+      ],
+      "reason": "Appears in 17 visits"
+    },
+    {
+      "form_oid": "MK5",
+      "form_name": "5-D Pruritus Scale",
+      "visits": [
+        "LFU6",
+        "SFU9",
+        "SCR",
+        "LFU2",
+        "LFU1",
+        "LFU3",
+        "EOS1",
+        "SFU6",
+        "LFU4",
+        "SFU11",
+        "WS",
+        "SFU8",
+        "UNSCH",
+        "SFU5",
+        "LFUC",
+        "SFU10",
+        "LFU5",
+        "SFU7",
+        "BASE",
+        "Subject",
+        "SFU12"
+      ],
+      "reason": "Appears in 21 visits"
+    },
+    {
+      "form_oid": "IE",
+      "form_name": "Inclusion/Exclusion Criteria Not Met-Master Protocol",
+      "visits": [
+        "Subject",
+        "SCR"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "IE1",
+      "form_name": "Inclusion/Exclusion Criteria Not Met-Study 1 Protocol",
+      "visits": [
+        "Subject",
+        "SCR"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "IE2",
+      "form_name": "Inclusion/Exclusion Criteria Not Met-Study 2 Protocol",
+      "visits": [
+        "Subject",
+        "SCR"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "CRI1_APH",
+      "form_name": "Criteria for Apheresis in Subjects",
+      "visits": [
+        "Subject",
+        "COL1"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "CRI2_LYM",
+      "form_name": "Criteria for Lymphodepletion in Subjects",
+      "visits": [
+        "Subject",
+        "EC1"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "CRI3_CART",
+      "form_name": "Criteria for CAR-T Cell Infusion in Subjects",
+      "visits": [
+        "Subject",
+        "EC2"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "MI",
+      "form_name": "Collection of mononuclear cells",
+      "visits": [
+        "Subject",
+        "COL1",
+        "COL2"
+      ],
+      "reason": "Appears in 3 visits"
+    },
+    {
+      "form_oid": "EC1",
+      "form_name": "Lymphodepletion pretreatment",
+      "visits": [
+        "Subject",
+        "EC1"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "EC2",
+      "form_name": "GC012F Injection infusion",
+      "visits": [
+        "Subject",
+        "EC2"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "CM",
+      "form_name": "Previous and Concomitant Medications",
+      "visits": [
+        "Subject",
+        "GF"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "PR",
+      "form_name": "Previous and Concomitant Procedures",
+      "visits": [
+        "Subject",
+        "GF"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "AEYN",
+      "form_name": "Adverse Event Assessment",
+      "visits": [
+        "Subject",
+        "GF"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "SA",
+      "form_name": "AZ Aware of SAE",
+      "visits": [
+        "Subject",
+        "GF"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "HLHMAS",
+      "form_name": "HLH/MAS IEC-HS Grading",
+      "visits": [
+        "Subject",
+        "GF"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "DD",
+      "form_name": "Death",
+      "visits": [
+        "Subject",
+        "GF"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "FU",
+      "form_name": "Survival Status",
+      "visits": [
+        "Subject",
+        "SUR"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "DS2_SCR",
+      "form_name": "Screening Results",
+      "visits": [
+        "Subject",
+        "SCR"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "DS3_WS",
+      "form_name": "Withdrawal from study",
+      "visits": [
+        "Subject",
+        "WS"
+      ],
+      "reason": "Appears in 2 visits"
+    },
+    {
+      "form_oid": "DS4_EOS",
+      "form_name": "End of Study",
+      "visits": [
+        "Subject",
+        "EOS2"
+      ],
+      "reason": "Appears in 2 visits"
+    }
+  ],
+  "occurrence": [
+    {
+      "form_oid": "SV",
+      "form_name": "Visit Date",
+      "reason": "In addable matrix"
+    },
+    {
+      "form_oid": "UNSCH",
+      "form_name": "Unscheduled Forms",
+      "reason": "In addable matrix"
+    },
+    {
+      "form_oid": "AE",
+      "form_name": "Adverse Events",
+      "reason": "In addable matrix"
+    },
+    {
+      "form_oid": "CRS",
+      "form_name": "CRS ASTCT Criteria",
+      "reason": "In addable matrix"
+    },
+    {
+      "form_oid": "ICANS",
+      "form_name": "ICANS ASTCT Criteria",
+      "reason": "In addable matrix"
+    },
+    {
+      "form_oid": "NEXTYN",
+      "form_name": "Next Visit",
+      "reason": "In addable matrix"
+    }
+  ]
+}

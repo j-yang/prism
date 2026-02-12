@@ -1,0 +1,164 @@
+{
+  "meta": {
+    "version": "2.0",
+    "description": "Mock derivation examples for AI Agent reference",
+    "created": "2026-02-12"
+  },
+  "derivation_patterns": [
+    {
+      "pattern_id": "P1_date_min",
+      "pattern_name": "Date - MIN Aggregation",
+      "description": "取最早的日期，通常用于首次事件日期",
+      "complexity": "simple",
+      "example": {
+        "derivation_id": "deriv_trtsdt",
+        "target_var": "trtsdt",
+        "target_schema": "baseline",
+        "depends_on": ["exstdtc"],
+        "source_tables": ["bronze.ex"],
+        "transformation_sql": "SELECT usubjid, MIN(exstdtc) AS trtsdt FROM bronze.ex WHERE exoccur='Y' GROUP BY usubjid",
+        "label": "First Treatment Date"
+      },
+      "template": "SELECT usubjid, MIN({date_column}) AS {target_var} FROM {source_table} WHERE {condition} GROUP BY usubjid",
+      "variables": {
+        "date_column": "日期列名",
+        "target_var": "目标变量名",
+        "source_table": "源表",
+        "condition": "筛选条件"
+      }
+    },
+    {
+      "pattern_id": "P2_flag_case",
+      "pattern_name": "Flag - CASE WHEN Logic",
+      "description": "基于条件生成Y/N flag",
+      "complexity": "simple",
+      "example": {
+        "derivation_id": "deriv_saffl",
+        "target_var": "saffl",
+        "target_schema": "baseline",
+        "depends_on": ["trtsdt"],
+        "transformation_sql": "CASE WHEN trtsdt IS NOT NULL THEN 'Y' ELSE 'N' END",
+        "label": "Safety Population Flag"
+      },
+      "template": "CASE WHEN {condition} THEN 'Y' ELSE 'N' END AS {target_var}",
+      "variables": {
+        "condition": "判断条件",
+        "target_var": "目标flag变量"
+      }
+    },
+    {
+      "pattern_id": "P3_baseline_value",
+      "pattern_name": "Baseline Value - First Visit",
+      "description": "取基线visit的值作为baseline",
+      "complexity": "medium",
+      "example": {
+        "derivation_id": "deriv_base_chg",
+        "target_var": "base, chg",
+        "target_schema": "longitudinal",
+        "depends_on": ["aval", "visitnum"],
+        "transformation_sql": "SELECT *, FIRST_VALUE(aval) OVER (PARTITION BY usubjid, paramcd ORDER BY visitnum) AS base, aval - base AS chg FROM bronze.lb",
+        "label": "Baseline and Change from Baseline"
+      },
+      "template": "SELECT *, FIRST_VALUE({value_column}) OVER (PARTITION BY usubjid, paramcd ORDER BY {visit_order}) AS base, {value_column} - base AS chg FROM {source_table}",
+      "variables": {
+        "value_column": "数值列(如aval)",
+        "visit_order": "visit排序列",
+        "source_table": "源表"
+      }
+    },
+    {
+      "pattern_id": "P4_join_lookup",
+      "pattern_name": "Join - Lookup Value",
+      "description": "从另一个表查找值",
+      "complexity": "medium",
+      "example": {
+        "derivation_id": "deriv_bl_phga",
+        "target_var": "bl_phga",
+        "target_schema": "baseline",
+        "depends_on": ["aval", "ablfl"],
+        "source_tables": ["bronze.efficacy"],
+        "transformation_sql": "SELECT usubjid, aval AS bl_phga FROM bronze.efficacy WHERE paramcd='PHGA' AND ablfl='Y'",
+        "label": "Baseline PhGA Score"
+      },
+      "template": "SELECT usubjid, {value_column} AS {target_var} FROM {source_table} WHERE {param_filter} AND {baseline_flag}='Y'",
+      "variables": {
+        "value_column": "要取的值",
+        "target_var": "目标变量",
+        "source_table": "源表",
+        "param_filter": "参数筛选",
+        "baseline_flag": "基线flag"
+      }
+    },
+    {
+      "pattern_id": "P5_composite_score",
+      "pattern_name": "Composite Score - SUM of Items",
+      "description": "多个item求和得到总分",
+      "complexity": "complex",
+      "example": {
+        "derivation_id": "deriv_mmt8",
+        "target_var": "MMT8",
+        "target_schema": "longitudinal",
+        "depends_on": ["MMT_ITEM1", "MMT_ITEM2", "...", "MMT_ITEM8"],
+        "source_tables": ["bronze.efficacy"],
+        "rule_doc": "rule_docs/mmt8.md",
+        "label": "MMT-8 Total Score",
+        "description": "Sum of 8 muscle strength items, with missing value handling - see rule doc"
+      },
+      "note": "复杂评分需要Rule Document详细说明缺失值处理、有效性规则等"
+    },
+    {
+      "pattern_id": "P6_teae_flag",
+      "pattern_name": "TEAE Flag - Date Range Logic",
+      "description": "治疗期不良事件flag（日期范围判断）",
+      "complexity": "medium",
+      "example": {
+        "derivation_id": "deriv_teaefl",
+        "target_var": "teaefl",
+        "target_schema": "occurrence",
+        "depends_on": ["aestdtc", "trtsdt", "trtedt"],
+        "transformation_sql": "CASE WHEN aestdtc >= trtsdt AND aestdtc <= trtedt + INTERVAL '28 days' THEN 'Y' ELSE 'N' END",
+        "label": "Treatment-Emergent AE Flag"
+      },
+      "template": "CASE WHEN {event_date} >= {trt_start} AND {event_date} <= {trt_end} + INTERVAL '{offset} days' THEN 'Y' ELSE 'N' END AS {target_var}",
+      "variables": {
+        "event_date": "事件日期",
+        "trt_start": "治疗开始日期",
+        "trt_end": "治疗结束日期",
+        "offset": "偏移天数(如28)",
+        "target_var": "目标flag"
+      }
+    },
+    {
+      "pattern_id": "P7_age_group",
+      "pattern_name": "Age Group Categorization",
+      "description": "年龄分组",
+      "complexity": "simple",
+      "example": {
+        "derivation_id": "deriv_agegroup",
+        "target_var": "agegroup",
+        "target_schema": "baseline",
+        "depends_on": ["age"],
+        "transformation_sql": "CASE WHEN age < 18 THEN '<18' WHEN age < 65 THEN '18-64' ELSE '>=65' END",
+        "label": "Age Group"
+      },
+      "template": "CASE WHEN {numeric_var} < {cutoff1} THEN '{label1}' WHEN {numeric_var} < {cutoff2} THEN '{label2}' ELSE '{label3}' END AS {target_var}",
+      "variables": {
+        "numeric_var": "连续变量",
+        "cutoff1": "第一个切点",
+        "cutoff2": "第二个切点",
+        "label1": "第一组标签",
+        "label2": "第二组标签",
+        "label3": "第三组标签"
+      }
+    }
+  ],
+  "usage_guidance": {
+    "for_agent": "Agent应该根据target_var和depends_on识别适用的pattern，然后套用template生成SQL",
+    "for_human": "人类应该先选择pattern，填写variables，然后让Agent生成完整SQL",
+    "complexity_guide": {
+      "simple": "Agent可直接生成，无需人工审核",
+      "medium": "Agent生成后建议人工review",
+      "complex": "需要Rule Document，Agent读取规则后生成"
+    }
+  }
+}

@@ -1,0 +1,242 @@
+{
+  "meta": {
+    "version": "2.0",
+    "description": "Mock output examples for AI Agent reference",
+    "created": "2026-02-12"
+  },
+  "output_patterns": [
+    {
+      "pattern_id": "O1_demog_table",
+      "pattern_name": "Demographics Table by Treatment",
+      "description": "标准人口学基线特征表",
+      "block": "demographics",
+      "example": {
+        "output_id": "T1_demog",
+        "output_type": "table",
+        "schema": "baseline",
+        "required_vars": ["usubjid", "age", "sex", "race", "ethnic", "weight", "height", "trta"],
+        "filter_condition": "saffl = 'Y'",
+        "population": "safety",
+        "group_by": {"group1": "trta"},
+        "stats_required": {
+          "continuous": ["n", "mean", "sd", "median", "min", "max"],
+          "categorical": ["n", "pct"]
+        },
+        "title_template": "Table 1: Demographics and Baseline Characteristics",
+        "footnote_template": "Population: Safety (SAFFL='Y'); Treatment: Actual Treatment (TRTA)",
+        "autoslider_function": "tbl_desc_stats"
+      },
+      "typical_variations": {
+        "by_subgroup": "group_by = {\"group1\": \"trta\", \"group2\": \"sex\"}",
+        "by_population": "filter_condition = \"ittfl = 'Y'\" for ITT population",
+        "additional_vars": "Add BMI, country, region as needed"
+      }
+    },
+    {
+      "pattern_id": "O2_efficacy_lineplot",
+      "pattern_name": "Efficacy Parameter Over Time - Line Plot",
+      "description": "疗效指标随时间变化趋势图",
+      "block": "efficacy",
+      "example": {
+        "output_id": "F1_phga_visit",
+        "output_type": "lineplot",
+        "schema": "longitudinal",
+        "required_vars": ["usubjid", "visit", "visitnum", "chg", "trta"],
+        "required_params": ["PHGA"],
+        "filter_condition": "efffl = 'Y' AND paramcd = 'PHGA'",
+        "population": "efficacy",
+        "group_by": {"group1": "trta"},
+        "stats_required": ["n", "mean", "se"],
+        "title_template": "Figure 1: Physician's Global Assessment (PhGA) Change from Baseline by Visit",
+        "footnote_template": "Population: Efficacy (EFFFL='Y'); Error bars: Standard Error",
+        "autoslider_function": "gg_lineplot",
+        "autoslider_params": {
+          "x": "visit",
+          "y": "chg",
+          "y_label": "Change from Baseline",
+          "show_errorbar": true,
+          "errorbar_type": "se"
+        }
+      },
+      "typical_variations": {
+        "absolute_value": "y = aval instead of chg",
+        "multiple_params": "required_params = [\"PHGA\", \"PGA\"] with faceting",
+        "subgroup_analysis": "group_by = {\"group1\": \"trta\", \"group2\": \"sex\"}"
+      }
+    },
+    {
+      "pattern_id": "O3_ae_summary",
+      "pattern_name": "AE Summary Table",
+      "description": "不良事件汇总表（任意类别发生率）",
+      "block": "safety",
+      "example": {
+        "output_id": "T4_ae_any",
+        "output_type": "table",
+        "schema": "occurrence",
+        "required_vars": ["usubjid", "trta"],
+        "filter_condition": "domain = 'AE' AND teaefl = 'Y'",
+        "population": "safety",
+        "group_by": {"group1": "trta"},
+        "stats_required": ["n_subj", "n_events", "pct"],
+        "title_template": "Table 4: Treatment-Emergent Adverse Events - Any Event",
+        "footnote_template": "TEAE: Adverse events with onset during treatment period; n_subj: Number of subjects with at least one event; pct: Percentage of subjects",
+        "autoslider_function": "tbl_ae_summary"
+      },
+      "typical_variations": {
+        "by_soc_pt": "Group by SOC and PT - hierarchical table",
+        "by_severity": "Filter by AETOXGR for different severity tables",
+        "serious_ae": "filter_condition includes AND aeser='Y'",
+        "related_ae": "filter_condition includes AND aerel IN ('RELATED', 'POSSIBLY RELATED')"
+      }
+    },
+    {
+      "pattern_id": "O4_ae_soc_pt",
+      "pattern_name": "AE by SOC and PT",
+      "description": "按系统器官分类和首选术语的不良事件表",
+      "block": "safety",
+      "example": {
+        "output_id": "T5_ae_soc_pt",
+        "output_type": "table",
+        "schema": "occurrence",
+        "required_vars": ["usubjid", "aesoc", "aedecod", "trta"],
+        "filter_condition": "domain = 'AE' AND teaefl = 'Y'",
+        "population": "safety",
+        "group_by": {"group1": "trta", "cat1": "aesoc", "cat2": "aedecod"},
+        "stats_required": ["n_subj", "pct"],
+        "title_template": "Table 5: Treatment-Emergent Adverse Events by System Organ Class and Preferred Term",
+        "footnote_template": "Sorted by decreasing frequency in total column",
+        "autoslider_function": "tbl_ae_soc_pt",
+        "autoslider_params": {
+          "sort_by": "total_desc",
+          "include_total_row": true
+        }
+      }
+    },
+    {
+      "pattern_id": "O5_cm_summary",
+      "pattern_name": "Concomitant Medications Summary",
+      "description": "伴随用药汇总表",
+      "block": "safety",
+      "example": {
+        "output_id": "T6_cm_atc",
+        "output_type": "table",
+        "schema": "occurrence",
+        "required_vars": ["usubjid", "cmatc1", "cmatc2", "cmdecod", "trta"],
+        "filter_condition": "domain = 'CM' AND cmfl = 'Y'",
+        "population": "safety",
+        "group_by": {"group1": "trta", "cat1": "cmatc1", "cat2": "cmdecod"},
+        "stats_required": ["n_subj", "pct"],
+        "title_template": "Table 6: Concomitant Medications by ATC Class",
+        "footnote_template": "CMFL='Y': Concomitant medications (started before or during treatment)",
+        "autoslider_function": "tbl_cm_summary"
+      }
+    },
+    {
+      "pattern_id": "O6_lab_shift",
+      "pattern_name": "Lab Shift Table - Baseline to Post-Baseline",
+      "description": "实验室指标基线到后基线的转换表",
+      "block": "safety",
+      "example": {
+        "output_id": "T7_lab_shift",
+        "output_type": "table",
+        "schema": "longitudinal",
+        "required_vars": ["usubjid", "paramcd", "bnrind", "anrind", "trta"],
+        "required_params": ["ALT", "AST", "BILI", "CREAT"],
+        "filter_condition": "saffl = 'Y' AND paramcd IN ('ALT', 'AST', 'BILI', 'CREAT') AND avisitn > 0",
+        "population": "safety",
+        "group_by": {"group1": "trta", "row": "bnrind", "col": "anrind"},
+        "stats_required": ["n", "pct"],
+        "title_template": "Table 7: Laboratory Values Shift from Baseline to Post-Baseline",
+        "footnote_template": "BNRIND: Baseline reference range indicator; ANRIND: Analysis visit reference range indicator",
+        "autoslider_function": "tbl_lab_shift"
+      }
+    },
+    {
+      "pattern_id": "O7_baseline_comparison",
+      "pattern_name": "Baseline Disease Characteristics with Statistical Testing",
+      "description": "基线疾病特征比较（带统计检验）",
+      "block": "demographics",
+      "example": {
+        "output_id": "T2_baseline_disease",
+        "output_type": "table",
+        "schema": "baseline",
+        "required_vars": ["usubjid", "disease_duration", "prior_therapy", "bl_phga", "bl_haqdi", "trta"],
+        "filter_condition": "ittfl = 'Y'",
+        "population": "itt",
+        "group_by": {"group1": "trta"},
+        "comparison": "pairwise",
+        "stats_required": ["n", "mean", "sd", "median", "p_value"],
+        "analysis_method": "ttest",
+        "title_template": "Table 2: Baseline Disease Characteristics - ITT Population",
+        "footnote_template": "P-values from t-test for continuous variables, chi-square test for categorical variables",
+        "autoslider_function": "tbl_desc_stats",
+        "autoslider_params": {
+          "include_pvalue": true,
+          "test_method": "auto"
+        }
+      }
+    },
+    {
+      "pattern_id": "O8_listing",
+      "pattern_name": "Data Listing",
+      "description": "数据清单（逐条记录）",
+      "block": "appendix",
+      "example": {
+        "output_id": "L1_sae",
+        "output_type": "listing",
+        "schema": "occurrence",
+        "required_vars": ["usubjid", "age", "sex", "trta", "aedecod", "aestdtc", "aeendtc", "aesev", "aerel"],
+        "filter_condition": "domain = 'AE' AND aeser = 'Y'",
+        "population": "safety",
+        "title_template": "Listing 1: Serious Adverse Events",
+        "footnote_template": "Sorted by subject ID and AE start date",
+        "autoslider_function": "tbl_listing",
+        "autoslider_params": {
+          "sort_by": ["usubjid", "aestdtc"]
+        }
+      }
+    }
+  ],
+  "output_blocks": {
+    "demographics": {
+      "description": "人口学和基线特征",
+      "typical_outputs": ["T1_demog", "T2_baseline_disease", "L1_disposition"]
+    },
+    "efficacy": {
+      "description": "疗效分析",
+      "typical_outputs": ["T3_primary_endpoint", "F1_phga_visit", "F2_response_rate"]
+    },
+    "safety": {
+      "description": "安全性分析",
+      "typical_outputs": ["T4_ae_summary", "T5_ae_soc_pt", "T6_cm", "T7_lab_shift", "L2_sae"]
+    },
+    "pk": {
+      "description": "药代动力学",
+      "typical_outputs": ["T8_pk_params", "F3_pk_concentration"]
+    },
+    "appendix": {
+      "description": "附录和清单",
+      "typical_outputs": ["L1_demog", "L2_ae", "L3_cm"]
+    }
+  },
+  "cross_study_considerations": {
+    "common_outputs": [
+      "T1_demog (demographics across all studies)",
+      "T4_ae_summary (AE summary with same structure)",
+      "F1_primary_endpoint (may use different parameters)"
+    ],
+    "indication_specific": {
+      "rheumatoid_arthritis": ["F1_acr_response", "T_haqdi", "T_das28"],
+      "systemic_lupus": ["T_sledai", "T_bilag", "F1_sledai_visit"],
+      "oncology": ["F1_tumor_size", "T_response_recist", "F2_kaplan_meier"]
+    },
+    "study_specific_overrides": {
+      "note": "Use study_overrides field in output_spec to adjust vars, filters, or presentation for specific studies"
+    }
+  },
+  "usage_guidance": {
+    "for_agent": "根据output_id前缀识别类型：T=Table, F=Figure, L=Listing；根据schema选择数据源；根据pattern识别所需的统计方法",
+    "for_human": "先选择output pattern，填写required_vars/params和filter，确认group_by和stats，最后指定autoslider函数",
+    "rendering_flow": "Silver table → Filter → Group & Aggregate (Gold) → Format → autoslider → PPT/RTF"
+  }
+}
