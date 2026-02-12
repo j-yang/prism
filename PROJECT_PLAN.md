@@ -1,7 +1,7 @@
 # PRISM - 项目实施计划
 
 **更新日期**: 2026-02-12  
-**状态**: Phase 1 部分完成
+**状态**: Phase 1 完成, Phase 2 进行中
 
 ---
 
@@ -10,7 +10,19 @@
 **项目名称**: PRISM (Pooled Research Intelligence & Statistical Mapping)  
 **目标**: 构建一个数据库驱动的临床数据自动化处理框架，支持跨study的标准化分析和输出生成  
 **技术栈**: DuckDB + Python + R + python-pptx/r2rtf  
-**核心理念**: Subject Level → Group Level → Rendered Outputs  
+**核心理念**: Agent生成代码，用户执行  
+
+### Agent = Code Generator (不是Executor)
+
+```
+Agent读取: ALS, Spec, Meta, Rule Docs
+    ↓
+Agent输出: SQL/R/Python 脚本
+    ↓
+用户执行脚本 → 数据处理 → 输出
+```
+
+**Agent绝不接触真实患者数据**
 
 详细架构设计见 [ARCHITECTURE.md](ARCHITECTURE.md)
 
@@ -86,26 +98,35 @@ Bronze (Raw) → Silver (Subject Level) → Gold (Group Level) → Platinum (Del
 - [x] 变量统一注册表 (meta.variables)
 - [x] 衍生规则表 (meta.derivations)
 - [x] 输出定义表 (meta.outputs)
-- [x] 设计文档: docs/META_SCHEMA_V2.md
+- [x] 设计文档: docs/META_SCHEMA.md
+- [x] 双层设计: DDL + Python Models
 
-**11张Meta表**:
+**双层Schema设计**:
 
-| 类别 | 表名 | 用途 |
-|------|------|------|
-| 参考库 | `meta.params` | 参数库 (可外链) |
-| 参考库 | `meta.flags` | Flag库 (可外链) |
-| 参考库 | `meta.visits` | Visit库 (可外链) |
-| Study | `meta.study_info` | 当前study信息 |
-| Study | `meta.variables` | 变量注册表 |
-| Study | `meta.derivations` | 衍生规则 |
-| Study | `meta.outputs` | 输出定义 |
-| Study | `meta.output_variables` | 输出-变量关联 |
-| Study | `meta.output_params` | 输出-参数关联 |
-| Study | `meta.functions` | 复杂函数库 |
-| Study | `meta.dependencies` | 依赖关系 |
+| Layer | 位置 | 用途 |
+|-------|------|------|
+| DDL | `sql/init_meta.sql` | 数据库表定义 |
+| Python Models | `src/prismdb/schema/models.py` | Agent解析/验证/代码生成 |
+
+**11张Meta表 + Python Model对应**:
+
+| 类别 | 表名 | Python Model | 用途 |
+|------|------|--------------|------|
+| 参考库 | `meta.params` | `Parameter` | 参数库 (可外链) |
+| 参考库 | `meta.flags` | `Flag` | Flag库 (可外链) |
+| 参考库 | `meta.visits` | `Visit` | Visit库 (可外链) |
+| Study | `meta.study_info` | `StudyInfo` | 当前study信息 |
+| Study | `meta.variables` | `Variable` | 变量注册表 |
+| Study | `meta.derivations` | `Derivation` | 衍生规则 |
+| Study | `meta.outputs` | `Output` | 输出定义 |
+| Study | `meta.output_variables` | `OutputVariable` | 输出-变量关联 |
+| Study | `meta.output_params` | `OutputParam` | 输出-参数关联 |
+| Study | `meta.functions` | `Function` | 复杂函数库 |
+| Study | `meta.dependencies` | `Dependency` | 依赖关系 |
 
 #### 2.1 Meta Schema实现
-- [ ] 创建 `sql/init_meta_v2.sql` (新DDL)
+- [ ] 创建 `sql/init_meta.sql` (DDL)
+- [ ] 创建 `src/prismdb/schema/models.py` (Python Models)
 - [ ] 更新 `src/prismdb/metadata.py` 支持新表
 - [ ] 创建参考库导入工具
 
@@ -115,17 +136,18 @@ Bronze (Raw) → Silver (Subject Level) → Gold (Group Level) → Platinum (Del
 - [ ] 导入到Meta表
 - [ ] 支持外链参数库/Flag库
 
-#### 2.3 衍生执行引擎
+#### 2.3 衍生代码生成 (Agent Core)
 - [ ] 实现依赖分析 (拓扑排序)
-- [ ] SQL衍生执行器
+- [ ] 生成SQL衍生代码 (不是执行)
 - [ ] 支持复杂衍生 (rule_docs外链)
-- [ ] Bronze → Silver转换
+- [ ] 生成Bronze → Silver转换脚本
 
 **Phase 2 交付物**:
 - 完整的Meta Schema DDL
+- Python Models (Pydantic)
 - Spec Parser工具
-- 衍生执行引擎
-- Silver层生成流程
+- 衍生代码生成器 (not executor)
+- Silver层生成脚本模板
 
 ---
 
@@ -237,49 +259,70 @@ Bronze (Raw) → Silver (Subject Level) → Gold (Group Level) → Platinum (Del
 
 ---
 
-### Phase 5: Agent集成
+### Phase 5: Agent = Code Generator
 
-**目标**: 实现AI Agent与框架的集成
+**目标**: 实现AI Agent作为代码生成器，不是执行器
 
-#### 5.1 定义Agent访问接口
-- [ ] meta表查询API
-- [ ] schema_docs查询接口
-- [ ] data_catalog查询接口
-- [ ] 不允许访问实际数据的权限控制
+**核心原则**:
+- Agent读取: ALS, Spec, Meta Schema, Rule Docs
+- Agent输出: SQL/R/Python脚本
+- 用户执行生成的代码
+- Agent **绝不**接触真实患者数据
 
-**预计工作量**: 2天
+#### 5.1 Agent架构设计
+- [ ] 定义Agent输入接口 (读取meta表)
+- [ ] 定义Agent输出格式 (生成脚本)
+- [ ] CLI设计 (`prism generate bronze/silver/gold`)
+- [ ] 用户工作流设计
 
-#### 5.2 实现衍生SQL生成Agent
-- [ ] Agent prompt模板
-- [ ] 根据output_spec分析缺失变量
-- [ ] 根据data_catalog生成SQL
+**用户工作流**:
+```bash
+# 1. 初始化项目
+prism init --als D8318N00001_ALS.xlsx --spec mapping_spec.xlsx
+
+# 2. Agent生成Bronze代码
+prism generate bronze
+# → 生成 scripts/01_init_bronze.py
+
+# 3. 你review并执行
+python scripts/01_init_bronze.py
+
+# 4. Agent生成Silver代码
+prism generate silver
+# → 生成 scripts/02_derive_silver.sql
+
+# 5. 你review并执行
+duckdb study.duckdb < scripts/02_derive_silver.sql
+```
+
+#### 5.2 Bronze代码生成
+- [ ] 解析ALS → 生成Bronze DDL
+- [ ] 生成数据导入脚本
+- [ ] SAS/CSV读取代码模板
+
+#### 5.3 Silver代码生成
+- [ ] 读取meta.derivations
+- [ ] 依赖分析 (拓扑排序)
+- [ ] 生成衍生SQL脚本
 - [ ] 利用rule_docs理解复杂逻辑
-- [ ] 生成derivations定义
 
-**预计工作量**: 4-5天
-
-#### 5.3 实现统计代码生成Agent
-- [ ] 根据output_spec生成统计代码
-- [ ] 简单统计：生成SQL
+#### 5.4 Gold代码生成
+- [ ] 读取meta.outputs
+- [ ] 生成统计SQL
 - [ ] 复杂统计：生成R/Python代码
-- [ ] 代码验证和测试
+- [ ] 代码模板库
 
-**预计工作量**: 4-5天
-
-#### 5.4 集成测试
-- [ ] Agent生成的代码质量测试
-- [ ] Human-in-the-loop workflow
-- [ ] 错误修正机制
-- [ ] Agent性能评估
-
-**预计工作量**: 3-4天
+#### 5.5 Platinum代码生成
+- [ ] 生成渲染R脚本
+- [ ] 生成autoslider spec YAML
+- [ ] 生成python-pptx脚本
 
 **Phase 5 交付物**:
-- Agent访问API
-- 衍生SQL生成Agent
-- 统计代码生成Agent
-- Agent集成文档
-- 使用示例
+- `prism` CLI工具
+- 代码生成器 (不是执行器)
+- 代码模板库
+- 生成脚本示例
+- 用户文档
 
 ---
 

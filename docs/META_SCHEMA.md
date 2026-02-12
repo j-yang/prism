@@ -4,6 +4,58 @@
 
 ---
 
+## 双层设计：DDL + Python Models
+
+Meta Schema同时存在于两个层次：
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│  Layer 1: Database DDL                                              │
+│  ├── sql/init_meta.sql                                              │
+│  └── 执行后在 study.duckdb 中创建 meta.* 表                          │
+│                                                                      │
+│  Layer 2: Python Models                                             │
+│  ├── src/prismdb/schema/models.py                                   │
+│  └── Pydantic/dataclass，用于Agent解析和代码生成                     │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### DDL ↔ Python Model 对应关系
+
+| Meta表 | Python Model | 用途 |
+|--------|--------------|------|
+| `meta.study_info` | `StudyInfo` | 研究基本信息 |
+| `meta.variables` | `Variable` | 变量定义 |
+| `meta.derivations` | `Derivation` | 衍生规则 |
+| `meta.params` | `Parameter` | 参数库 |
+| `meta.flags` | `Flag` | Flag库 |
+| `meta.visits` | `Visit` | 访视定义 |
+| `meta.outputs` | `Output` | 输出定义 |
+| `meta.output_variables` | `OutputVariable` | 输出-变量关联 |
+| `meta.output_params` | `OutputParam` | 输出-参数关联 |
+| `meta.functions` | `Function` | 函数库 |
+| `meta.dependencies` | `Dependency` | 依赖图 |
+
+### 为什么需要两层？
+
+```
+Excel Spec                    Python Models                 DuckDB
+────────────────────────────────────────────────────────────────────
+                    parse                      load
+centralized_spec.xlsx ───→ List[Variable] ───→ meta.variables
+                              │
+                              │ Agent读取
+                              ↓
+                        生成 derive_silver.sql
+```
+
+1. **解析器输出** - 把Excel解析成结构化对象
+2. **Agent输入** - Agent理解spec的数据结构
+3. **验证** - 类型检查、必填字段检查
+4. **代码生成** - 基于model生成SQL/R代码
+
+---
+
 ## 架构前提
 
 ```

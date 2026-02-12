@@ -1,22 +1,82 @@
-# PRISM-DB - 架构设计文档 v3.0
+# PRISM-DB - 架构设计文档 v3.1
 
 **更新日期**: 2026-02-12  
 **状态**: 架构设计最终确认  
-**项目定位**: Clinical Trial Data Warehouse (数据库专项)
+**项目定位**: Clinical Trial Data Warehouse + Code Generation Agent
 
 ---
 
 ## 项目定位
 
-**PRISM-DB** 是一个专注于临床试验数据库构建的项目，实现从原始EDC数据到分析就绪统计数据集的完整数据仓库解决方案。
+**PRISM-DB** 是一个临床试验数据处理框架，包含：
+1. **数据仓库** - Bronze/Silver/Gold三层Medallion架构
+2. **元数据驱动** - Schema、衍生规则、输出定义都在meta表中
+3. **Code Generation Agent** - 基于metadata生成SQL/R/Python代码
 
-**范围界定**:
-- ✅ **数据库架构** - Bronze/Silver/Gold三层设计
-- ✅ **ETL流程** - 数据导入、衍生、聚合
-- ✅ **统计计算** - 描述统计、假设检验、复杂模型
-- ✅ **元数据管理** - Schema文档、变量目录、衍生规则
-- ❌ **输出渲染** - PPT/RTF/PDF生成（由prism-render负责）
-- ❌ **AI Agent** - 代码生成（由prism-agent负责）
+### 核心理念：Agent是Code Generator，不是Executor
+
+```
+┌────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│   ┌─────────────┐         ┌─────────────────────────────────┐  │
+│   │   Inputs    │         │         Agent (Code Gen)        │  │
+│   │             │ ──────→ │                                 │  │
+│   │ • ALS       │         │  • 理解输入                      │  │
+│   │ • Spec      │         │  • 理解meta schema              │  │
+│   │ • Rule Docs │         │  • 生成代码                      │  │
+│   │ • Meta.*    │         │                                 │  │
+│   └─────────────┘         └──────────────┬──────────────────┘  │
+│                                          │                      │
+│                                          │ 生成                 │
+│                                          ↓                      │
+│                           ┌─────────────────────────────────┐  │
+│                           │      Generated Code             │  │
+│                           │                                 │  │
+│                           │  • 01_init_bronze.py            │  │
+│                           │  • 02_derive_silver.sql         │  │
+│                           │  • 03_compute_gold.R            │  │
+│                           │  • 04_render_platinum.R         │  │
+│                           └──────────────┬──────────────────┘  │
+│                                          │                      │
+│                                          │ 用户执行              │
+│                                          ↓                      │
+│                           ┌─────────────────────────────────┐  │
+│                           │         study.duckdb            │  │
+│                           │  Bronze → Silver → Gold         │  │
+│                           └─────────────────────────────────┘  │
+│                                          │                      │
+│                                          ↓                      │
+│                           ┌─────────────────────────────────┐  │
+│                           │         outputs/                │  │
+│                           │  *.pptx, *.rtf, *.png           │  │
+│                           └─────────────────────────────────┘  │
+│                                                                 │
+└────────────────────────────────────────────────────────────────┘
+```
+
+**Agent的本质**:
+
+| Agent 不是 | Agent 是 |
+|------------|----------|
+| Runtime executor | **Code generator** |
+| 接触真实数据 | **只读metadata/spec** |
+| 端到端自动化 | **辅助编程** |
+| 黑盒 | **生成可审查的代码** |
+
+**类似于**: GitHub Copilot、dbt codegen、Cursor
+
+---
+
+## 双层Schema设计
+
+Meta Schema同时存在于两个层次：
+
+| Layer | 位置 | 用途 |
+|-------|------|------|
+| **DDL** | `sql/init_meta.sql` | 数据库表定义 |
+| **Python Models** | `src/prismdb/schema/models.py` | Agent解析/验证/代码生成 |
+
+详见 [docs/META_SCHEMA.md](docs/META_SCHEMA.md)
 
 ---
 
