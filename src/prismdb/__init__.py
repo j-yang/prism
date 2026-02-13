@@ -7,6 +7,9 @@ __version__ = "3.1.0"
 
 from .database import Database, init_database, get_connection
 from .metadata import MetadataManager
+from .silver import SilverGenerator
+from .gold import GoldEngine
+from .platinum import PlatinumGenerator
 
 from .parse_als_v2 import parse_als_to_db, parse_als
 from .classify_forms_v2 import classify_forms
@@ -24,6 +27,9 @@ __all__ = [
     "init_database",
     "get_connection",
     "MetadataManager",
+    "SilverGenerator",
+    "GoldEngine",
+    "PlatinumGenerator",
     "parse_als_to_db",
     "parse_als",
     "classify_forms",

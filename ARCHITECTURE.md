@@ -1,8 +1,8 @@
-# PRISM-DB - 架构设计文档 v3.1
+# PRISM-DB - 架构设计文档 v3.2
 
-**更新日期**: 2026-02-12  
-**状态**: 架构设计最终确认  
-**项目定位**: Clinical Trial Data Warehouse + Code Generation Agent
+**更新日期**: 2026-02-14  
+**状态**: MVP 开发中  
+**项目定位**: Clinical Trial Data Warehouse + Code Generation Agent + Web Portal
 
 ---
 
@@ -94,7 +94,7 @@ Meta Schema同时存在于两个层次：
 
 ## 一、核心架构
 
-### 1.1 三层数据仓库架构 (Medallion Architecture)
+### 1.1 四层数据仓库架构 (Medallion Architecture)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -132,21 +132,29 @@ Meta Schema同时存在于两个层次：
 │  └────────────────────────────────────────────────────────────────────────┘ │
 │                                                                              │
 ├─────────────────────────────────────────────────────────────────────────────┤
-│ Metadata Schema                                                             │
-│ ┌──────────────────┐ ┌─────────────────┐ ┌──────────────────┐              │
-│ │ meta.output_spec │ │ meta.derivations│ │ meta.schema_docs │              │
-│ └──────────────────┘ └─────────────────┘ └──────────────────┘              │
-│ ┌─────────────────────┐ ┌─────────────────┐                                │
-│ │ meta.output_assembly│ │ meta.data_catalog│                                │
-│ └─────────────────────┘ └─────────────────┘                                │
+│ Metadata Schema (11 Tables)                                                 │
+│ params, flags, visits, study_info, variables, derivations, outputs,        │
+│ output_variables, output_params, functions, dependencies                    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Traceability Schema (2 Tables)                                              │
+│ data_lineage, silver_sources                                                │
 └─────────────────────────────────────────────────────────────────────────────┘
 
-                                    │
-                                    ▼
-                         数据导出接口 (CSV/Parquet)
-                                    │
-                                    ▼
-                    下游系统 (prism-render, prism-agent, R/Python)
+                                     │
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                          Platinum Layer (Web Portal)                         │
+│  ┌─────────────────────────────────────────────────────────────────────┐   │
+│  │  DuckDB WASM (Browser)                                               │   │
+│  │  • 加载 study.duckdb                                                  │   │
+│  │  • 执行 SQL 查询                                                      │   │
+│  │  • 渲染表格/图表                                                       │   │
+│  │  • Traceability 点击追溯                                              │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
+│                                                                              │
+│  产出: index.html + style.css + app.js + study.duckdb                       │
+│  部署: 静态 HTTP 服务器 (Nginx)                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### 1.2 核心设计理念
