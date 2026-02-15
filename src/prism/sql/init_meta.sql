@@ -13,7 +13,7 @@ CREATE SCHEMA IF NOT EXISTS meta;
 -- 1. meta.study_info - Study基本信息
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS meta.study_info (
-    study_code TEXT PRIMARY KEY,
+    studyid TEXT PRIMARY KEY,
     indication TEXT,
     description TEXT,
     als_version TEXT,
@@ -30,7 +30,7 @@ COMMENT ON TABLE meta.study_info IS 'Study基本信息，每个study.duckdb只�
 CREATE TABLE IF NOT EXISTS meta.params (
     param_id TEXT PRIMARY KEY,           -- 'param_phga'
     paramcd TEXT NOT NULL UNIQUE,        -- 'PHGA'
-    param_label TEXT NOT NULL,           -- 'Physician Global Activity'
+    parameter TEXT NOT NULL,           -- 'Physician Global Activity'
     param_desc TEXT,
     
     category TEXT,                       -- 'efficacy', 'safety', 'pk', 'pd'
@@ -55,7 +55,9 @@ COMMENT ON TABLE meta.params IS 'Longitudinal参数定义，可从外部库导�
 
 CREATE INDEX IF NOT EXISTS idx_params_paramcd ON meta.params(paramcd);
 CREATE INDEX IF NOT EXISTS idx_params_category ON meta.params(category);
--- ============================================================================ 3. meta.flags - Flag库 (可外链) ============================================================================
+-- ============================================================================
+-- 3. meta.flags - Flag库 (可外链)
+-- ============================================================================
 CREATE TABLE IF NOT EXISTS meta.flags (
     flag_id TEXT PRIMARY KEY,            -- 'flag_teaefl'
     flag_name TEXT NOT NULL UNIQUE,      -- 'TEAEFL'
@@ -64,7 +66,7 @@ CREATE TABLE IF NOT EXISTS meta.flags (
     
     domain TEXT NOT NULL,                -- 'AE', 'CM', 'MH', 'ALL'
     
-    default_condition TEXT,              -- SQL condition: "ASTDT >= TRTSDT"
+    condition TEXT,              -- SQL condition: "ASTDT >= TRTSDT"
     true_value TEXT DEFAULT 'Y',
     false_value TEXT DEFAULT 'N',
     
