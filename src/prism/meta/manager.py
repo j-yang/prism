@@ -13,10 +13,10 @@ class MetadataManager:
     def set_study_info(
         self,
         study_code: str,
-        indication: str = None,
-        description: str = None,
-        als_version: str = None,
-        spec_version: str = None,
+        indication: Optional[str] = None,
+        description: Optional[str] = None,
+        als_version: Optional[str] = None,
+        spec_version: Optional[str] = None,
     ) -> None:
         sql = """
             INSERT INTO meta.study_info 
@@ -720,3 +720,51 @@ class MetadataManager:
         output["params"] = self.get_output_params(output_id)
 
         return output
+
+    def add_form_classification(
+        self,
+        form_oid: str,
+        schema: str,
+        domain: Optional[str] = None,
+        source_forms: Optional[List[str]] = None,
+        confidence: str = "medium",
+    ) -> None:
+        source_forms_json = json.dumps(source_forms) if source_forms else None
+
+        sql = """
+            INSERT INTO meta.form_classification
+            (form_oid, domain, schema, source_forms, classification_confidence)
+            VALUES (?, ?, ?, ?, ?)
+            ON CONFLICT (form_oid) 
+            DO UPDATE SET
+                domain = EXCLUDED.domain,
+                schema = EXCLUDED.schema,
+                source_forms = EXCLUDED.source_forms,
+                classification_confidence = EXCLUDED.classification_confidence
+        """
+        self.db.execute(sql, (form_oid, domain, schema, source_forms_json, confidence))
+        logger.info(f"Form classification added: {form_oid} -> {schema}")
+
+    def get_form_classification(
+        self, form_oid: str = None, schema: str = None
+    ) -> List[Dict]:
+        sql = "SELECT * FROM meta.form_classification WHERE 1=1"
+        params = []
+
+        if form_oid:
+            sql += " AND form_oid = ?"
+            params.append(form_oid)
+
+        if schema:
+            sql += " AND schema = ?"
+            params.append(schema)
+
+        sql += " ORDER BY schema, form_oid"
+
+        df = self.db.query_df(sql, tuple(params) if params else None)
+        return df.to_dict("records")
+
+    def get_forms_by_domain(self, domain: str) -> List[str]:
+        sql = "SELECT form_oid FROM meta.form_classification WHERE domain = ?"
+        df = self.db.query_df(sql, (domain,))
+        return df["form_oid"].tolist() if len(df) > 0 else []

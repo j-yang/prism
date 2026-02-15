@@ -1,8 +1,8 @@
 -- ============================================================================
--- PRISM-DB Meta Schema Initialization
--- Version: 3.1
+-- PRISM Meta Schema Initialization
+-- Version: 3.0
 -- Date: 2026-02-13
--- Description: Creates all 11 metadata tables for PRISM-DB
+-- Description: Creates all 11 metadata tables for PRISM
 -- Based on: ARCHITECTURE.md v3.1
 -- ============================================================================
 
@@ -55,10 +55,7 @@ COMMENT ON TABLE meta.params IS 'Longitudinal参数定义，可从外部库导�
 
 CREATE INDEX IF NOT EXISTS idx_params_paramcd ON meta.params(paramcd);
 CREATE INDEX IF NOT EXISTS idx_params_category ON meta.params(category);
-
--- ============================================================================
--- 3. meta.flags - Flag库 (可外链)
--- ============================================================================
+-- ============================================================================ 3. meta.flags - Flag库 (可外链) ============================================================================
 CREATE TABLE IF NOT EXISTS meta.flags (
     flag_id TEXT PRIMARY KEY,            -- 'flag_teaefl'
     flag_name TEXT NOT NULL UNIQUE,      -- 'TEAEFL'
@@ -263,6 +260,23 @@ COMMENT ON TABLE meta.dependencies IS '变量间的依赖关系（用于拓扑�
 
 CREATE INDEX IF NOT EXISTS idx_dependencies_from ON meta.dependencies(from_var);
 CREATE INDEX IF NOT EXISTS idx_dependencies_to ON meta.dependencies(to_var);
+
+-- ============================================================================
+-- 12. meta.form_classification - Form分类映射
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS meta.form_classification (
+    form_oid TEXT PRIMARY KEY,         -- 'AE', 'CM1', 'MH2'
+    domain TEXT,                       -- 'AE', 'CM', 'MH', 'DEATH'
+    schema TEXT NOT NULL,              -- 'baseline', 'longitudinal', 'occurrence'
+    source_forms TEXT,                 -- JSON: 合并的原始 forms
+    classification_confidence TEXT,    -- 'high', 'medium', 'low'
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+COMMENT ON TABLE meta.form_classification IS 'Form到Domain和Schema的映射关系';
+
+CREATE INDEX IF NOT EXISTS idx_form_classification_domain ON meta.form_classification(domain);
+CREATE INDEX IF NOT EXISTS idx_form_classification_schema ON meta.form_classification(schema);
 
 -- ============================================================================
 -- Helper Views

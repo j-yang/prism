@@ -1,6 +1,16 @@
+"""
+ALS Parser for PRISM
+
+Parses Annotated Label Specification (ALS) files and generates:
+1. Bronze layer tables (baseline, longitudinal, occurrence)
+2. Meta tables (study_info, visits, form_classification)
+"""
+
 import pandas as pd
 from pathlib import Path
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
+import json
+import re
 import logging
 
 from prism.core.database import Database
@@ -8,125 +18,226 @@ from prism.meta.manager import MetadataManager
 
 logger = logging.getLogger(__name__)
 
+DOMAIN_MAPPING: Dict[str, List[str]] = {
+    "AE": ["AE", "AE1", "AE2", "AE3"],
+    "CM": ["CM", "CM1", "CM2", "CM3"],
+    "MH": ["MH", "MH1", "MH2", "MH3"],
+    "PR": ["PR", "PR1", "PR2", "PR3"],
+    "DEATH": ["DS", "DS1", "DTH", "DEATH"],
+}
 
-def parse_als_to_db(
-    als_path: str, db: Database, study_code: str = ""
-) -> Dict[str, Any]:
-    logger.info(f"Parsing ALS: {als_path}")
-    als_path = Path(als_path)
+DOMAIN_FIELD_MAPPING: Dict[str, Dict[str, Optional[str]]] = {
+    "AE": {
+        "term": "AETERM",
+        "startdt": "AESTDTC",
+        "enddt": "AEENDTC",
+        "coding_high": "AESOC",
+        "coding_low": "AEDECOD",
+    },
+    "CM": {
+        "term": "CMTRT",
+        "startdt": "CMSTDTC",
+        "enddt": "CMENDTC",
+        "coding_high": "CMATC1",
+        "coding_low": "CMDECOD",
+    },
+    "MH": {
+        "term": "MHTERM",
+        "startdt": "MHSTDTC",
+        "enddt": "MHENDTC",
+        "coding_high": "MHSOC",
+        "coding_low": "MHDECOD",
+    },
+    "PR": {
+        "term": "PRTRT",
+        "startdt": "PRSTDTC",
+        "enddt": "PRENDTC",
+        "coding_high": "PRATC1",
+        "coding_low": "PRDECOD",
+    },
+    "DEATH": {
+        "term": "DSTERM",
+        "startdt": "DSSTDTC",
+        "enddt": None,
+        "coding_high": None,
+        "coding_low": None,
+    },
+}
 
-    als_data = _parse_als_file(als_path)
+BASELINE_FOLDER_PATTERNS = ["SCR", "BASE", "SCREEN"]
+FOLLOWUP_FOLDER_PATTERNS = ["SFU", "LFU", "EC", "COL"]
 
-    form_classification = classify_forms(
-        forms=als_data["forms"],
-        fields=als_data["fields"],
-        matrices=als_data["matrices"],
-        matrix_details=als_data["matrix_details"],
-    )
 
-    ddl_statements = _generate_bronze_ddl(als_data, form_classification)
+def get_domain_for_form(form_oid: str) -> Optional[str]:
+    form_upper = form_oid.upper()
+    for domain, patterns in DOMAIN_MAPPING.items():
+        for pattern in patterns:
+            if form_upper == pattern or form_upper.startswith(pattern):
+                return domain
+    return None
 
-    db.create_schema("bronze")
-    for form_oid, ddl in ddl_statements.items():
-        logger.info(f"Creating Bronze table: bronze.{form_oid.lower()}")
-        db.execute(ddl)
 
-    meta = MetadataManager(db)
-    meta.set_study_info(study_code=study_code)
+def classify_forms(
+    forms: List[Dict],
+    fields: List[Dict],
+    matrices: Dict[str, List[str]],
+) -> Dict[str, Dict[str, Any]]:
+    result: Dict[str, Dict[str, Any]] = {}
 
-    _populate_variables(meta, als_data, form_classification)
+    for form in forms:
+        form_oid = form["oid"]
+        form_name = form.get("name", "").lower()
 
-    result = {
-        "study_code": study_code,
-        "forms_total": len(als_data["forms"]),
-        "forms_by_type": {
-            "baseline": len(form_classification["baseline"]),
-            "longitudinal": len(form_classification["longitudinal"]),
-            "occurrence": len(form_classification["occurrence"]),
-        },
-        "fields_total": len(als_data["fields"]),
-        "codelists_total": len(als_data["codelists"]),
-        "bronze_tables_created": len(ddl_statements),
-        "classification": form_classification,
-    }
+        domain = get_domain_for_form(form_oid)
 
-    logger.info(
-        f"ALS parsing complete: {result['forms_total']} forms, "
-        f"{result['fields_total']} fields, "
-        f"{result['bronze_tables_created']} Bronze tables"
-    )
+        if domain:
+            result[form_oid] = {
+                "domain": domain,
+                "schema": "occurrence",
+                "source_forms": [form_oid],
+                "confidence": "high",
+            }
+            continue
+
+        folders = matrices.get(form_oid, [])
+
+        is_baseline_only = (
+            all(
+                any(pattern in f for pattern in BASELINE_FOLDER_PATTERNS)
+                for f in folders
+            )
+            or len(folders) == 0
+        )
+
+        has_followup = any(
+            any(pattern in f for pattern in FOLLOWUP_FOLDER_PATTERNS) for f in folders
+        )
+
+        is_log = any(
+            f.get("form_oid") == form_oid and bool(f.get("is_log", False))
+            for f in fields
+        )
+
+        if is_baseline_only and not has_followup:
+            result[form_oid] = {
+                "domain": None,
+                "schema": "baseline",
+                "source_forms": [form_oid],
+                "confidence": "medium",
+            }
+        elif has_followup or is_log:
+            result[form_oid] = {
+                "domain": None,
+                "schema": "longitudinal",
+                "source_forms": [form_oid],
+                "confidence": "medium",
+            }
+        else:
+            result[form_oid] = {
+                "domain": None,
+                "schema": "unknown",
+                "source_forms": [form_oid],
+                "confidence": "low",
+            }
 
     return result
 
 
 def _parse_als_file(als_path: Path) -> Dict[str, Any]:
-    forms_df = pd.read_excel(als_path, sheet_name="Forms")
-    fields_df = pd.read_excel(als_path, sheet_name="Fields")
-    matrices_df = pd.read_excel(als_path, sheet_name="Matrices")
-
-    codelists = _parse_codelists(als_path)
-
     xl = pd.ExcelFile(als_path)
-    matrix_sheets = [s for s in xl.sheet_names if s.startswith("Matrix") and "#" in s]
-    matrix_details = {}
-    for sheet in matrix_sheets:
-        matrix_details[sheet] = pd.read_excel(als_path, sheet_name=sheet)
+
+    forms_df = pd.read_excel(xl, sheet_name="Forms")
+    fields_df = pd.read_excel(xl, sheet_name="Fields")
+    folders_df = pd.read_excel(xl, sheet_name="Folders")
 
     forms = []
     for _, row in forms_df.iterrows():
         forms.append(
             {
-                "oid": row["OID"],
-                "name": row["DraftFormName"],
-                "active": row["DraftFormActive"],
+                "oid": str(row["OID"]),
+                "name": str(row.get("DraftFormName", "")),
+                "active": row.get("DraftFormActive", True),
             }
         )
 
     fields = []
     for _, row in fields_df.iterrows():
-        field = {
-            "form_oid": row["FormOID"],
-            "field_oid": row["FieldOID"],
-            "variable_oid": row["VariableOID"],
-            "data_format": row["DataFormat"],
-            "label": row["SASLabel"] if pd.notna(row["SASLabel"]) else row["FieldOID"],
-            "codelist_name": row["DataDictionaryName"]
-            if pd.notna(row["DataDictionaryName"])
-            else None,
-        }
-        if field["codelist_name"] and field["codelist_name"] in codelists:
-            field["codelist"] = codelists[field["codelist_name"]]
-        fields.append(field)
-
-    matrices = []
-    for _, row in matrices_df.iterrows():
-        matrices.append(
-            {"oid": row["OID"], "name": row["MatrixName"], "addable": row["Addable"]}
+        fields.append(
+            {
+                "form_oid": str(row["FormOID"]),
+                "field_oid": str(row["FieldOID"]),
+                "variable_oid": str(row["VariableOID"])
+                if pd.notna(row.get("VariableOID"))
+                else None,
+                "data_format": str(row.get("DataFormat", "")),
+                "label": str(row["SASLabel"])
+                if pd.notna(row.get("SASLabel"))
+                else str(row["FieldOID"]),
+                "is_log": row.get("IsLog", False),
+                "codelist_name": str(row["DataDictionaryName"])
+                if pd.notna(row.get("DataDictionaryName"))
+                else None,
+            }
         )
+
+    folders = []
+    for _, row in folders_df.iterrows():
+        folders.append(
+            {
+                "oid": str(row["OID"]),
+                "name": str(row["FolderName"]),
+                "ordinal": row.get("Ordinal"),
+            }
+        )
+
+    matrices = _parse_matrices(xl, forms)
+
+    codelists = _parse_codelists(xl)
+
+    crf_draft = pd.read_excel(xl, sheet_name="CRFDraft")
 
     return {
         "forms": forms,
         "fields": fields,
+        "folders": folders,
         "matrices": matrices,
-        "matrix_details": matrix_details,
         "codelists": codelists,
+        "crf_draft": crf_draft,
     }
 
 
-def _parse_codelists(als_path: Path) -> Dict[str, Dict[str, str]]:
+def _parse_matrices(xl: pd.ExcelFile, forms: List[Dict]) -> Dict[str, List[str]]:
+    matrices: Dict[str, List[str]] = {f["oid"]: [] for f in forms}
+
+    matrix_sheets = [s for s in xl.sheet_names if s.startswith("Matrix") and "#" in s]
+
+    for sheet in matrix_sheets:
+        df = pd.read_excel(xl, sheet_name=sheet)
+        folder_oid = sheet.split("#")[1] if "#" in sheet else sheet
+
+        form_col = df.columns[0]
+        for _, row in df.iterrows():
+            form_oid = str(row[form_col])
+            if form_oid in matrices:
+                matrices[form_oid].append(folder_oid)
+
+    return matrices
+
+
+def _parse_codelists(xl: pd.ExcelFile) -> Dict[str, Dict[str, str]]:
     try:
-        dict_df = pd.read_excel(als_path, sheet_name="DataDictionaries")
-        entries_df = pd.read_excel(als_path, sheet_name="DataDictionaryEntries")
+        dict_df = pd.read_excel(xl, sheet_name="DataDictionaries")
+        entries_df = pd.read_excel(xl, sheet_name="DataDictionaryEntries")
     except Exception:
         return {}
 
-    codelists = {}
+    codelists: Dict[str, Dict[str, str]] = {}
     for _, row in dict_df.iterrows():
-        dict_name = row["Name"] if "Name" in dict_df.columns else row.get("OID", "")
+        dict_name = str(row.get("DataDictionaryName", row.get("OID", "")))
         codelists[dict_name] = {}
 
     for _, row in entries_df.iterrows():
-        dict_name = row.get("DataDictionaryName", row.get("DataDictionaryOID", ""))
+        dict_name = str(row.get("DataDictionaryName", row.get("DataDictionaryOID", "")))
         if dict_name in codelists:
             coded = str(row.get("CodedData", row.get("CodedValue", "")))
             decode = str(row.get("UserDataString", row.get("Decode", "")))
@@ -135,170 +246,121 @@ def _parse_codelists(als_path: Path) -> Dict[str, Dict[str, str]]:
     return codelists
 
 
-def classify_forms(
-    forms: List[Dict],
-    fields: List[Dict],
-    matrices: List[Dict],
-    matrix_details: Dict,
-) -> Dict[str, List[str]]:
-    baseline = []
-    longitudinal = []
-    occurrence = []
+def parse_als_to_db(
+    als_path: str,
+    db: Database,
+    study_code: str = "",
+) -> Dict[str, Any]:
+    logger.info(f"Parsing ALS: {als_path}")
+    als_path_obj = Path(als_path)
 
-    for form in forms:
-        form_oid = form["oid"]
-        form_name = form.get("name", "").lower()
+    als_data = _parse_als_file(als_path_obj)
 
-        if any(
-            kw in form_name
-            for kw in ["demog", "icf", "enroll", "medical", "history", "baseline"]
-        ):
-            baseline.append(form_oid)
-        elif any(kw in form_name for kw in ["ae", "sae", "cm", "mh", "protocol"]):
-            occurrence.append(form_oid)
-        elif any(kw in form_name for kw in ["lab", "vs", "pk", "pd", "efficacy"]):
-            longitudinal.append(form_oid)
-        else:
-            baseline.append(form_oid)
+    form_classification = classify_forms(
+        forms=als_data["forms"],
+        fields=als_data["fields"],
+        matrices=als_data["matrices"],
+    )
 
-    return {
-        "baseline": baseline,
-        "longitudinal": longitudinal,
-        "occurrence": occurrence,
+    db.execute("CREATE SCHEMA IF NOT EXISTS bronze")
+
+    meta = MetadataManager(db)
+
+    crf_draft = als_data.get("crf_draft")
+    als_version = None
+    if crf_draft is not None and len(crf_draft) > 0:
+        als_version = str(crf_draft.iloc[0].get("DraftName", ""))
+
+    meta.set_study_info(
+        study_code=study_code,
+        als_version=als_version,
+    )
+
+    _populate_visits(meta, als_data["folders"])
+
+    _populate_form_classification(meta, form_classification)
+
+    result = {
+        "study_code": study_code,
+        "als_version": als_version,
+        "forms_total": len(als_data["forms"]),
+        "fields_total": len(als_data["fields"]),
+        "folders_total": len(als_data["folders"]),
+        "codelists_total": len(als_data["codelists"]),
+        "classification": {
+            "occurrence": len(
+                [f for f in form_classification.values() if f["schema"] == "occurrence"]
+            ),
+            "baseline": len(
+                [f for f in form_classification.values() if f["schema"] == "baseline"]
+            ),
+            "longitudinal": len(
+                [
+                    f
+                    for f in form_classification.values()
+                    if f["schema"] == "longitudinal"
+                ]
+            ),
+            "unknown": len(
+                [f for f in form_classification.values() if f["schema"] == "unknown"]
+            ),
+        },
     }
 
-
-def _generate_bronze_ddl(als_data: Dict, form_classification: Dict) -> Dict[str, str]:
-    ddl_statements = {}
-
-    fields_by_form = {}
-    for field in als_data["fields"]:
-        form_oid = field["form_oid"]
-        if form_oid not in fields_by_form:
-            fields_by_form[form_oid] = []
-        fields_by_form[form_oid].append(field)
-
-    for form in als_data["forms"]:
-        form_oid = form["oid"]
-        table_name = form_oid.lower()
-
-        if form_oid not in fields_by_form:
-            continue
-
-        columns = [
-            "    usubjid TEXT NOT NULL",
-            "    folder_oid TEXT",
-            "    folder_instance_id INTEGER",
-            "    record_date DATE",
-        ]
-
-        added_columns = set()
-        for field in fields_by_form[form_oid]:
-            variable_oid = field.get("variable_oid")
-            if not variable_oid or (
-                isinstance(variable_oid, float) and pd.isna(variable_oid)
-            ):
-                continue
-
-            col_name = str(variable_oid).lower()
-
-            if col_name in added_columns:
-                logger.warning(
-                    f"Duplicate column {col_name} in form {form_oid}, skipping"
-                )
-                continue
-
-            col_type = _map_data_format(field["data_format"])
-            columns.append(f"    {col_name} {col_type}")
-            added_columns.add(col_name)
-
-        columns_str = ",\n".join(columns)
-        ddl = f"""
-CREATE TABLE IF NOT EXISTS bronze.{table_name} (
-{columns_str},
-    PRIMARY KEY (usubjid, folder_oid, folder_instance_id, record_date)
-);
-"""
-        ddl_statements[form_oid] = ddl
-
-    return ddl_statements
+    logger.info(f"ALS parsing complete: {result}")
+    return result
 
 
-def _map_data_format(data_format: str) -> str:
-    data_format = str(data_format).upper()
+def _populate_visits(meta: MetadataManager, folders: List[Dict]) -> None:
+    logger.info("Populating meta.visits...")
 
-    if "TEXT" in data_format or "CHAR" in data_format:
-        return "TEXT"
-    elif "DATE" in data_format:
-        return "DATE"
-    elif "TIME" in data_format:
-        return "TIMESTAMP"
-    elif "INTEGER" in data_format or "INT" in data_format:
-        return "INTEGER"
-    elif "FLOAT" in data_format or "DOUBLE" in data_format:
-        return "DOUBLE"
-    else:
-        return "TEXT"
+    for folder in folders:
+        visit_id = folder["oid"].lower()
+        visit_name = folder["oid"]
+        visit_label = folder["name"]
+        visitnum = folder.get("ordinal")
+
+        is_baseline = any(
+            pattern in folder["oid"].upper() for pattern in BASELINE_FOLDER_PATTERNS
+        )
+
+        meta.add_visit(
+            visit_id=visit_id,
+            visit_name=visit_name,
+            visitnum=visitnum,
+            visit_label=visit_label,
+            is_baseline=is_baseline,
+        )
+
+    logger.info(f"Visits populated: {len(folders)} records")
 
 
-def _populate_variables(
-    meta: MetadataManager, als_data: Dict, form_classification: Dict
-):
-    logger.info("Populating meta.variables...")
+def _populate_form_classification(
+    meta: MetadataManager,
+    form_classification: Dict[str, Dict[str, Any]],
+) -> None:
+    logger.info("Populating meta.form_classification...")
 
-    added_vars = set()
+    for form_oid, info in form_classification.items():
+        meta.add_form_classification(
+            form_oid=form_oid,
+            domain=info.get("domain"),
+            schema=info["schema"],
+            source_forms=info.get("source_forms", [form_oid]),
+            confidence=info.get("confidence", "medium"),
+        )
 
-    for form in als_data["forms"]:
-        form_oid = form["oid"]
-
-        schema_name = None
-        if form_oid in form_classification["baseline"]:
-            schema_name = "baseline"
-        elif form_oid in form_classification["longitudinal"]:
-            schema_name = "longitudinal"
-        elif form_oid in form_classification["occurrence"]:
-            schema_name = "occurrence"
-        else:
-            continue
-
-        for field in als_data["fields"]:
-            if field["form_oid"] != form_oid:
-                continue
-
-            variable_oid = field.get("variable_oid")
-            if not variable_oid or (
-                isinstance(variable_oid, float) and pd.isna(variable_oid)
-            ):
-                continue
-
-            var_name = str(variable_oid).lower()
-            var_id = f"{form_oid.lower()}_{var_name}"
-
-            if var_id in added_vars:
-                continue
-
-            data_type = _map_data_format(field["data_format"])
-
-            param_ref = None
-            if schema_name == "longitudinal" and var_name.upper().startswith("PARAM"):
-                param_ref = var_name.upper()
-
-            meta.add_variable(
-                var_id=var_id,
-                var_name=var_name,
-                schema_name=schema_name,
-                var_label=field["label"],
-                block=form_oid.upper(),
-                data_type=data_type,
-                param_ref=param_ref,
-                flag_ref=None,
-                is_baseline_of_param=False,
-                display_order=None,
-            )
-            added_vars.add(var_id)
-
-    logger.info(f"Variables populated: {len(added_vars)} records")
+    logger.info(f"Form classification populated: {len(form_classification)} records")
 
 
 def parse_als(als_path: str) -> Dict[str, Any]:
     return _parse_als_file(Path(als_path))
+
+
+def get_domain_field_mapping() -> Dict[str, Dict[str, Optional[str]]]:
+    return DOMAIN_FIELD_MAPPING.copy()
+
+
+def set_domain_field_mapping(mapping: Dict[str, Dict[str, Optional[str]]]) -> None:
+    global DOMAIN_FIELD_MAPPING
+    DOMAIN_FIELD_MAPPING = {k: dict(v) for k, v in mapping.items()}
