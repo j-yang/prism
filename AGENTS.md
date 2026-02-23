@@ -66,7 +66,7 @@ from prism.core.database import Database
 | Classes | PascalCase | `Database`, `MetadataManager` |
 | Functions | snake_case | `parse_als_to_db()`, `load_study_data()` |
 | Variables | snake_case | `db_path`, `study_code` |
-| SQL schemas/tables | lowercase | `bronze.demog`, `meta.variables` |
+| SQL schemas/tables | lowercase | `bronze.baseline`, `meta.gold_dictionary` |
 
 ---
 
@@ -79,35 +79,46 @@ with Database(db_path) as db:
     result = db.query_df("SELECT * FROM bronze.demog")
 ```
 
-### Meta Schema (11 Tables)
+### Meta Schema (10 Tables)
 
 All metadata is stored in the `meta` schema:
 
-**Reference Tables (可外链)**:
+**Study Configuration**:
 | Table | Purpose |
 |-------|---------|
-| `meta.params` | Longitudinal parameter definitions |
-| `meta.flags` | Occurrence event flag definitions |
+| `meta.study_info` | Study基本信息 |
 | `meta.visits` | Analysis visit definitions |
+| `meta.form_classification` | Form → Domain/Schema 映射 |
 
-**Study-Specific Tables**:
+**Parameter & Attribute Definitions**:
 | Table | Purpose |
 |-------|---------|
-| `meta.study_info` | Current study information |
-| `meta.variables` | Unified variable registry |
-| `meta.derivations` | Transformation rules |
-| `meta.outputs` | Output definitions |
-| `meta.output_variables` | Output-variable associations |
-| `meta.output_params` | Output-parameter associations |
-| `meta.functions` | Complex function library |
-| `meta.dependencies` | Variable dependency graph |
+| `meta.params` | Longitudinal参数定义 (可外链) |
+| `meta.attrs` | Occurrence domain扩展字段定义 |
+
+**Data Dictionaries**:
+| Table | Purpose |
+|-------|---------|
+| `meta.bronze_dictionary` | Bronze层数据字典 (来自ALS解析) |
+| `meta.silver_dictionary` | Silver层数据字典 (衍生变量) |
+| `meta.gold_dictionary` | Gold层数据字典 (Group Level统计定义) |
+
+**Deliverable Definitions**:
+| Table | Purpose |
+|-------|---------|
+| `meta.platinum_dictionary` | Platinum交付物定义 (table/figure/listing) |
+
+**Dependencies**:
+| Table | Purpose |
+|-------|---------|
+| `meta.dependencies` | 变量依赖关系 |
 
 **DDL Location**: `src/prism/sql/init_meta.sql`
 
 ### Data Layer Conventions
 | Layer | Schema Pattern | Row Granularity |
 |-------|----------------|-----------------|
-| Bronze | `bronze.<form_name>` | Raw EDC records |
+| Bronze | `bronze.baseline`, `bronze.longitudinal`, `bronze.occurrence` | Raw EDC records |
 | Silver | `silver.baseline`, `silver.longitudinal`, `silver.occurrence` | Subject-level |
 | Gold | `gold.baseline`, `gold.longitudinal`, `gold.occurrence` | Group-level |
 

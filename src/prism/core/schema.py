@@ -17,7 +17,7 @@ class DataType(str, Enum):
     FLAG = "flag"
 
 
-class OutputType(str, Enum):
+class DeliverableType(str, Enum):
     TABLE = "table"
     LISTING = "listing"
     FIGURE = "figure"
@@ -116,77 +116,58 @@ class Visit(BaseModel):
     created_at: Optional[datetime] = None
 
 
-class Variable(BaseModel):
+class BronzeVariable(BaseModel):
     var_id: str
+    form_oid: str
+    field_oid: str
+    var_name: Optional[str] = None
+    var_label: Optional[str] = None
+    data_type: Optional[str] = None
+    is_required: bool = False
+    codelist_ref: Optional[str] = None
+    created_at: Optional[datetime] = None
+
+
+class SilverVariable(BaseModel):
     var_name: str
     var_label: Optional[str] = None
     schema: str
-    block: Optional[str] = None
     data_type: Optional[str] = None
+    source_vars: Optional[str] = None
+    transformation: Optional[str] = None
+    transformation_type: Optional[str] = None
+    rule_doc_path: Optional[str] = None
+    description: Optional[str] = None
     param_ref: Optional[str] = None
-    flag_ref: Optional[str] = None
-    is_baseline_of_param: bool = False
     display_order: Optional[int] = None
     created_at: Optional[datetime] = None
 
 
-class Derivation(BaseModel):
-    deriv_id: str
-    target_var: str
-    source_vars: Optional[List[str]] = None
-    source_tables: Optional[List[str]] = None
-    transformation: str
-    transformation_type: Optional[str] = None
-    function_id: Optional[str] = None
-    rule_doc_path: Optional[str] = None
-    complexity: Optional[str] = None
+class GoldVariable(BaseModel):
+    var_id: str
+    group_id: str
+    schema: str
+    population: Optional[str] = None
+    selection: Optional[str] = None
+    statistics: Optional[List] = None
+    deliverable_id: Optional[str] = None
     description: Optional[str] = None
+    unit: Optional[str] = None
+    display_order: Optional[int] = None
     created_at: Optional[datetime] = None
 
-    class Config:
-        json_encoders = {list: lambda v: v if isinstance(v, str) else str(v)}
 
-
-class Output(BaseModel):
-    output_id: str
-    output_type: str
+class PlatinumDeliverable(BaseModel):
+    deliverable_id: str
+    deliverable_type: str
     title: Optional[str] = None
-    schema: str
-    source_block: Optional[str] = None
+    schema: Optional[str] = None
+    elements: Optional[List] = None
     population: Optional[str] = None
-    visit_filter: Optional[str] = None
-    filter_expr: Optional[str] = None
     render_function: Optional[str] = None
     render_options: Optional[dict] = None
     section: Optional[str] = None
     display_order: Optional[int] = None
-    created_at: Optional[datetime] = None
-
-
-class OutputVariable(BaseModel):
-    id: Optional[int] = None
-    output_id: str
-    var_id: str
-    role: Optional[str] = None
-    display_label: Optional[str] = None
-    display_order: Optional[int] = None
-
-
-class OutputParam(BaseModel):
-    id: Optional[int] = None
-    output_id: str
-    paramcd: str
-    display_order: Optional[int] = None
-
-
-class Function(BaseModel):
-    function_id: str
-    function_name: str
-    description: Optional[str] = None
-    impl_type: str
-    impl_code: Optional[str] = None
-    input_params: Optional[dict] = None
-    output_type: Optional[str] = None
     created_at: Optional[datetime] = None
 
 

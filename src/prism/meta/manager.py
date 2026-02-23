@@ -19,10 +19,10 @@ class MetadataManager:
         spec_version: Optional[str] = None,
     ) -> None:
         sql = """
-            INSERT INTO meta.study_info 
+            INSERT INTO meta.study_info
             (study_code, indication, description, als_version, spec_version)
             VALUES (?, ?, ?, ?, ?)
-            ON CONFLICT (study_code) 
+            ON CONFLICT (study_code)
             DO UPDATE SET
                 indication = EXCLUDED.indication,
                 description = EXCLUDED.description,
@@ -66,7 +66,7 @@ class MetadataManager:
              unit, default_source_form, default_source_var, default_aval_expr,
              has_baseline, baseline_definition, is_external, external_source, display_order)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (param_id) 
+            ON CONFLICT (param_id)
             DO UPDATE SET
                 paramcd = EXCLUDED.paramcd,
                 param_label = EXCLUDED.param_label,
@@ -129,73 +129,6 @@ class MetadataManager:
             return None
         return df.iloc[0].to_dict()
 
-    def add_flag(
-        self,
-        flag_id: str,
-        flag_name: str,
-        flag_label: str,
-        domain: str,
-        flag_desc: str = None,
-        default_condition: str = None,
-        true_value: str = "Y",
-        false_value: str = "N",
-        is_external: bool = False,
-        external_source: str = None,
-        display_order: int = None,
-    ) -> None:
-        sql = """
-            INSERT INTO meta.flags
-            (flag_id, flag_name, flag_label, flag_desc, domain, default_condition,
-             true_value, false_value, is_external, external_source, display_order)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (flag_id) 
-            DO UPDATE SET
-                flag_name = EXCLUDED.flag_name,
-                flag_label = EXCLUDED.flag_label,
-                flag_desc = EXCLUDED.flag_desc,
-                domain = EXCLUDED.domain,
-                default_condition = EXCLUDED.default_condition,
-                true_value = EXCLUDED.true_value,
-                false_value = EXCLUDED.false_value,
-                is_external = EXCLUDED.is_external,
-                external_source = EXCLUDED.external_source,
-                display_order = EXCLUDED.display_order
-        """
-        self.db.execute(
-            sql,
-            (
-                flag_id,
-                flag_name,
-                flag_label,
-                flag_desc,
-                domain,
-                default_condition,
-                true_value,
-                false_value,
-                is_external,
-                external_source,
-                display_order,
-            ),
-        )
-        logger.info(f"Flag added: {flag_name}")
-
-    def get_flags(self, domain: str = None, is_external: bool = None) -> List[Dict]:
-        sql = "SELECT * FROM meta.flags WHERE 1=1"
-        params = []
-
-        if domain:
-            sql += " AND domain = ?"
-            params.append(domain)
-
-        if is_external is not None:
-            sql += " AND is_external = ?"
-            params.append(is_external)
-
-        sql += " ORDER BY display_order NULLS LAST, flag_name"
-
-        df = self.db.query_df(sql, tuple(params) if params else None)
-        return df.to_dict("records")
-
     def add_visit(
         self,
         visit_id: str,
@@ -218,7 +151,7 @@ class MetadataManager:
              is_baseline, is_endpoint, target_day, window_lower, window_upper,
              is_external, external_source, display_order)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (visit_id) 
+            ON CONFLICT (visit_id)
             DO UPDATE SET
                 visitnum = EXCLUDED.visitnum,
                 visit_name = EXCLUDED.visit_name,
@@ -272,199 +205,272 @@ class MetadataManager:
         df = self.db.query_df(sql, tuple(params) if params else None)
         return df.to_dict("records")
 
-    def add_variable(
+    # ============================================================================
+    # Bronze Dictionary
+    # ============================================================================
+
+    def add_bronze_variable(
         self,
         var_id: str,
-        var_name: str,
-        schema_name: str,
+        form_oid: str,
+        field_oid: str,
+        var_name: str = None,
         var_label: str = None,
-        block: str = None,
         data_type: str = None,
-        param_ref: str = None,
-        flag_ref: str = None,
-        is_baseline_of_param: bool = False,
-        display_order: int = None,
+        is_required: bool = False,
+        codelist_ref: str = None,
     ) -> None:
         sql = """
-            INSERT INTO meta.variables
-            (var_id, var_name, var_label, schema, block, data_type,
-             param_ref, flag_ref, is_baseline_of_param, display_order)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (var_id) 
+            INSERT INTO meta.bronze_dictionary
+            (var_id, form_oid, field_oid, var_name, var_label, data_type,
+             is_required, codelist_ref)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (var_id)
             DO UPDATE SET
+                form_oid = EXCLUDED.form_oid,
+                field_oid = EXCLUDED.field_oid,
                 var_name = EXCLUDED.var_name,
                 var_label = EXCLUDED.var_label,
-                schema = EXCLUDED.schema,
-                block = EXCLUDED.block,
                 data_type = EXCLUDED.data_type,
-                param_ref = EXCLUDED.param_ref,
-                flag_ref = EXCLUDED.flag_ref,
-                is_baseline_of_param = EXCLUDED.is_baseline_of_param,
-                display_order = EXCLUDED.display_order
+                is_required = EXCLUDED.is_required,
+                codelist_ref = EXCLUDED.codelist_ref
         """
         self.db.execute(
             sql,
             (
                 var_id,
+                form_oid,
+                field_oid,
                 var_name,
                 var_label,
-                schema_name,
-                block,
                 data_type,
+                is_required,
+                codelist_ref,
+            ),
+        )
+        logger.info(f"Bronze variable added: {var_id}")
+
+    def get_bronze_variables(self, form_oid: str = None) -> List[Dict]:
+        sql = "SELECT * FROM meta.bronze_dictionary WHERE 1=1"
+        params = []
+
+        if form_oid:
+            sql += " AND form_oid = ?"
+            params.append(form_oid)
+
+        sql += " ORDER BY var_id"
+
+        df = self.db.query_df(sql, tuple(params) if params else None)
+        return df.to_dict("records")
+
+    # ============================================================================
+    # Silver Dictionary
+    # ============================================================================
+
+    def add_silver_variable(
+        self,
+        var_name: str,
+        schema: str,
+        var_label: str = None,
+        data_type: str = None,
+        source_vars: str = None,
+        transformation: str = None,
+        transformation_type: str = None,
+        rule_doc_path: str = None,
+        description: str = None,
+        param_ref: str = None,
+        display_order: int = None,
+    ) -> None:
+        sql = """
+            INSERT INTO meta.silver_dictionary
+            (var_name, var_label, schema, data_type, source_vars,
+             transformation, transformation_type, rule_doc_path, description,
+             param_ref, display_order)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (var_name)
+            DO UPDATE SET
+                var_label = EXCLUDED.var_label,
+                schema = EXCLUDED.schema,
+                data_type = EXCLUDED.data_type,
+                source_vars = EXCLUDED.source_vars,
+                transformation = EXCLUDED.transformation,
+                transformation_type = EXCLUDED.transformation_type,
+                rule_doc_path = EXCLUDED.rule_doc_path,
+                description = EXCLUDED.description,
+                param_ref = EXCLUDED.param_ref,
+                display_order = EXCLUDED.display_order
+        """
+        self.db.execute(
+            sql,
+            (
+                var_name,
+                var_label,
+                schema,
+                data_type,
+                source_vars,
+                transformation,
+                transformation_type,
+                rule_doc_path,
+                description,
                 param_ref,
-                flag_ref,
-                is_baseline_of_param,
                 display_order,
             ),
         )
-        logger.info(f"Variable added: {var_id} ({schema_name})")
+        logger.info(f"Silver variable added: {var_name}")
 
-    def get_variables(
-        self,
-        schema: str = None,
-        block: str = None,
-        param_ref: str = None,
-        flag_ref: str = None,
+    def get_silver_variables(
+        self, schema: str = None, param_ref: str = None
     ) -> List[Dict]:
-        sql = "SELECT * FROM meta.variables WHERE 1=1"
+        sql = "SELECT * FROM meta.silver_dictionary WHERE 1=1"
         params = []
 
         if schema:
             sql += " AND schema = ?"
             params.append(schema)
 
-        if block:
-            sql += " AND block = ?"
-            params.append(block)
-
         if param_ref:
             sql += " AND param_ref = ?"
             params.append(param_ref)
 
-        if flag_ref:
-            sql += " AND flag_ref = ?"
-            params.append(flag_ref)
-
-        sql += " ORDER BY schema, block NULLS LAST, display_order NULLS LAST, var_id"
+        sql += " ORDER BY display_order NULLS LAST, var_name"
 
         df = self.db.query_df(sql, tuple(params) if params else None)
         return df.to_dict("records")
 
-    def get_variable(self, var_id: str) -> Optional[Dict]:
-        sql = "SELECT * FROM meta.variables WHERE var_id = ?"
-        df = self.db.query_df(sql, (var_id,))
+    def get_silver_variable(self, var_name: str) -> Optional[Dict]:
+        sql = "SELECT * FROM meta.silver_dictionary WHERE var_name = ?"
+        df = self.db.query_df(sql, (var_name,))
         if len(df) == 0:
             return None
         return df.iloc[0].to_dict()
 
-    def add_derivation(
+    # ============================================================================
+    # Gold Dictionary
+    # ============================================================================
+
+    def add_gold_variable(
         self,
-        deriv_id: str,
-        target_var: str,
-        transformation: str,
-        source_vars: List[str] = None,
-        source_tables: List[str] = None,
-        transformation_type: str = None,
-        function_id: str = None,
-        rule_doc_path: str = None,
-        complexity: str = None,
+        var_id: str,
+        group_id: str,
+        schema: str,
+        population: str = None,
+        selection: str = None,
+        statistics: List = None,
+        deliverable_id: str = None,
         description: str = None,
+        unit: str = None,
+        display_order: int = None,
     ) -> None:
-        source_vars_json = json.dumps(source_vars) if source_vars else None
-        source_tables_json = json.dumps(source_tables) if source_tables else None
+        statistics_json = json.dumps(statistics) if statistics else None
 
         sql = """
-            INSERT INTO meta.derivations
-            (deriv_id, target_var, source_vars, source_tables, transformation,
-             transformation_type, function_id, rule_doc_path, complexity, description)
+            INSERT INTO meta.gold_dictionary
+            (var_id, group_id, schema, population, selection,
+             statistics, deliverable_id, description, unit, display_order)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (deriv_id) 
+            ON CONFLICT (var_id)
             DO UPDATE SET
-                target_var = EXCLUDED.target_var,
-                source_vars = EXCLUDED.source_vars,
-                source_tables = EXCLUDED.source_tables,
-                transformation = EXCLUDED.transformation,
-                transformation_type = EXCLUDED.transformation_type,
-                function_id = EXCLUDED.function_id,
-                rule_doc_path = EXCLUDED.rule_doc_path,
-                complexity = EXCLUDED.complexity,
-                description = EXCLUDED.description
+                group_id = EXCLUDED.group_id,
+                schema = EXCLUDED.schema,
+                population = EXCLUDED.population,
+                selection = EXCLUDED.selection,
+                statistics = EXCLUDED.statistics,
+                deliverable_id = EXCLUDED.deliverable_id,
+                description = EXCLUDED.description,
+                unit = EXCLUDED.unit,
+                display_order = EXCLUDED.display_order
         """
         self.db.execute(
             sql,
             (
-                deriv_id,
-                target_var,
-                source_vars_json,
-                source_tables_json,
-                transformation,
-                transformation_type,
-                function_id,
-                rule_doc_path,
-                complexity,
+                var_id,
+                group_id,
+                schema,
+                population,
+                selection,
+                statistics_json,
+                deliverable_id,
                 description,
+                unit,
+                display_order,
             ),
         )
-        logger.info(f"Derivation added: {deriv_id}")
+        logger.info(f"Gold variable added: {var_id}")
 
-    def get_derivations(
-        self, complexity: str = None, transformation_type: str = None
+    def get_gold_variables(
+        self, schema: str = None, group_id: str = None, deliverable_id: str = None
     ) -> List[Dict]:
-        sql = "SELECT * FROM meta.derivations WHERE 1=1"
+        sql = "SELECT * FROM meta.gold_dictionary WHERE 1=1"
         params = []
 
-        if complexity:
-            sql += " AND complexity = ?"
-            params.append(complexity)
+        if schema:
+            sql += " AND schema = ?"
+            params.append(schema)
 
-        if transformation_type:
-            sql += " AND transformation_type = ?"
-            params.append(transformation_type)
+        if group_id:
+            sql += " AND group_id = ?"
+            params.append(group_id)
 
-        sql += " ORDER BY complexity, deriv_id"
+        if deliverable_id:
+            sql += " AND deliverable_id = ?"
+            params.append(deliverable_id)
+
+        sql += " ORDER BY display_order NULLS LAST, var_id"
 
         df = self.db.query_df(sql, tuple(params) if params else None)
-        return df.to_dict("records")
+        results = df.to_dict("records")
 
-    def get_derivation_for_var(self, var_id: str) -> Optional[Dict]:
-        sql = "SELECT * FROM meta.derivations WHERE target_var = ?"
+        # Parse JSON fields
+        for r in results:
+            if r.get("statistics"):
+                r["statistics"] = json.loads(r["statistics"])
+
+        return results
+
+    def get_gold_variable(self, var_id: str) -> Optional[Dict]:
+        sql = "SELECT * FROM meta.gold_dictionary WHERE var_id = ?"
         df = self.db.query_df(sql, (var_id,))
         if len(df) == 0:
             return None
-        return df.iloc[0].to_dict()
 
-    def add_output(
+        result = df.iloc[0].to_dict()
+        if result.get("statistics"):
+            result["statistics"] = json.loads(result["statistics"])
+
+        return result
+
+    # ============================================================================
+    # Platinum Dictionary
+    # ============================================================================
+
+    def add_platinum_deliverable(
         self,
-        output_id: str,
-        output_type: str,
-        schema_name: str,
+        deliverable_id: str,
+        deliverable_type: str,
         title: str = None,
-        source_block: str = None,
+        schema: str = None,
+        elements: List = None,
         population: str = None,
-        visit_filter: str = None,
-        filter_expr: str = None,
         render_function: str = None,
         render_options: Dict = None,
         section: str = None,
         display_order: int = None,
     ) -> None:
+        elements_json = json.dumps(elements) if elements else None
         render_options_json = json.dumps(render_options) if render_options else None
 
         sql = """
-            INSERT INTO meta.outputs
-            (output_id, output_type, title, schema, source_block,
-             population, visit_filter, filter_expr, render_function,
-             render_options, section, display_order)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (output_id) 
+            INSERT INTO meta.platinum_dictionary
+            (deliverable_id, deliverable_type, title, schema, elements,
+             population, render_function, render_options, section, display_order)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (deliverable_id)
             DO UPDATE SET
-                output_type = EXCLUDED.output_type,
+                deliverable_type = EXCLUDED.deliverable_type,
                 title = EXCLUDED.title,
                 schema = EXCLUDED.schema,
-                source_block = EXCLUDED.source_block,
+                elements = EXCLUDED.elements,
                 population = EXCLUDED.population,
-                visit_filter = EXCLUDED.visit_filter,
-                filter_expr = EXCLUDED.filter_expr,
                 render_function = EXCLUDED.render_function,
                 render_options = EXCLUDED.render_options,
                 section = EXCLUDED.section,
@@ -473,168 +479,129 @@ class MetadataManager:
         self.db.execute(
             sql,
             (
-                output_id,
-                output_type,
+                deliverable_id,
+                deliverable_type,
                 title,
-                schema_name,
-                source_block,
+                schema,
+                elements_json,
                 population,
-                visit_filter,
-                filter_expr,
                 render_function,
                 render_options_json,
                 section,
                 display_order,
             ),
         )
-        logger.info(f"Output added: {output_id}")
+        logger.info(f"Platinum deliverable added: {deliverable_id}")
 
-    def get_outputs(
-        self, schema: str = None, output_type: str = None, section: str = None
+    def get_platinum_deliverables(
+        self, schema: str = None, deliverable_type: str = None, section: str = None
     ) -> List[Dict]:
-        sql = "SELECT * FROM meta.outputs WHERE 1=1"
+        sql = "SELECT * FROM meta.platinum_dictionary WHERE 1=1"
         params = []
 
         if schema:
             sql += " AND schema = ?"
             params.append(schema)
 
-        if output_type:
-            sql += " AND output_type = ?"
-            params.append(output_type)
+        if deliverable_type:
+            sql += " AND deliverable_type = ?"
+            params.append(deliverable_type)
 
         if section:
             sql += " AND section = ?"
             params.append(section)
 
-        sql += " ORDER BY section NULLS LAST, display_order NULLS LAST, output_id"
+        sql += " ORDER BY section NULLS LAST, display_order NULLS LAST, deliverable_id"
 
         df = self.db.query_df(sql, tuple(params) if params else None)
-        return df.to_dict("records")
+        results = df.to_dict("records")
 
-    def get_output(self, output_id: str) -> Optional[Dict]:
-        sql = "SELECT * FROM meta.outputs WHERE output_id = ?"
-        df = self.db.query_df(sql, (output_id,))
+        # Parse JSON fields
+        for r in results:
+            if r.get("elements"):
+                r["elements"] = json.loads(r["elements"])
+            if r.get("render_options"):
+                r["render_options"] = json.loads(r["render_options"])
+
+        return results
+
+    def get_platinum_deliverable(self, deliverable_id: str) -> Optional[Dict]:
+        sql = "SELECT * FROM meta.platinum_dictionary WHERE deliverable_id = ?"
+        df = self.db.query_df(sql, (deliverable_id,))
         if len(df) == 0:
             return None
-        return df.iloc[0].to_dict()
 
-    def add_output_variable(
+        result = df.iloc[0].to_dict()
+
+        if result.get("elements"):
+            result["elements"] = json.loads(result["elements"])
+        if result.get("render_options"):
+            result["render_options"] = json.loads(result["render_options"])
+
+        return result
+
+    # ============================================================================
+    # Form Classification
+    # ============================================================================
+
+    def add_form_classification(
         self,
-        output_id: str,
-        var_id: str,
-        role: str = None,
-        display_label: str = None,
-        display_order: int = None,
+        form_oid: str,
+        schema: str,
+        domain: Optional[str] = None,
+        source_forms: Optional[List[str]] = None,
+        confidence: str = "medium",
     ) -> None:
+        source_forms_json = json.dumps(source_forms) if source_forms else None
+
         sql = """
-            INSERT INTO meta.output_variables
-            (output_id, var_id, role, display_label, display_order)
+            INSERT INTO meta.form_classification
+            (form_oid, domain, schema, source_forms, classification_confidence)
             VALUES (?, ?, ?, ?, ?)
-            ON CONFLICT (output_id, var_id) 
+            ON CONFLICT (form_oid)
             DO UPDATE SET
-                role = EXCLUDED.role,
-                display_label = EXCLUDED.display_label,
-                display_order = EXCLUDED.display_order
+                domain = EXCLUDED.domain,
+                schema = EXCLUDED.schema,
+                source_forms = EXCLUDED.source_forms,
+                classification_confidence = EXCLUDED.classification_confidence
         """
-        self.db.execute(sql, (output_id, var_id, role, display_label, display_order))
-        logger.info(f"Output variable added: {output_id} -> {var_id}")
+        self.db.execute(sql, (form_oid, domain, schema, source_forms_json, confidence))
+        logger.info(f"Form classification added: {form_oid} -> {schema}")
 
-    def get_output_variables(self, output_id: str) -> List[Dict]:
-        sql = """
-            SELECT ov.*, v.var_name, v.var_label, v.schema, v.data_type
-            FROM meta.output_variables ov
-            JOIN meta.variables v ON ov.var_id = v.var_id
-            WHERE ov.output_id = ?
-            ORDER BY ov.display_order NULLS LAST
-        """
-        df = self.db.query_df(sql, (output_id,))
-        return df.to_dict("records")
-
-    def add_output_param(
-        self, output_id: str, paramcd: str, display_order: int = None
-    ) -> None:
-        sql = """
-            INSERT INTO meta.output_params
-            (output_id, paramcd, display_order)
-            VALUES (?, ?, ?)
-            ON CONFLICT (output_id, paramcd) 
-            DO UPDATE SET
-                display_order = EXCLUDED.display_order
-        """
-        self.db.execute(sql, (output_id, paramcd, display_order))
-        logger.info(f"Output param added: {output_id} -> {paramcd}")
-
-    def get_output_params(self, output_id: str) -> List[Dict]:
-        sql = """
-            SELECT op.*, p.param_label, p.category, p.unit
-            FROM meta.output_params op
-            JOIN meta.params p ON op.paramcd = p.paramcd
-            WHERE op.output_id = ?
-            ORDER BY op.display_order NULLS LAST
-        """
-        df = self.db.query_df(sql, (output_id,))
-        return df.to_dict("records")
-
-    def add_function(
-        self,
-        function_id: str,
-        function_name: str,
-        impl_type: str,
-        description: str = None,
-        impl_code: str = None,
-        input_params: Dict = None,
-        output_type: str = None,
-    ) -> None:
-        input_params_json = json.dumps(input_params) if input_params else None
-
-        sql = """
-            INSERT INTO meta.functions
-            (function_id, function_name, description, impl_type, impl_code,
-             input_params, output_type)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (function_id) 
-            DO UPDATE SET
-                function_name = EXCLUDED.function_name,
-                description = EXCLUDED.description,
-                impl_type = EXCLUDED.impl_type,
-                impl_code = EXCLUDED.impl_code,
-                input_params = EXCLUDED.input_params,
-                output_type = EXCLUDED.output_type
-        """
-        self.db.execute(
-            sql,
-            (
-                function_id,
-                function_name,
-                description,
-                impl_type,
-                impl_code,
-                input_params_json,
-                output_type,
-            ),
-        )
-        logger.info(f"Function added: {function_id}")
-
-    def get_functions(self, impl_type: str = None) -> List[Dict]:
-        sql = "SELECT * FROM meta.functions WHERE 1=1"
+    def get_form_classification(
+        self, form_oid: str = None, schema: str = None
+    ) -> List[Dict]:
+        sql = "SELECT * FROM meta.form_classification WHERE 1=1"
         params = []
 
-        if impl_type:
-            sql += " AND impl_type = ?"
-            params.append(impl_type)
+        if form_oid:
+            sql += " AND form_oid = ?"
+            params.append(form_oid)
 
-        sql += " ORDER BY function_id"
+        if schema:
+            sql += " AND schema = ?"
+            params.append(schema)
+
+        sql += " ORDER BY schema, form_oid"
 
         df = self.db.query_df(sql, tuple(params) if params else None)
-        return df.to_dict("records")
+        results = df.to_dict("records")
 
-    def get_function(self, function_id: str) -> Optional[Dict]:
-        sql = "SELECT * FROM meta.functions WHERE function_id = ?"
-        df = self.db.query_df(sql, (function_id,))
-        if len(df) == 0:
-            return None
-        return df.iloc[0].to_dict()
+        # Parse JSON fields
+        for r in results:
+            if r.get("source_forms"):
+                r["source_forms"] = json.loads(r["source_forms"])
+
+        return results
+
+    def get_forms_by_domain(self, domain: str) -> List[str]:
+        sql = "SELECT form_oid FROM meta.form_classification WHERE domain = ?"
+        df = self.db.query_df(sql, (domain,))
+        return df["form_oid"].tolist() if len(df) > 0 else []
+
+    # ============================================================================
+    # Dependencies
+    # ============================================================================
 
     def add_dependency(self, from_var: str, to_var: str) -> None:
         sql = """
@@ -665,106 +632,3 @@ class MetadataManager:
         sql = "SELECT to_var FROM meta.dependencies WHERE from_var = ?"
         df = self.db.query_df(sql, (var_id,))
         return df["to_var"].tolist() if len(df) > 0 else []
-
-    def get_execution_order(self) -> List[str]:
-        deps = self.get_dependencies()
-        if not deps:
-            variables = self.get_variables()
-            return [v["var_id"] for v in variables]
-
-        graph = {}
-        in_degree = {}
-
-        for v in self.get_variables():
-            var_id = v["var_id"]
-            graph[var_id] = []
-            in_degree[var_id] = 0
-
-        for d in deps:
-            from_var = d["from_var"]
-            to_var = d["to_var"]
-            if from_var in graph and to_var in graph:
-                graph[from_var].append(to_var)
-                in_degree[to_var] += 1
-
-        queue = [v for v in in_degree if in_degree[v] == 0]
-        result = []
-
-        while queue:
-            var = queue.pop(0)
-            result.append(var)
-            for neighbor in graph.get(var, []):
-                in_degree[neighbor] -= 1
-                if in_degree[neighbor] == 0:
-                    queue.append(neighbor)
-
-        return result
-
-    def get_missing_derivations(self) -> List[Dict]:
-        sql = """
-            SELECT v.* 
-            FROM meta.variables v
-            LEFT JOIN meta.derivations d ON v.var_id = d.target_var
-            WHERE d.deriv_id IS NULL
-            ORDER BY v.schema, v.var_id
-        """
-        df = self.db.query_df(sql)
-        return df.to_dict("records")
-
-    def get_output_full_spec(self, output_id: str) -> Optional[Dict]:
-        output = self.get_output(output_id)
-        if not output:
-            return None
-
-        output["variables"] = self.get_output_variables(output_id)
-        output["params"] = self.get_output_params(output_id)
-
-        return output
-
-    def add_form_classification(
-        self,
-        form_oid: str,
-        schema: str,
-        domain: Optional[str] = None,
-        source_forms: Optional[List[str]] = None,
-        confidence: str = "medium",
-    ) -> None:
-        source_forms_json = json.dumps(source_forms) if source_forms else None
-
-        sql = """
-            INSERT INTO meta.form_classification
-            (form_oid, domain, schema, source_forms, classification_confidence)
-            VALUES (?, ?, ?, ?, ?)
-            ON CONFLICT (form_oid) 
-            DO UPDATE SET
-                domain = EXCLUDED.domain,
-                schema = EXCLUDED.schema,
-                source_forms = EXCLUDED.source_forms,
-                classification_confidence = EXCLUDED.classification_confidence
-        """
-        self.db.execute(sql, (form_oid, domain, schema, source_forms_json, confidence))
-        logger.info(f"Form classification added: {form_oid} -> {schema}")
-
-    def get_form_classification(
-        self, form_oid: str = None, schema: str = None
-    ) -> List[Dict]:
-        sql = "SELECT * FROM meta.form_classification WHERE 1=1"
-        params = []
-
-        if form_oid:
-            sql += " AND form_oid = ?"
-            params.append(form_oid)
-
-        if schema:
-            sql += " AND schema = ?"
-            params.append(schema)
-
-        sql += " ORDER BY schema, form_oid"
-
-        df = self.db.query_df(sql, tuple(params) if params else None)
-        return df.to_dict("records")
-
-    def get_forms_by_domain(self, domain: str) -> List[str]:
-        sql = "SELECT form_oid FROM meta.form_classification WHERE domain = ?"
-        df = self.db.query_df(sql, (domain,))
-        return df["form_oid"].tolist() if len(df) > 0 else []
