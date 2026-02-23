@@ -83,12 +83,12 @@ class TestDomainFieldMapping:
         mapping = get_domain_field_mapping()
 
         assert "AE" in mapping
-        assert mapping["AE"]["term"] == "AETERM"
-        assert mapping["AE"]["startdt"] == "AESTDTC"
-        assert mapping["AE"]["coding_low"] == "AEDECOD"
+        assert mapping["AE"]["term"] == "aeterm"
+        assert mapping["AE"]["startdt"] == "aestdtc"
+        assert mapping["AE"]["coding_low"] == "aedecod"
 
         assert "CM" in mapping
-        assert mapping["CM"]["term"] == "CMTRT"
+        assert mapping["CM"]["term"] == "cmtrt"
 
 
 class TestParseALS:

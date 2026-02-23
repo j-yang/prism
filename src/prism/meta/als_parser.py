@@ -2,15 +2,14 @@
 ALS Parser for PRISM
 
 Parses Annotated Label Specification (ALS) files and generates:
-1. Bronze layer tables (baseline, longitudinal, occurrence)
-2. Meta tables (study_info, visits, form_classification)
+1. Bronze layer tables (one per form)
+2. Meta tables (study_info, visits, form_classification, bronze_dictionary)
 """
 
 import pandas as pd
 from pathlib import Path
 from typing import Dict, List, Any, Optional
 import json
-import re
 import logging
 
 from prism.core.database import Database
@@ -24,44 +23,6 @@ DOMAIN_MAPPING: Dict[str, List[str]] = {
     "MH": ["MH", "MH1", "MH2", "MH3"],
     "PR": ["PR", "PR1", "PR2", "PR3"],
     "DEATH": ["DS", "DS1", "DTH", "DEATH"],
-}
-
-DOMAIN_FIELD_MAPPING: Dict[str, Dict[str, Optional[str]]] = {
-    "AE": {
-        "term": "AETERM",
-        "startdt": "AESTDTC",
-        "enddt": "AEENDTC",
-        "coding_high": "AESOC",
-        "coding_low": "AEDECOD",
-    },
-    "CM": {
-        "term": "CMTRT",
-        "startdt": "CMSTDTC",
-        "enddt": "CMENDTC",
-        "coding_high": "CMATC1",
-        "coding_low": "CMDECOD",
-    },
-    "MH": {
-        "term": "MHTERM",
-        "startdt": "MHSTDTC",
-        "enddt": "MHENDTC",
-        "coding_high": "MHSOC",
-        "coding_low": "MHDECOD",
-    },
-    "PR": {
-        "term": "PRTRT",
-        "startdt": "PRSTDTC",
-        "enddt": "PRENDTC",
-        "coding_high": "PRATC1",
-        "coding_low": "PRDECOD",
-    },
-    "DEATH": {
-        "term": "DSTERM",
-        "startdt": "DSSTDTC",
-        "enddt": None,
-        "coding_high": None,
-        "coding_low": None,
-    },
 }
 
 BASELINE_FOLDER_PATTERNS = ["SCR", "BASE", "SCREEN"]
@@ -246,6 +207,51 @@ def _parse_codelists(xl: pd.ExcelFile) -> Dict[str, Dict[str, str]]:
     return codelists
 
 
+def _infer_data_type(data_format: str) -> str:
+    if not data_format:
+        return "TEXT"
+
+    fmt = str(data_format).upper()
+
+    if "DATE" in fmt or "YYYY" in fmt:
+        return "DATE"
+    if "TIME" in fmt or "HH" in fmt:
+        return "TIMESTAMP"
+
+    try:
+        if "." in data_format:
+            return "DOUBLE"
+        if data_format.isdigit():
+            return "INTEGER"
+    except Exception:
+        pass
+
+    if data_format.startswith("$"):
+        return "TEXT"
+
+    return "TEXT"
+
+
+def generate_bronze_ddl(form_oid: str, fields: List[Dict]) -> str:
+    form_fields = [f for f in fields if f["form_oid"] == form_oid]
+
+    columns = ["    usubjid TEXT NOT NULL", "    subjid TEXT"]
+
+    for field in form_fields:
+        var_name = (field["variable_oid"] or field["field_oid"]).lower()
+        data_type = _infer_data_type(field.get("data_format", ""))
+        columns.append(f"    {var_name} {data_type}")
+
+    ddl = f"""CREATE TABLE IF NOT EXISTS bronze.{form_oid.lower()} (
+{",\n".join(columns)}
+);
+
+COMMENT ON TABLE bronze.{form_oid.lower()} IS 'Raw data from form {form_oid}';
+
+"""
+    return ddl
+
+
 def parse_als_to_db(
     als_path: str,
     db: Database,
@@ -272,13 +278,32 @@ def parse_als_to_db(
         als_version = str(crf_draft.iloc[0].get("DraftName", ""))
 
     meta.set_study_info(
-        study_code=study_code,
+        studyid=study_code or "STUDY001",
         als_version=als_version,
     )
 
     _populate_visits(meta, als_data["folders"])
 
     _populate_form_classification(meta, form_classification)
+
+    _populate_bronze_dictionary(meta, als_data["fields"], form_classification)
+
+    _create_bronze_tables(db, als_data["forms"], als_data["fields"])
+
+    classification_summary = {
+        "occurrence": len(
+            [f for f in form_classification.values() if f["schema"] == "occurrence"]
+        ),
+        "baseline": len(
+            [f for f in form_classification.values() if f["schema"] == "baseline"]
+        ),
+        "longitudinal": len(
+            [f for f in form_classification.values() if f["schema"] == "longitudinal"]
+        ),
+        "unknown": len(
+            [f for f in form_classification.values() if f["schema"] == "unknown"]
+        ),
+    }
 
     result = {
         "study_code": study_code,
@@ -287,24 +312,8 @@ def parse_als_to_db(
         "fields_total": len(als_data["fields"]),
         "folders_total": len(als_data["folders"]),
         "codelists_total": len(als_data["codelists"]),
-        "classification": {
-            "occurrence": len(
-                [f for f in form_classification.values() if f["schema"] == "occurrence"]
-            ),
-            "baseline": len(
-                [f for f in form_classification.values() if f["schema"] == "baseline"]
-            ),
-            "longitudinal": len(
-                [
-                    f
-                    for f in form_classification.values()
-                    if f["schema"] == "longitudinal"
-                ]
-            ),
-            "unknown": len(
-                [f for f in form_classification.values() if f["schema"] == "unknown"]
-            ),
-        },
+        "bronze_tables": len(als_data["forms"]),
+        "classification": classification_summary,
     }
 
     logger.info(f"ALS parsing complete: {result}")
@@ -353,14 +362,81 @@ def _populate_form_classification(
     logger.info(f"Form classification populated: {len(form_classification)} records")
 
 
+def _populate_bronze_dictionary(
+    meta: MetadataManager,
+    fields: List[Dict],
+    form_classification: Dict[str, Dict[str, Any]],
+) -> None:
+    logger.info("Populating meta.bronze_dictionary...")
+
+    count = 0
+    for field in fields:
+        form_oid = field["form_oid"]
+        var_name = (field.get("variable_oid") or field["field_oid"]).lower()
+
+        classification = form_classification.get(form_oid, {})
+        schema = classification.get("schema", "unknown")
+
+        meta.add_bronze_variable(
+            var_name=var_name,
+            form_oid=form_oid.lower(),
+            field_oid=field["field_oid"],
+            var_label=field.get("label"),
+            data_type=_infer_data_type(field.get("data_format", "")),
+            schema=schema,
+            codelist_ref=field.get("codelist_name"),
+        )
+        count += 1
+
+    logger.info(f"Bronze dictionary populated: {count} records")
+
+
+def _create_bronze_tables(
+    db: Database,
+    forms: List[Dict],
+    fields: List[Dict],
+) -> None:
+    logger.info("Creating bronze tables...")
+
+    count = 0
+    for form in forms:
+        form_oid = form["oid"]
+
+        if not form.get("active", True):
+            continue
+
+        ddl = generate_bronze_ddl(form_oid, fields)
+        db.execute(ddl)
+        count += 1
+
+    logger.info(f"Bronze tables created: {count}")
+
+
 def parse_als(als_path: str) -> Dict[str, Any]:
     return _parse_als_file(Path(als_path))
 
 
 def get_domain_field_mapping() -> Dict[str, Dict[str, Optional[str]]]:
-    return DOMAIN_FIELD_MAPPING.copy()
-
-
-def set_domain_field_mapping(mapping: Dict[str, Dict[str, Optional[str]]]) -> None:
-    global DOMAIN_FIELD_MAPPING
-    DOMAIN_FIELD_MAPPING = {k: dict(v) for k, v in mapping.items()}
+    return {
+        "AE": {
+            "term": "aeterm",
+            "startdt": "aestdtc",
+            "enddt": "aeendtc",
+            "coding_high": "aesoc",
+            "coding_low": "aedecod",
+        },
+        "CM": {
+            "term": "cmtrt",
+            "startdt": "cmstdtc",
+            "enddt": "cmendtc",
+            "coding_high": "cmatc1",
+            "coding_low": "cmdecod",
+        },
+        "MH": {
+            "term": "mhterm",
+            "startdt": "mhstdtc",
+            "enddt": "mhendtc",
+            "coding_high": "mhsoc",
+            "coding_low": "mhdecod",
+        },
+    }

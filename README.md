@@ -8,15 +8,15 @@ PRISM implements a Medallion architecture for clinical trial data:
 
 ```
 ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌───────────┐
-│  Meta   │───▶│  Bronze │───▶│  Silver │───▶│   Gold     │
-│ (Spec)  │    │  (Raw)  │    │(Derived)│    │  (Stats)   │
+│  Meta   │───▶│  Bronze │───▶│  Silver │───▶│   Gold    │
+│ (Spec)  │    │  (Raw)  │    │(Derived)│    │ (Stats)   │
 └─────────┘    └─────────┘    └─────────┘    └───────────┘
-                                                     │
-                                                     ▼
-                                              ┌───────────┐
-                                              │  Platinum  │
-                                              │ (Reports) │
-                                              └───────────┘
+                                                       │
+                                                       ▼
+                                                ┌───────────┐
+                                                │ Platinum  │
+                                                │ (Reports) │
+                                                └───────────┘
 ```
 
 ## Installation
@@ -29,13 +29,16 @@ pip install -e .
 
 ```python
 from prism import Database, MetadataManager, SilverGenerator, GoldEngine
+from prism.meta import parse_als_to_db
 
 # Initialize database
 db = Database("study.duckdb")
 
+# Parse ALS (creates bronze tables and meta.bronze_dictionary)
+parse_als_to_db("path/to/als.xlsx", db, study_code="STUDY001")
+
 # Manage metadata
 meta = MetadataManager(db)
-meta.set_study_info(study_code="STUDY001")
 
 # Generate Silver layer SQL
 silver = SilverGenerator(db)
@@ -52,7 +55,7 @@ gold.generate_all("generated/gold/")
 prism/
 ├── src/prism/
 │   ├── core/           # Database, schema models
-│   ├── sql/            # DDL scripts (init_meta.sql v5.0)
+│   ├── sql/            # DDL scripts
 │   ├── agent/          # LLM integration, templates
 │   ├── meta/           # Metadata management, ALS parser
 │   ├── bronze/         # Raw data import (SAS/CSV)
@@ -68,33 +71,50 @@ prism/
 
 | Layer | Schema | Description |
 |-------|--------|-------------|
-| Meta | `meta.*` | 10 metadata tables (dictionaries, deliverables, dependencies) |
+| Meta | `meta.*` | 10 metadata tables |
 | Bronze | `bronze.*` | Raw EDC data (one table per form) |
 | Silver | `silver.baseline/longitudinal/occurrence` | Subject-level derived data |
 | Gold | `gold.baseline/longitudinal/occurrence` | Group-level statistics |
+| Platinum | - | Report output (RTF/PDF/HTML) |
 
-## Meta Schema (v5.0)
+## Bronze Layer
 
-### Dictionaries
-| Table | Purpose |
-|-------|---------|
-| `meta.bronze_dictionary` | Bronze层数据字典 |
-| `meta.silver_dictionary` | Silver层数据字典 |
-| `meta.gold_dictionary` | Gold层数据字典 (Group Level) |
+**按原始 Form 存储，保持完整 Traceability**
 
-### Deliverables
-| Table | Purpose |
-|-------|---------|
-| `meta.platinum_dictionary` | Platinum交付物定义 (table/figure/listing) |
+- `bronze.ae` - Adverse Events
+- `bronze.cm` - Concomitant Medications
+- `bronze.dm` - Demographics
+- `bronze.lb` - Laboratory
+- `bronze.vs` - Vital Signs
+- ... (N tables, one per form)
+
+Processing rules:
+- Column names: lowercase
+- Date conversion: SAS date → DATE type
+- No filtering by default
+
+## Meta Schema (10 Tables)
 
 ### Configuration
 | Table | Purpose |
 |-------|---------|
-| `meta.study_info` | Study基本信息 |
-| `meta.params` | Longitudinal参数定义 |
-| `meta.attrs` | Occurrence domain扩展字段定义 |
-| `meta.visits` | Analysis visit definitions |
-| `meta.form_classification` | Form分类映射 |
+| `meta.study_info` | Study 基本信息 |
+| `meta.visits` | 分析 Visit 定义 |
+| `meta.form_classification` | Form → Domain/Schema 映射 |
+
+### Dictionaries
+| Table | Purpose |
+|-------|---------|
+| `meta.bronze_dictionary` | Bronze 层数据字典（来自 ALS） |
+| `meta.silver_dictionary` | Silver 层数据字典（来自 Spec） |
+| `meta.gold_dictionary` | Gold 层数据字典（来自 Spec） |
+| `meta.platinum_dictionary` | Platinum 交付物定义 |
+
+### Definitions
+| Table | Purpose |
+|-------|---------|
+| `meta.params` | Longitudinal 参数定义 |
+| `meta.attrs` | Occurrence 扩展字段定义 |
 | `meta.dependencies` | 变量依赖关系 |
 
 ## Agent
@@ -118,7 +138,7 @@ PYTHONPATH=src pytest tests/
 ## Documentation
 
 - **ARCHITECTURE.md** - Detailed architecture and schema design
-- **CHANGELOG.md** - Version history and changes
+- **ALS_PLAN.md** - ALS parser design notes
 
 ## License
 

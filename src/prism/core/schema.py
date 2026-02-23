@@ -56,7 +56,7 @@ class ImplType(str, Enum):
 
 
 class StudyInfo(BaseModel):
-    study_code: str
+    studyid: str
     indication: Optional[str] = None
     description: Optional[str] = None
     als_version: Optional[str] = None
@@ -117,10 +117,10 @@ class Visit(BaseModel):
 
 
 class BronzeVariable(BaseModel):
-    var_id: str
+    var_name: str
     form_oid: str
-    field_oid: str
-    var_name: Optional[str] = None
+    schema: str
+    field_oid: Optional[str] = None
     var_label: Optional[str] = None
     data_type: Optional[str] = None
     is_required: bool = False

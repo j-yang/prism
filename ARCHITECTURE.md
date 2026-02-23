@@ -4,77 +4,144 @@
 
 PRISM is a clinical trial data warehouse built on DuckDB with AI-powered code generation.
 
-## Medallion Architecture
+## Architecture
 
 ```
-                    ┌─────────────────────────────────────┐
-                    │                  Meta Layer                  │
-                    │  10 tables: params, attrs, visits,          │
-                    │  bronze_dictionary, silver_dictionary,        │
-                    │  gold_dictionary, platinum_dictionary,        │
-                    │  form_classification, dependencies, etc.                │
-                    └──────────────────────┬──────────────────────┘
-                                           │
-                    ┌──────────────────────▼──────────────────────┐
-                    │                Bronze Layer                  │
-                    │  Raw EDC data imported from SAS/CSV/Excel    │
-                    │  3 tables: bronze_baseline,                │
-                    │            bronze_longitudinal,             │
-                    │            bronze_occurrence                    │
-                    └──────────────────────┬──────────────────────┘
-                                           │ Agent generates SQL
-                    ┌──────────────────────▼──────────────────────┐
-                    │                Silver Layer                  │
-                    │  Subject-level derived data                 │
-                    │  3 schemas: baseline, longitudinal,         │
-                    │             occurrence                      │
-                    └──────────────────────┬──────────────────────┘
-                                           │ Agent generates Python
-                    ┌──────────────────────▼──────────────────────┐
-                    │                 Gold Layer                   │
-                    │  Group-level statistics                     │
-                    │  Long-table format for flexible rendering   │
-                    └──────────────────────┬──────────────────────┘
-                                           │
-                    ┌──────────────────────▼──────────────────────┐
-                    │              Platinum Layer                  │
-                    │  Report output: RTF, PDF, HTML, Slides      │
-                    └─────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│                     meta (Specification)                    │
+│  10 tables: study_info, visits, form_classification,        │
+│  bronze_dictionary, params, attrs, silver_dictionary,       │
+│  gold_dictionary, platinum_dictionary, dependencies         │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────┐
+│                    Bronze (Raw Data)                        │
+│  One table per form: bronze.ae, bronze.cm, bronze.dm, ...   │
+│  Minimal processing: lowercase columns, date conversion     │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ Agent generates SQL
+┌──────────────────────────▼──────────────────────────────────┐
+│                    Silver (Derived)                         │
+│  3 schemas: silver.baseline, silver.longitudinal,           │
+│             silver.occurrence                               │
+└──────────────────────────┬──────────────────────────────────┘
+                           │ Agent generates Python
+┌──────────────────────────▼──────────────────────────────────┐
+│                    Gold (Statistics)                        │
+│  3 schemas: gold.baseline, gold.longitudinal,               │
+│             gold.occurrence                                 │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+┌──────────────────────────▼──────────────────────────────────┐
+│                   Platinum (Deliverables)                   │
+│  Output: RTF, PDF, HTML, Slides                             │
+└─────────────────────────────────────────────────────────────┘
 ```
+
+---
 
 ## Meta Schema (10 Tables)
 
 ### Study Configuration
 | Table | Purpose |
 |-------|---------|
-| `meta.study_info` | Study基本信息 |
-| `meta.visits` | Analysis visit definitions |
+| `meta.study_info` | Study 基本信息 |
+| `meta.visits` | 分析 Visit 定义 |
+
+### Data Dictionary
+| Table | Purpose |
+|-------|---------|
+| `meta.bronze_dictionary` | Bronze 层数据字典（来自 ALS） |
+| `meta.silver_dictionary` | Silver 层数据字典（来自 Spec） |
+| `meta.gold_dictionary` | Gold 层数据字典（来自 Spec） |
+| `meta.platinum_dictionary` | Platinum 交付物定义 |
+
+### Form & Variable Classification
+| Table | Purpose |
+|-------|---------|
 | `meta.form_classification` | Form → Domain/Schema 映射 |
-
-### Parameter & Attribute Definitions
-| Table | Purpose |
-|-------|---------|
-| `meta.params` | Longitudinal参数定义 (可外链) |
-| `meta.attrs` | Occurrence domain扩展字段定义 |
-
-### Data Dictionaries
-| Table | Purpose |
-|-------|---------|
-| `meta.bronze_dictionary` | Bronze层数据字典 (来自ALS解析) |
-| `meta.silver_dictionary` | Silver层数据字典 (衍生变量) |
-| `meta.gold_dictionary` | Gold层数据字典 (Group Level统计定义) |
-
-### Deliverable Definitions
-| Table | Purpose |
-|-------|---------|
-| `meta.platinum_dictionary` | Platinum交付物定义 (table/figure/listing) |
+| `meta.params` | Longitudinal 参数定义 |
+| `meta.attrs` | Occurrence 扩展字段定义 |
 
 ### Dependencies
 | Table | Purpose |
 |-------|---------|
 | `meta.dependencies` | 变量依赖关系 |
 
-## Gold Layer Design
+---
+
+## Bronze Layer
+
+### Design Principle
+
+**按原始 Form 存储，保持完整 Traceability**
+
+```
+bronze.ae    -- Adverse Events
+bronze.cm    -- Concomitant Medications
+bronze.dm    -- Demographics
+bronze.lb    -- Laboratory
+bronze.vs    -- Vital Signs
+... (N tables, one per form)
+```
+
+### Processing Rules
+
+1. **列名小写**：`AETERM` → `aeterm`
+2. **日期转换**：SAS date → DATE type
+3. **保留所有字段**：不做筛选
+4. **可选删除**：用户可指定删除不需要的列
+
+### Example
+
+```sql
+CREATE TABLE bronze.ae (
+    usubjid TEXT NOT NULL,
+    subjid TEXT,
+    aeterm TEXT,
+    aestdtc DATE,
+    aeendtc DATE,
+    aesoc TEXT,
+    aedecod TEXT,
+    aeout TEXT,
+    aeser TEXT,
+    ... (all AE fields)
+);
+```
+
+### Traceability
+
+```
+bronze_dictionary:
+  var_name | form_oid | schema      | var_label
+  ---------|----------|-------------|------------
+  aeterm   | ae       | occurrence  | Adverse Event
+  age      | dm       | baseline    | Age
+  sysbp    | vs       | longitudinal| Systolic BP
+```
+
+---
+
+## Silver Layer
+
+3 schemas with consistent structure:
+
+### baseline
+- One row per subject
+- Derived from bronze baseline forms
+
+### longitudinal
+- One row per subject per visit
+- Derived from bronze longitudinal forms
+
+### occurrence
+- One row per event
+- Consolidated from AE, CM, MH, PR forms
+- Structure: `usubjid, subjid, domain, seq, term, startdt, enddt, coding_high, coding_low, flags JSON, attrs JSON`
+
+---
+
+## Gold Layer
 
 ### Gold Schema (3 Tables)
 
@@ -111,59 +178,31 @@ deliverable_id, element_id, group_id, selection, statistics(JSON)
 {"n_subjects": 10, "n_events": 15, "pct": 20.0}
 ```
 
-### Gold Dictionary Schema
+---
 
-```sql
-CREATE TABLE meta.gold_dictionary (
-    element_id TEXT NOT NULL,          -- 变量名/paramcd/coding_high/coding_low
-    group_id TEXT NOT NULL,            -- 分组值：Drug, Placebo
-    schema TEXT NOT NULL,              -- baseline, longitudinal, occurrence
+## Data Flow
 
-    population TEXT,                   -- SAFFL, FASFL
-    selection TEXT,                    -- 过滤条件
-                                      -- baseline: NULL
-                                      -- longitudinal: "visit=VISIT1"
-                                      -- occurrence: "domain=AE;saefl=Y"
+```
+1. ALS 解析
+   parse_als_to_db() → bronze tables, meta.bronze_dictionary
 
-    statistics JSON,                   -- 要计算的统计量 ["n", "mean", "sd"]
+2. Spec 解析
+   parse_spec_to_db() → meta.params, meta.silver_dictionary, meta.gold_dictionary
 
-    deliverable_id TEXT,               -- 关联的 platinum 交付物
+3. Bronze 数据加载
+   load_sas_to_bronze() → bronze.* tables
 
-    description TEXT,
-    unit TEXT,
-    display_order INTEGER,
-    created_at TIMESTAMP,
+4. Silver 生成
+   SilverGenerator.generate() → silver.* tables
 
-    PRIMARY KEY (element_id, group_id, schema, COALESCE(selection, ''))
-);
+5. Gold 生成
+   GoldEngine.generate() → gold.* tables
+
+6. Platinum 渲染
+   render_output() → RTF/PDF/HTML
 ```
 
-## Platinum Layer Design
-
-### Platinum Dictionary Schema
-
-```sql
-CREATE TABLE meta.platinum_dictionary (
-    deliverable_id TEXT PRIMARY KEY,    -- "T1_DEMOG", "L2_AE"
-    deliverable_type TEXT NOT NULL,    -- table, listing, figure
-
-    title TEXT,
-
-    schema TEXT,                       -- baseline, longitudinal, occurrence
-
-    elements JSON,                     -- 引用的元素
-    -- [{"type": "variable", "id": "age", "label": "Age (Years)"},
-    --  {"type": "param", "id": "PHGA", "label": "Physician Global Assessment"},
-    --  {"type": "attr", "id": "saefl", "filter": "saefl='Y'"}]
-
-    population TEXT,
-
-    section TEXT,
-    display_order INTEGER,
-
-    created_at TIMESTAMP
-);
-```
+---
 
 ## Agent System
 
@@ -178,7 +217,7 @@ meta.silver_dictionary (transformation) ──▶ Template Match? ──▶ Yes 
                                     DeepSeek LLM ──▶ Generated SQL/Python
                                                  │
                                                  ▼
-                                    Needs Review (flagged )
+                                    Needs Review (flagged)
 ```
 
 ### Template Types
@@ -191,41 +230,8 @@ meta.silver_dictionary (transformation) ──▶ Template Match? ──▶ Yes 
 | date_diff | "Date diff" | `DATE_DIFF(day, d1, d2)` |
 | combine | "Combine", "Concat" | `CONCAT(a, b)` |
 | flag | "Flag", "Y/N" | `CASE WHEN cond THEN 'Y'` |
-| age_group | "Age categorization" | `CASE WHEN age < 18 THEN '<18' ...` |
-| concat | "Column concatenation" | `CONCAT(a, b, c)` |
-| change_baseline | "Baseline change" | `value - baseline_value` |
 
-## Data Flow
-
-```
-1. Parse ALS
-   parse_als_to_db() → meta.bronze_dictionary, meta.form_classification,
-                       meta.visits, bronze DDL
-
-2. Load Raw Data
-   load_sas_to_bronze() → bronze.* tables
-
-3. Define Silver Variables (from Spec)
-   meta.silver_dictionary ← derivation rules
-
-4. Generate Silver SQL
-   SilverGenerator.generate_all() → derive_baseline.sql, etc.
-
-5. Execute Silver SQL
-   User runs generated SQL → silver.* tables
-
-6. Define Gold Statistics (from Spec)
-   meta.gold_dictionary ← group-level analysis definitions
-
-7. Generate Gold Scripts
-   GoldEngine.generate_all() → T1_demog.py, etc.
-
-8. Execute Gold Scripts
-   User runs generated Python → gold.* tables
-
-9. Render Reports (Future)
-   render_output() → RTF/PDF/HTML
-```
+---
 
 ## File Organization
 
@@ -233,22 +239,19 @@ meta.silver_dictionary (transformation) ──▶ Template Match? ──▶ Yes 
 src/prism/
 ├── core/
 │   ├── database.py      # DuckDB connection wrapper
-│   ├── schema.py        # Pydantic models (BronzeVariable, SilverVariable, GoldVariable, PlatinumDeliverable, ...)
+│   ├── schema.py        # Pydantic models
 │   └── config.py        # Path helpers
 │
 ├── sql/
-│   ├── init_meta.sql    # Meta schema DDL (v5.1)
-│   ├── init_bronze.sql  # Bronze schema DDL
-│   ├── init_silver.sql  # Silver schema DDL
-│   ├── init_gold.sql    # Gold schema DDL
-│   └── init_traceability.sql
+│   ├── init_meta.sql    # Meta schema DDL
+│   └── init_bronze.sql  # Bronze schema template
 │
 ├── agent/
 │   ├── llm.py           # DeepSeek API wrapper
 │   └── templates/       # Jinja2 templates
 │
 ├── meta/
-│   ├── manager.py       # MetadataManager class (CRUD for all dictionary tables)
+│   ├── manager.py       # MetadataManager class
 │   └── als_parser.py    # ALS file parser
 │
 ├── bronze/
@@ -262,31 +265,10 @@ src/prism/
 │   └── stats.py         # Statistical functions
 │
 └── platinum/
-    └── renderer.py      # Report rendering (stub)
+    └── renderer.py      # Report rendering
 ```
 
-## Future: prism-portal
-
-The `archive/` directory contains an abandoned DuckDB-WASM implementation.
-
-For a future interactive portal, consider:
-- **Flask + Jinja2**: Server-side rendering
-- **NiceGUI/Streamlit**: Python-native UI
-- **Pre-generated JSON + vanilla JS**: No build step
-
-Key feature: drill-down from Gold statistics to Silver raw data.
-
-## Traceability Schema (2 Tables)
-
-| Table | Purpose |
-|-------|---------|
-| `meta.data_lineage` | Gold → Silver 追溯 |
-| `meta.silver_sources` | Silver → Bronze 追溯 |
-
-### Helper View
-| View | Purpose |
-|------|---------|
-| `meta.v_full_lineage` | 完整追溯链 (Gold → Silver → Bronze) |
+---
 
 ## Technology Stack
 

@@ -12,7 +12,7 @@ class MetadataManager:
 
     def set_study_info(
         self,
-        study_code: str,
+        studyid: str,
         indication: Optional[str] = None,
         description: Optional[str] = None,
         als_version: Optional[str] = None,
@@ -20,9 +20,9 @@ class MetadataManager:
     ) -> None:
         sql = """
             INSERT INTO meta.study_info
-            (study_code, indication, description, als_version, spec_version)
+            (studyid, indication, description, als_version, spec_version)
             VALUES (?, ?, ?, ?, ?)
-            ON CONFLICT (study_code)
+            ON CONFLICT (studyid)
             DO UPDATE SET
                 indication = EXCLUDED.indication,
                 description = EXCLUDED.description,
@@ -31,9 +31,9 @@ class MetadataManager:
                 updated_at = NOW()
         """
         self.db.execute(
-            sql, (study_code, indication, description, als_version, spec_version)
+            sql, (studyid, indication, description, als_version, spec_version)
         )
-        logger.info(f"Study info set: {study_code}")
+        logger.info(f"Study info set: {studyid}")
 
     def get_study_info(self) -> Optional[Dict]:
         sql = "SELECT * FROM meta.study_info LIMIT 1"
@@ -211,10 +211,10 @@ class MetadataManager:
 
     def add_bronze_variable(
         self,
-        var_id: str,
+        var_name: str,
         form_oid: str,
-        field_oid: str,
-        var_name: str = None,
+        schema: str,
+        field_oid: str = None,
         var_label: str = None,
         data_type: str = None,
         is_required: bool = False,
@@ -222,14 +222,13 @@ class MetadataManager:
     ) -> None:
         sql = """
             INSERT INTO meta.bronze_dictionary
-            (var_id, form_oid, field_oid, var_name, var_label, data_type,
+            (var_name, form_oid, field_oid, schema, var_label, data_type,
              is_required, codelist_ref)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (var_id)
+            ON CONFLICT (var_name, form_oid)
             DO UPDATE SET
-                form_oid = EXCLUDED.form_oid,
                 field_oid = EXCLUDED.field_oid,
-                var_name = EXCLUDED.var_name,
+                schema = EXCLUDED.schema,
                 var_label = EXCLUDED.var_label,
                 data_type = EXCLUDED.data_type,
                 is_required = EXCLUDED.is_required,
@@ -238,19 +237,21 @@ class MetadataManager:
         self.db.execute(
             sql,
             (
-                var_id,
+                var_name,
                 form_oid,
                 field_oid,
-                var_name,
+                schema,
                 var_label,
                 data_type,
                 is_required,
                 codelist_ref,
             ),
         )
-        logger.info(f"Bronze variable added: {var_id}")
+        logger.info(f"Bronze variable added: {var_name} ({form_oid})")
 
-    def get_bronze_variables(self, form_oid: str = None) -> List[Dict]:
+    def get_bronze_variables(
+        self, form_oid: str = None, schema: str = None
+    ) -> List[Dict]:
         sql = "SELECT * FROM meta.bronze_dictionary WHERE 1=1"
         params = []
 
@@ -258,7 +259,11 @@ class MetadataManager:
             sql += " AND form_oid = ?"
             params.append(form_oid)
 
-        sql += " ORDER BY var_id"
+        if schema:
+            sql += " AND schema = ?"
+            params.append(schema)
+
+        sql += " ORDER BY form_oid, var_name"
 
         df = self.db.query_df(sql, tuple(params) if params else None)
         return df.to_dict("records")

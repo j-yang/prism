@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS meta.bronze_dictionary (
     var_name TEXT NOT NULL,
     form_oid TEXT NOT NULL,
     field_oid TEXT,              -- EDC field标识，用于溯源
-    schema TEXT NOT NULL,        -- 'baseline', 'longitudinal', 'event'
+    schema TEXT NOT NULL,        -- 'baseline', 'longitudinal', 'occurrence'
     var_label TEXT,
     data_type TEXT,
     is_required BOOLEAN DEFAULT FALSE,
