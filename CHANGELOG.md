@@ -15,6 +15,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - `prism.spec.memory` - DuckDB-based pattern storage for cross-study learning
   - `prism.spec.excel_writer` - Formatted Excel output with conditional formatting
   - `prism.spec.cli` - Command-line interface
+- **Optimized Spec Generation**: Two-phase approach to reduce LLM calls
+  - `extract_all_elements()` - Extract unique elements from all deliverables
+  - `generate_variables_batch()` - Batch generate all silver variables in one LLM call
+  - `generate_gold_batch()` - Batch generate gold statistics (10 deliverables per batch)
+  - `generate_for_context_optimized()` - Optimized entry point
+  - `TEMPLATE_BATCH_VARIABLES` - New prompt template for batch generation
+- `used_in` field in silver_variables and params to track deliverable references
 - CLI entry point: `prism spec generate`, `prism spec learn`, `prism spec patterns`
 - Support for snake_case descriptive variable naming
 - Excel spec with 6 sheets: study_config, params, silver_variables, platinum, gold_statistics, review_needed
@@ -29,6 +36,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 - Added `python-docx>=1.0.0` dependency
 - Added `prism = "prism.cli:main"` console script entry point
+- Optimized spec generation: ~70 LLM calls → ~5 LLM calls (for 34 deliverables)
 - **BREAKING**: Renamed `meta.bronze_variables` → `meta.bronze_dictionary`
 - **BREAKING**: Renamed `meta.silver_variables` → `meta.silver_dictionary`
 - **BREAKING**: Removed `meta.outputs` table (replaced by `meta.platinum_dictionary`)

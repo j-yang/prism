@@ -217,6 +217,119 @@ Return ONLY valid JSON.
 """
 
 
+TEMPLATE_BATCH_VARIABLES = """## Task: Generate All Variables from Mock Shell Elements
+
+### Study Information
+- Protocol: {protocol_no}
+- Title: {study_title}
+
+### Extracted Elements from Mock Shell
+These elements are extracted from all deliverables (tables, listings, figures):
+```json
+{elements_json}
+```
+
+### Available ALS Variables
+```json
+{als_vars_json}
+```
+
+### Learned Patterns
+```json
+{patterns_json}
+```
+
+### Your Tasks
+
+Generate ALL silver variables and params needed for this study in one batch.
+
+1. **silver_variables**: For each unique element, create a silver variable
+   - Use descriptive snake_case names (e.g., age, sex, cohort, teae_flg, sae_flg)
+   - For simple mappings (age, sex), just reference the ALS field
+   - For derived flags (Any AE, Any SAE), write CASE WHEN derivation
+   - Include the `used_in` list showing which deliverables use this variable
+   
+   ```json
+   [
+     {{
+       "var_name": "age",
+       "schema": "baseline",
+       "label": "Age (years)",
+       "data_type": "INTEGER",
+       "derivation": "",
+       "source_vars": ["DM.AGE"],
+       "used_in": ["14.1.2.1", "14.1.2.2"],
+       "confidence": "high"
+     }},
+     {{
+       "var_name": "sae_flg",
+       "schema": "occurrence",
+       "label": "Serious Adverse Event Flag",
+       "data_type": "TEXT",
+       "derivation": "CASE WHEN AESER = 'Yes' THEN 'Y' ELSE 'N' END",
+       "source_vars": ["AESER"],
+       "used_in": ["14.3.1"],
+       "confidence": "high"
+     }}
+   ]
+   ```
+
+2. **params**: For longitudinal parameters (from figures)
+   - Extract from figure titles like "Line Plot of PhGA Overtime"
+   - Create param definitions with paramcd, parameter, category, unit
+   
+   ```json
+   [
+     {{
+       "paramcd": "PHGA",
+       "parameter": "Physician Global Assessment",
+       "category": "Efficacy",
+       "unit": "cm",
+       "source_form": "PhGA Form",
+       "used_in": ["14.2.1", "14.2.15"]
+     }}
+   ]
+   ```
+
+3. **study_config**: Population and event period definitions
+   
+   ```json
+   {{
+     "populations": [
+       {{"name": "Safety Set", "selection": "received_infusion = 'Y' AND has_safety_eval = 'Y'"}},
+       {{"name": "Full Analysis Set", "selection": "received_infusion = 'Y'"}}
+     ],
+     "event_periods": [
+       {{"name": "post_dose", "selection": "ae_start_date >= infusion_date"}},
+       {{"name": "pre_dose", "selection": "ae_end_date < infusion_date"}}
+     ]
+   }}
+   ```
+
+### Important Rules
+
+1. **Deduplicate**: Each var_name should be unique. If same concept appears in multiple deliverables, create ONE variable.
+2. **Schema assignment**:
+   - baseline: Demographics, baseline characteristics (age, sex, disease_duration)
+   - occurrence: AE, CM, any event-based data (sae_flg, teae_flg, conmed_name)
+   - longitudinal: Repeated measures over time (handled via params, not silver_variables)
+3. **Confidence levels**:
+   - high: Direct ALS mapping or standard derivation
+   - medium: Assumed derivation, needs verification
+   - low: Uncertain, requires human review
+
+### Output Format
+
+Return ONLY valid JSON:
+{{
+  "silver_variables": [...],
+  "params": [...],
+  "study_config": {{...}},
+  "confidence_notes": ["Items needing review"]
+}}
+"""
+
+
 def format_prompt(
     template: str,
     protocol_no: str = "",
@@ -228,6 +341,7 @@ def format_prompt(
     patterns_json: str = "[]",
     original_json: str = "{}",
     corrected_json: str = "{}",
+    elements_json: str = "[]",
 ) -> str:
     """Format a prompt template with provided values."""
     return template.format(
@@ -240,4 +354,5 @@ def format_prompt(
         patterns_json=patterns_json,
         original_json=original_json,
         corrected_json=corrected_json,
+        elements_json=elements_json,
     )

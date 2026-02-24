@@ -1,5 +1,42 @@
 # Working Log
 
+## 2026-02-25
+
+### Discussed
+- Spec Agent 优化：如何减少LLM调用次数
+- 变量去重：34个deliverable共享约108个unique elements
+- 两阶段生成架构设计
+
+### Decisions
+- 采用两阶段生成：
+  - Phase 1: 批量提取elements → 1次LLM调用生成所有变量
+  - Phase 2: 分批生成gold statistics (每批10个deliverable)
+- 变量添加 `used_in` 字段，记录被哪些deliverable使用
+- Params添加 `used_in` 字段
+
+### Completed
+- 新增 `extract_all_elements()` - 从所有deliverable提取unique elements
+- 新增 `generate_variables_batch()` - 批量生成silver variables和params
+- 新增 `generate_gold_batch()` - 批量生成gold statistics
+- 新增 `generate_for_context_optimized()` - 优化的两阶段生成入口
+- 新增 `TEMPLATE_BATCH_VARIABLES` prompt模板
+- Excel输出添加 `used_in` 列
+- 生成完整spec：30个platinum，104个gold statistics
+
+### Known Issues
+- 批量变量生成在完整数据集(108 elements)时返回空结果
+- 小数据集(25 elements)测试正常
+- 可能原因：LLM响应超时或格式解析问题
+
+### LLM调用优化
+
+| 方案 | LLM调用 | 说明 |
+|------|---------|------|
+| 优化前 | ~70次 | 每个deliverable 2次 |
+| 优化后 | ~5次 | 1次变量 + 4批gold |
+
+---
+
 ## 2026-02-24
 
 ### Discussed

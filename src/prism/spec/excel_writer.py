@@ -132,7 +132,16 @@ class SpecExcelWriter:
         if not params:
             self._write_table(
                 ws,
-                [["paramcd", "parameter", "category", "unit", "source_form"]],
+                [
+                    [
+                        "paramcd",
+                        "parameter",
+                        "category",
+                        "unit",
+                        "source_form",
+                        "used_in",
+                    ]
+                ],
                 "params",
             )
             return
@@ -144,6 +153,9 @@ class SpecExcelWriter:
             paramcd = p.get("paramcd", "")
             if paramcd and paramcd not in seen:
                 seen.add(paramcd)
+                used_in = p.get("used_in", "")
+                if isinstance(used_in, list):
+                    used_in = ", ".join(str(x) for x in used_in)
                 rows.append(
                     [
                         paramcd,
@@ -151,12 +163,12 @@ class SpecExcelWriter:
                         p.get("category", ""),
                         p.get("unit", ""),
                         p.get("source_form", ""),
-                        p.get("visits", ""),
+                        used_in,
                     ]
                 )
 
         rows.insert(
-            0, ["paramcd", "parameter", "category", "unit", "source_form", "visits"]
+            0, ["paramcd", "parameter", "category", "unit", "source_form", "used_in"]
         )
         self._write_table(ws, rows, "params")
 
@@ -185,6 +197,9 @@ class SpecExcelWriter:
                 source_vars = v.get("source_vars", "")
                 if isinstance(source_vars, list):
                     source_vars = ", ".join(str(x) for x in source_vars)
+                used_in = v.get("used_in", "")
+                if isinstance(used_in, list):
+                    used_in = ", ".join(str(x) for x in used_in)
                 rows.append(
                     [
                         var_name,
@@ -194,7 +209,7 @@ class SpecExcelWriter:
                         v.get("derivation", ""),
                         source_vars,
                         v.get("confidence", "medium"),
-                        v.get("used_in", ""),
+                        used_in,
                     ]
                 )
 
