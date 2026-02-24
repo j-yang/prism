@@ -58,6 +58,7 @@ prism/
 │   ├── sql/            # DDL scripts
 │   ├── agent/          # LLM integration, templates
 │   ├── meta/           # Metadata management, ALS parser
+│   ├── spec/           # Spec Agent (mock shell → spec)
 │   ├── bronze/         # Raw data import (SAS/CSV)
 │   ├── silver/         # Data transformation
 │   ├── gold/           # Statistical analysis
@@ -128,6 +129,34 @@ Set your API key:
 ```bash
 export DEEPSEEK_API_KEY=your_key_here
 ```
+
+## Spec Agent
+
+Automated spec generation from mock shell documents:
+
+```bash
+# Generate spec from mock shell
+prism spec generate --mock shell.docx --als als.xlsx --output spec.xlsx
+
+# List deliverables only
+prism spec generate --mock shell.docx --als als.xlsx --list-only
+
+# Learn from corrections
+prism spec learn --original draft.json --corrected final.json --study STUDY001
+
+# View learned patterns
+prism spec patterns stats
+```
+
+Output Excel contains 6 sheets:
+- `study_config` - Populations, event periods
+- `params` - Longitudinal parameter definitions
+- `silver_variables` - Variables with derivation SQL
+- `platinum` - Deliverable definitions
+- `gold_statistics` - Statistics definitions
+- `review_needed` - Items requiring human review
+
+Memory store at `~/.prism/memory.duckdb` enables cross-study learning.
 
 ## Testing
 

@@ -1,5 +1,81 @@
 # Working Log
 
+## 2026-02-24
+
+### Discussed
+- Spec Agent 设计：如何从 Mock Shell 自动生成 clinical trial spec
+- Spec 文件格式：Excel vs DB，最终选择 Excel + DB 混合方案
+- Agent 架构：LLM 为核心，Memory Store 用于跨 study 学习
+
+### Decisions
+- Spec Agent 放在 `prism/spec/` 模块
+- Memory Store 用 DuckDB 存储在 `~/.prism/memory.duckdb`
+- 变量命名使用 snake_case 描述性风格
+- Excel Spec 包含 5 个 sheets：study_config, params, silver_variables, platinum, gold_statistics
+
+### Completed
+- 创建 `prism/spec/` 模块（8 个文件，~750 行代码）
+  - `extractor.py` - Mock Shell 解析器（docx/xlsx）
+  - `templates.py` - LLM Prompt 模板
+  - `generator.py` - Spec 生成器
+  - `matcher.py` - ALS 变量匹配
+  - `learner.py` - Diff 学习器
+  - `memory.py` - DuckDB 存储
+  - `excel_writer.py` - 格式化 Excel 输出
+  - `cli.py` - 命令行接口
+- 创建 `prism/cli.py` 主入口
+- 更新 `pyproject.toml` 添加 prism 命令和 python-docx 依赖
+- 生成示例 spec：`examples/some_study/spec_full.xlsx`
+
+### Spec Agent 架构
+
+```
+INPUT                    AGENT                    OUTPUT
+┌─────────┐                                       
+│Mock     │──┐                                      
+│Shell    │  │     ┌─────────────────┐             
+└─────────┘  │     │                 │    ┌───────┐
+             ├────▶│   Spec Agent    │───▶│ Spec  │
+┌─────────┐  │     │   (LLM-core)    │    │.xlsx  │
+│  ALS    │──┘     │                 │    └───────┘
+└─────────┘        └────────┬────────┘
+                            │
+                   ┌────────▼────────┐
+                   │  Memory Store   │
+                   │  (DuckDB file)  │
+                   └─────────────────┘
+```
+
+### CLI Usage
+
+```bash
+# 生成 spec
+prism spec generate --mock shell.docx --als als.xlsx --output spec.xlsx
+
+# 查看 deliverables
+prism spec generate --mock shell.docx --als als.xlsx --list-only
+
+# 学习修正
+prism spec learn --original draft.json --corrected final.json --study GC012F
+
+# 查看 patterns
+prism spec patterns stats
+prism spec patterns list
+```
+
+### Excel Spec Layout
+
+| Sheet | 内容 |
+|-------|------|
+| study_config | Populations, Event Periods |
+| params | Longitudinal 参数定义 |
+| silver_variables | 变量 + derivation |
+| platinum | 交付物列表 |
+| gold_statistics | 统计量定义 |
+| review_needed | 需要 review 的项 |
+
+---
+
 ## 2026-02-17
 
 ### Discussed

@@ -143,6 +143,7 @@ prism/
 │   ├── sql/                 # DDL scripts
 │   ├── agent/               # LLM, templates
 │   ├── meta/                # Metadata manager, ALS parser
+│   ├── spec/                # Spec Agent (mock shell → spec)
 │   ├── bronze/              # Data loader
 │   ├── silver/              # SQL generator
 │   ├── gold/                # Analysis engine
@@ -151,6 +152,35 @@ prism/
 ├── examples/                # Example data
 └── archive/                 # Deprecated code
 ```
+
+---
+
+## Spec Agent
+
+The `prism.spec` module generates clinical trial specs from mock shell documents.
+
+### CLI Commands
+```bash
+prism spec generate --mock shell.docx --als als.xlsx --output spec.xlsx
+prism spec learn --original draft.json --corrected final.json --study STUDY001
+prism spec patterns stats
+```
+
+### Module Structure
+| File | Purpose |
+|------|---------|
+| `extractor.py` | Parse mock shell (docx/xlsx) to structured JSON |
+| `generator.py` | Generate silver/gold specs via LLM |
+| `matcher.py` | Match variables to ALS fields |
+| `learner.py` | Learn from human corrections |
+| `memory.py` | DuckDB pattern storage |
+| `excel_writer.py` | Formatted Excel output |
+| `cli.py` | Command-line interface |
+
+### Memory Store
+- Location: `~/.prism/memory.duckdb`
+- Stores learned patterns for cross-study learning
+- Tables: `patterns`, `variable_mappings`, `study_history`
 
 ---
 
@@ -163,6 +193,8 @@ prism/
 | pydantic | Schema validation |
 | jinja2 | Templates |
 | requests | HTTP (LLM API) |
+| python-docx | Mock shell parsing |
+| openpyxl | Excel reading/writing |
 
 ---
 

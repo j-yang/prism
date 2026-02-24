@@ -7,6 +7,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- **Spec Agent**: Automated clinical trial spec generation from mock shell documents
+  - `prism.spec.extractor` - Parse mock shell (docx/xlsx) to structured JSON
+  - `prism.spec.generator` - Generate silver variables, gold statistics via LLM
+  - `prism.spec.matcher` - Match variables to ALS fields
+  - `prism.spec.learner` - Learn from human corrections
+  - `prism.spec.memory` - DuckDB-based pattern storage for cross-study learning
+  - `prism.spec.excel_writer` - Formatted Excel output with conditional formatting
+  - `prism.spec.cli` - Command-line interface
+- CLI entry point: `prism spec generate`, `prism spec learn`, `prism spec patterns`
+- Support for snake_case descriptive variable naming
+- Excel spec with 6 sheets: study_config, params, silver_variables, platinum, gold_statistics, review_needed
+- Memory store at `~/.prism/memory.duckdb` for learned patterns
 - New Gold layer data dictionary (`meta.gold_dictionary`) for group-level statistics
 - New Platinum layer deliverable definition (`meta.platinum_dictionary`) for table/figure/listing
 - `selection` field in gold_dictionary for filter conditions (visit, domain, saefl, etc.)
@@ -15,6 +27,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `deliverable_id` field in gold_dictionary to link with platinum deliverables
 
 ### Changed
+- Added `python-docx>=1.0.0` dependency
+- Added `prism = "prism.cli:main"` console script entry point
 - **BREAKING**: Renamed `meta.bronze_variables` → `meta.bronze_dictionary`
 - **BREAKING**: Renamed `meta.silver_variables` → `meta.silver_dictionary`
 - **BREAKING**: Removed `meta.outputs` table (replaced by `meta.platinum_dictionary`)
