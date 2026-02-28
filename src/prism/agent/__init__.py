@@ -1,3 +1,11 @@
-from .llm import call_deepseek, extract_code_block, get_api_key
+"""PRISM Agent Module.
 
-__all__ = ["call_deepseek", "extract_code_block", "get_api_key"]
+Provides PydanticAI-based agents for clinical trial metadata generation.
+"""
+
+from prism.agent.base import BaseAgent, ToolRegistry
+
+__all__ = [
+    "BaseAgent",
+    "ToolRegistry",
+]

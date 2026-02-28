@@ -6,11 +6,11 @@ Parses Annotated Label Specification (ALS) files and generates:
 2. Meta tables (study_info, visits, form_classification, bronze_dictionary)
 """
 
-import pandas as pd
-from pathlib import Path
-from typing import Dict, List, Any, Optional
-import json
 import logging
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
 
 from prism.core.database import Database
 from prism.meta.manager import MetadataManager
@@ -47,7 +47,6 @@ def classify_forms(
 
     for form in forms:
         form_oid = form["oid"]
-        form_name = form.get("name", "").lower()
 
         domain = get_domain_for_form(form_oid)
 
@@ -127,17 +126,23 @@ def _parse_als_file(als_path: Path) -> Dict[str, Any]:
             {
                 "form_oid": str(row["FormOID"]),
                 "field_oid": str(row["FieldOID"]),
-                "variable_oid": str(row["VariableOID"])
-                if pd.notna(row.get("VariableOID"))
-                else None,
+                "variable_oid": (
+                    str(row["VariableOID"])
+                    if pd.notna(row.get("VariableOID"))
+                    else None
+                ),
                 "data_format": str(row.get("DataFormat", "")),
-                "label": str(row["SASLabel"])
-                if pd.notna(row.get("SASLabel"))
-                else str(row["FieldOID"]),
+                "label": (
+                    str(row["SASLabel"])
+                    if pd.notna(row.get("SASLabel"))
+                    else str(row["FieldOID"])
+                ),
                 "is_log": row.get("IsLog", False),
-                "codelist_name": str(row["DataDictionaryName"])
-                if pd.notna(row.get("DataDictionaryName"))
-                else None,
+                "codelist_name": (
+                    str(row["DataDictionaryName"])
+                    if pd.notna(row.get("DataDictionaryName"))
+                    else None
+                ),
             }
         )
 

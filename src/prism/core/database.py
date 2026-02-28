@@ -1,7 +1,8 @@
-import duckdb
-from pathlib import Path
-from typing import Optional, Any, List, Dict
 import logging
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import duckdb
 
 logger = logging.getLogger(__name__)
 

@@ -4,68 +4,117 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [1.1.0] - 2025-03-01
 
 ### Added
-- **Spec Agent**: Automated clinical trial spec generation from mock shell documents
-  - `prism.spec.extractor` - Parse mock shell (docx/xlsx) to structured JSON
-  - `prism.spec.generator` - Generate silver variables, gold statistics via LLM
-  - `prism.spec.matcher` - Match variables to ALS fields
-  - `prism.spec.learner` - Learn from human corrections
-  - `prism.spec.memory` - DuckDB-based pattern storage for cross-study learning
-  - `prism.spec.excel_writer` - Formatted Excel output with conditional formatting
-  - `prism.spec.cli` - Command-line interface
-- **Optimized Spec Generation**: Two-phase approach to reduce LLM calls
-  - `extract_all_elements()` - Extract unique elements from all deliverables
-  - `generate_variables_batch()` - Batch generate all silver variables in one LLM call
-  - `generate_gold_batch()` - Batch generate gold statistics (10 deliverables per batch)
-  - `generate_for_context_optimized()` - Optimized entry point
-  - `TEMPLATE_BATCH_VARIABLES` - New prompt template for batch generation
-- `used_in` field in silver_variables and params to track deliverable references
-- CLI entry point: `prism spec generate`, `prism spec learn`, `prism spec patterns`
-- Support for snake_case descriptive variable naming
-- Excel spec with 6 sheets: study_config, params, silver_variables, platinum, gold_statistics, review_needed
-- Memory store at `~/.prism/memory.duckdb` for learned patterns
-- New Gold layer data dictionary (`meta.gold_dictionary`) for group-level statistics
-- New Platinum layer deliverable definition (`meta.platinum_dictionary`) for table/figure/listing
-- `selection` field in gold_dictionary for filter conditions (visit, domain, saefl, etc.)
-- `statistics` JSON field in gold_dictionary for flexible statistic types
-- `elements` JSON field in platinum_dictionary for referenced elements
-- `deliverable_id` field in gold_dictionary to link with platinum deliverables
+
+#### MCP Server Integration
+- **PRISM MCP Server** (`src/prism/mcp/server.py`)
+  - Full MCP protocol support for OpenCode, Claude Desktop, etc.
+  - 8 MCP tools exposed:
+    - `list_deliverables` - List deliverables from mock shell
+    - `lookup_als_field` - Query ALS fields by domain/keywords
+    - `get_bronze_schema` - Get Bronze layer table structure
+    - `get_meta_variables` - Get variables from meta tables
+    - `generate_meta` - Generate metadata (requires LLM)
+    - `load_meta` - Load metadata to DuckDB
+    - `generate_silver` - Generate Silver Polars code (requires LLM)
+    - `generate_gold` - Generate Gold statistics code (requires LLM)
+  - Entry point: `prism-mcp` command
+
+#### Documentation
+- **MCP_GUIDE.md** - Comprehensive MCP usage guide
+- **MCP_SETUP.md** - Configuration and setup instructions
 
 ### Changed
-- Added `python-docx>=1.0.0` dependency
-- Added `prism = "prism.cli:main"` console script entry point
-- Optimized spec generation: ~70 LLM calls → ~5 LLM calls (for 34 deliverables)
-- **BREAKING**: Renamed `meta.bronze_variables` → `meta.bronze_dictionary`
-- **BREAKING**: Renamed `meta.silver_variables` → `meta.silver_dictionary`
-- **BREAKING**: Removed `meta.outputs` table (replaced by `meta.platinum_dictionary`)
-- **BREAKING**: Removed `meta.output_variables` table
-- **BREAKING**: Removed `meta.output_params` table
-- **BREAKING**: Renamed `gold_dictionary.var_id` → `element_id` (统计对象：variable/param/coding)
-- **BREAKING**: Gold tables now use JSON for statistics (one row per group+element+selection)
-- Updated `MetadataManager` API to use new dictionary table names
-- Updated Pydantic models to match new schema
-- Renamed `OutputType` enum → `DeliverableType`
-- Meta Schema version: 5.0 → 5.1
-- Gold Schema version: 3.1 → 4.0
+
+#### Architecture
+- Removed old provider system (`agent/provider.py`, `agent/deepseek.py`, `agent/zhipu.py`)
+- Unified all LLM calls under PydanticAI
+- `MetaGenerator` now uses PydanticAI (was using old provider)
+- `GoldEngine` deprecated (use `GoldAgent` instead)
+
+#### Dependencies
+- Added `mcp[cli]>=1.2.0` for MCP server support
+- PydanticAI now the sole LLM interface
+
+### Fixed
+- **ALS field lookup** - Now correctly extracts domain from FormOID and uses DraftFieldName as label
+- **Tool registry** - Improved ALS field loading with multiple fallback columns
+
+## [1.0.0] - 2025-02-28
+
+### Added
+
+#### Unified PydanticAI Architecture
+- **PydanticAI Base Agent** (`src/prism/agent/base.py`)
+  - Shared infrastructure for all agents
+  - Tool registry: ALS lookup, Bronze schema, Meta variables, Dependency check
+  - Provider abstraction: DeepSeek, Zhipu
+  - Structured output via Pydantic models
+
+#### Meta Layer
+- **MetaAgent** (`src/prism/meta/agent.py`) - PydanticAI agent for metadata generation
+  - Batch processing (10 variables per call)
+  - Structured output with Pydantic validation
+- **Merged spec → meta** - All spec functionality moved to meta module
+- **Meta CLI** - `prism meta generate`, `prism meta load`, `prism meta extract`
+
+#### Silver Layer
+- **SilverAgent** (`src/prism/silver/agent.py`) - PydanticAI agent for Silver transformations
+  - Generates Polars Python code
+  - Per-schema generation (baseline, longitudinal, occurrence)
+  - Human reviews code before execution
+- **Silver CLI** - `prism silver generate`, `prism silver list`
+
+#### Gold Layer
+- **GoldAgent** (`src/prism/gold/agent.py`) - PydanticAI agent for Gold statistics
+  - Generates Polars statistical aggregations
+  - Per-schema generation
+  - Human reviews code before execution
+- **Gold CLI** - `prism gold generate`, `prism gold list`
+
+#### Platinum Layer
+- **PlatinumAgent** (`src/prism/platinum/agent.py`) - PydanticAI agent for slide generation
+- **PPTXRenderer** (`src/prism/platinum/renderer.py`) - PowerPoint rendering with python-pptx
+  - Native PPTX charts (editable in PowerPoint)
+  - Table slides, figure slides, listing slides
+  - Combined output (all slides in one file)
+- **Platinum CLI** - `prism platinum generate`, `prism platinum list`, `prism platinum preview`
+
+### Changed
+
+#### Architecture
+- **BREAKING**: Unified all layers under PydanticAI
+- **BREAKING**: Renamed `prism spec` → `prism meta`
+- **BREAKING**: Moved `src/prism/spec/` → `src/prism/meta/`
+- **BREAKING**: Silver/Gold now generate Python Polars code (not SQL)
+- **BREAKING**: Platinum now generates PPTX slide decks (not RTF/PDF)
+
+#### CLI
+- Default provider changed from Zhipu to DeepSeek
+- Added `--provider` flag to all commands
+- All commands now use `uv run prism` pattern
+
+#### Dependencies
+- Added `pydantic-ai>=0.0.10`
+- Added `python-pptx>=1.0.0`
+- Added `httpx>=0.27.0`, `httpcore>=1.0.0`, `sniffio>=1.3.0`, `socksio>=1.0.0`
 
 ### Removed
-- `meta.derivations` table (derivations now stored in `meta.silver_dictionary`)
-- `meta.flags` table (replaced by `meta.attrs`)
-- `meta.variables` unified table (replaced by separate bronze/silver/gold dictionaries)
-- `meta.functions` table
-- `platinum_dictionary.render_function` field
-- `platinum_dictionary.render_options` field
-- `Output`, `OutputVariable`, `OutputParam`, `Variable`, `Derivation`, `Function` Pydantic models
-- `add_variable`, `get_variables`, `get_variable` methods in MetadataManager
-- `add_derivation`, `get_derivations`, `get_derivation_for_var` methods in MetadataManager
-- `add_output`, `get_outputs`, `get_output` methods in MetadataManager
-- `add_output_variable`, `get_output_variables` methods in MetadataManager
-- `add_output_param`, `get_output_params` methods in MetadataManager
-- `add_function`, `get_functions`, `get_function` methods in MetadataManager
-- `add_flag`, `get_flags` methods in MetadataManager
-- `get_missing_derivations`, `get_execution_order`, `get_output_full_spec` methods in MetadataManager
+- `src/prism/spec/` directory (merged into meta)
+- `src/prism/sql/` directory (DDL now auto-generated from Pydantic)
+- `src/prism/agent/templates/` directory (unused)
+- Legacy pattern learning system (`matcher.py`, `learner.py`, `memory.py`)
+- Test databases (`study.duckdb`, `test_prism_v31.duckdb`, `test_silver_gen.duckdb`)
+
+### Documentation
+- Rewrote `README.md` with new architecture
+- Rewrote `ARCHITECTURE.md` with PydanticAI design
+- Rewrote `CLI_CHEATSHEET.md` with new commands
+- Removed outdated `ALS_PLAN.md`
+
+---
 
 ## [0.1.0] - 2024-XX-XX
 
@@ -76,6 +125,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Gold Python script generator
 - Metadata manager with 11 tables
 - DuckDB database integration
+- Spec Agent for mock shell parsing
 
 ---
 
@@ -83,6 +133,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 | Version | Date | Changes |
 |---------|------|---------|
-| v5.1 | 2026-02-17 | gold_dictionary: var_id→element_id, 复合PK; gold表用JSON存statistics; platinum移除render字段 |
-| v5.0 | 2026-02-16 | Meta schema redesign: *_dictionary tables, gold_dictionary, platinum_dictionary |
-| v4.0 | 2026-02-16 | Previous meta schema with outputs, output_variables, output_params |
+| v6.0 | 2025-02-28 | Unified PydanticAI architecture, spec→meta merge |
+| v5.1 | 2025-02-17 | gold_dictionary: var_id→element_id, JSON statistics |
+| v5.0 | 2025-02-16 | Meta schema redesign: *_dictionary tables |

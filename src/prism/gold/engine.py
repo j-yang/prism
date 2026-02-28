@@ -1,15 +1,26 @@
-import os
 import json
+import logging
+import os
 import re
 from datetime import datetime
-from typing import Dict, List, Optional, Any
-import logging
+from typing import Any, Dict, List, Optional
+
 import pandas as pd
 
 from prism.core.database import Database
-from prism.agent.llm import call_deepseek, extract_code_block
 
 logger = logging.getLogger(__name__)
+
+
+def _deprecated_call_deepseek(prompt: str, **kwargs) -> str:
+    """Deprecated: Use GoldAgent instead."""
+    logger.warning("GoldEngine is deprecated. Use GoldAgent instead.")
+    return ""
+
+
+def _deprecated_extract_code_block(content: str, language: str) -> str:
+    """Deprecated: Use GoldAgent instead."""
+    return ""
 
 
 class GoldEngine:
@@ -68,7 +79,9 @@ class GoldEngine:
             FROM meta.outputs o
             LEFT JOIN meta.output_variables ov ON o.output_id = ov.output_id
             GROUP BY o.output_id
-            ORDER BY ANY_VALUE(o.section) NULLS LAST, ANY_VALUE(o.display_order) NULLS LAST
+            ORDER BY
+                ANY_VALUE(o.section) NULLS LAST,
+                ANY_VALUE(o.display_order) NULLS LAST
         """
         df = self.db.query_df(sql)
 
@@ -399,7 +412,7 @@ if __name__ == '__main__':
             return None
 
         prompt = self._build_prompt(output)
-        content = call_deepseek(prompt)
+        content = _deprecated_call_deepseek(prompt)
 
         if content:
             return self._extract_code(content, output)
@@ -469,7 +482,7 @@ if __name__ == '__main__':
 """
 
     def _extract_code(self, content: str, output: Dict) -> str:
-        code = extract_code_block(content, "python")
+        code = _deprecated_extract_code_block(content, "python")
 
         header = f'''"""
 {output.get("title", output["output_id"])}

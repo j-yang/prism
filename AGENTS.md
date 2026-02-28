@@ -18,26 +18,26 @@ PRISM is a clinical trial data warehouse built on DuckDB implementing a Medallio
 
 ### Setup
 ```bash
-pip install -e .
+uv sync
 ```
 
 ### Running Tests
 ```bash
-PYTHONPATH=src pytest                  # Run all tests
-PYTHONPATH=src pytest tests/ -v        # Verbose output
-PYTHONPATH=src pytest -x               # Stop on first failure
+uv run pytest                  # Run all tests
+uv run pytest tests/ -v        # Verbose output
+uv run pytest -x               # Stop on first failure
 ```
 
 ### Linting and Formatting
 ```bash
-black src/prism/                       # Format code
-ruff check src/prism/                  # Lint code
-mypy src/prism/                        # Type check
+uv run --extra dev black src/prism/                       # Format code
+uv run --extra dev ruff check src/prism/                  # Lint code
+uv run --extra dev mypy src/prism/                        # Type check
 ```
 
 ### Database Utilities
 ```bash
-duckdb <database>.duckdb               # Open DuckDB CLI
+uv run duckdb <database>.duckdb               # Open DuckDB CLI
 ```
 
 ---
@@ -79,7 +79,7 @@ with Database(db_path) as db:
     result = db.query_df("SELECT * FROM bronze.demog")
 ```
 
-### Meta Schema (10 Tables)
+### Meta Schema (9 Tables)
 
 All metadata is stored in the `meta` schema:
 
@@ -113,7 +113,7 @@ All metadata is stored in the `meta` schema:
 |-------|---------|
 | `meta.dependencies` | 变量依赖关系 |
 
-**DDL Location**: `src/prism/sql/init_meta.sql`
+**DDL Location**: Auto-generated from `src/prism/core/models.py` via `src/prism/meta/schema.py`
 
 ### Data Layer Conventions
 | Layer | Schema Pattern | Row Granularity |
@@ -139,15 +139,21 @@ All metadata is stored in the `meta` schema:
 ```
 prism/
 ├── src/prism/               # Main source code
-│   ├── core/                # Database, schema, config
-│   ├── sql/                 # DDL scripts
-│   ├── agent/               # LLM, templates
-│   ├── meta/                # Metadata manager, ALS parser
-│   ├── spec/                # Spec Agent (mock shell → spec)
+│   ├── core/                # Database, schema, config, models
+│   ├── agent/               # LLM providers (zhipu, deepseek) + PydanticAI base
+│   ├── meta/                # Metadata generation and management
+│   │   ├── agent.py         # PydanticAI agent for meta generation
+│   │   ├── generator.py     # Batch LLM generator
+│   │   ├── extractor.py     # Mock shell extraction
+│   │   ├── loader.py        # Load to meta tables
+│   │   ├── excel_writer.py  # Excel output
+│   │   ├── manager.py       # Metadata manager
+│   │   └── als_parser.py    # ALS parsing
 │   ├── bronze/              # Data loader
-│   ├── silver/              # SQL generator
+│   ├── silver/              # Silver transformation engine
 │   ├── gold/                # Analysis engine
-│   └── platinum/            # Report renderer
+│   ├── platinum/            # Report renderer
+│   └── transforms/          # Python transformations registry
 ├── tests/                   # Test files
 ├── examples/                # Example data
 └── archive/                 # Deprecated code
@@ -155,32 +161,84 @@ prism/
 
 ---
 
-## Spec Agent
+## Meta Generation
 
-The `prism.spec` module generates clinical trial specs from mock shell documents.
+The `prism.meta` module generates clinical trial metadata from mock shell documents.
+
+### LLM Providers
+
+| Provider | Usage |
+|----------|-------|
+| DeepSeek (default) | `--provider deepseek` - Working, has balance |
+| Zhipu | `--provider zhipu` - GLM-4 model (needs balance top-up) |
+
+### Generation Modes
+
+| Mode | Command | Speed | Use Case |
+|------|---------|-------|----------|
+| Batch | `prism meta generate` (default) | Fast (~30s) | Daily use, full generation |
+| Debug | `prism meta generate --debug 14.3.1` | Slow (~2min) | Debug single deliverable |
 
 ### CLI Commands
 ```bash
-prism spec generate --mock shell.docx --als als.xlsx --output spec.xlsx
-prism spec learn --original draft.json --corrected final.json --study STUDY001
-prism spec patterns stats
+# Generate metadata (batch mode - recommended)
+uv run prism --provider deepseek meta generate --mock shell.docx --als als.xlsx -o meta.xlsx
+
+# Debug a specific deliverable
+uv run prism meta generate --mock shell.docx --als als.xlsx --debug 14.3.1 -v
+
+# List deliverables without generating
+uv run prism meta generate --mock shell.docx --als als.xlsx --list-only
+
+# Generate for specific deliverables only
+uv run prism meta generate --mock shell.docx --als als.xlsx -d "14.1.2.1,14.3.1" -o meta.xlsx
+
+# Load metadata to meta tables
+uv run prism meta load --meta meta.xlsx --db study.duckdb
+
+# Extract mock shell to JSON
+uv run prism meta extract --mock shell.docx -o shell.json
 ```
 
 ### Module Structure
 | File | Purpose |
 |------|---------|
+| `agent.py` | PydanticAI agent for meta generation (10 vars/batch) |
+| `generator.py` | Batch LLM generator (current implementation) |
 | `extractor.py` | Parse mock shell (docx/xlsx) to structured JSON |
-| `generator.py` | Generate silver/gold specs via LLM |
-| `matcher.py` | Match variables to ALS fields |
-| `learner.py` | Learn from human corrections |
-| `memory.py` | DuckDB pattern storage |
+| `templates.py` | LLM prompt templates |
+| `loader.py` | Load metadata to meta tables |
 | `excel_writer.py` | Formatted Excel output |
 | `cli.py` | Command-line interface |
 
-### Memory Store
-- Location: `~/.prism/memory.duckdb`
-- Stores learned patterns for cross-study learning
-- Tables: `patterns`, `variable_mappings`, `study_history`
+### Output Excel Sheets
+| Sheet | Content |
+|-------|---------|
+| study_config | Population and visit definitions |
+| params | Longitudinal parameter definitions |
+| silver_variables | Silver layer variable specs |
+| platinum | Deliverable definitions |
+| gold_statistics | Statistics definitions |
+| review_needed | Items requiring human review |
+
+---
+
+## PydanticAI Architecture
+
+PRISM uses PydanticAI for unified LLM-based generation across Meta, Silver, and Gold layers.
+
+### Base Agent (`src/prism/agent/base.py`)
+- Shared infrastructure for all agents
+- Tool registry: ALS lookup, Bronze schema, Meta variables, Dependency check
+- Provider abstraction: DeepSeek, Zhipu
+
+### Shared Tools
+| Tool | Purpose |
+|------|---------|
+| `lookup_als(domain, keywords)` | Look up ALS fields |
+| `get_bronze_schema()` | Get Bronze layer tables/columns |
+| `get_meta_variables(schema)` | Get variables from meta tables |
+| `check_dependencies(var_names)` | Check if required variables exist |
 
 ---
 
@@ -190,9 +248,12 @@ prism spec patterns stats
 |---------|---------|
 | duckdb | Database engine |
 | pandas | Data manipulation |
+| polars | Fast data processing (transforms) |
 | pydantic | Schema validation |
+| pydantic-ai | LLM agent framework |
 | jinja2 | Templates |
 | requests | HTTP (LLM API) |
+| zhipuai | Zhipu LLM API |
 | python-docx | Mock shell parsing |
 | openpyxl | Excel reading/writing |
 

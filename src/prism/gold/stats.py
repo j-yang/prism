@@ -1,6 +1,7 @@
+from typing import Any, Dict, List
+
 import numpy as np
 import pandas as pd
-from typing import Dict, List, Any, Optional
 
 
 def desc_stats_continuous(values: List[float]) -> Dict[str, Any]:

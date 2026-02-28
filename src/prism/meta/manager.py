@@ -1,6 +1,7 @@
-from typing import Dict, List, Any, Optional
 import json
 import logging
+from typing import Dict, List, Optional
+
 from prism.core.database import Database
 
 logger = logging.getLogger(__name__)

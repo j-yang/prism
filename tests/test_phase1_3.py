@@ -8,8 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from prismdb import Database, init_database, MetadataManager
-from prismdb.parse_als_v2 import parse_als_to_db
+from prism import Database, init_database, MetadataManager, parse_als_to_db
 
 
 def test_phase_1_3():

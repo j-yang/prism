@@ -2,14 +2,14 @@
 
 ## Overview
 
-PRISM is a clinical trial data warehouse built on DuckDB with AI-powered code generation.
+PRISM is a clinical trial data warehouse built on DuckDB with unified PydanticAI agents for code generation.
 
 ## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                     meta (Specification)                    │
-│  10 tables: study_info, visits, form_classification,        │
+│  9 tables: study_info, visits, form_classification,        │
 │  bronze_dictionary, params, attrs, silver_dictionary,       │
 │  gold_dictionary, platinum_dictionary, dependencies         │
 └──────────────────────────┬──────────────────────────────────┘
@@ -19,54 +19,84 @@ PRISM is a clinical trial data warehouse built on DuckDB with AI-powered code ge
 │  One table per form: bronze.ae, bronze.cm, bronze.dm, ...   │
 │  Minimal processing: lowercase columns, date conversion     │
 └──────────────────────────┬──────────────────────────────────┘
-                           │ Agent generates SQL
+                           │ PydanticAI Silver Agent
 ┌──────────────────────────▼──────────────────────────────────┐
 │                    Silver (Derived)                         │
 │  3 schemas: silver.baseline, silver.longitudinal,           │
 │             silver.occurrence                               │
+│  Output: Python Polars code (human reviews before run)      │
 └──────────────────────────┬──────────────────────────────────┘
-                           │ Agent generates Python
+                           │ PydanticAI Gold Agent
 ┌──────────────────────────▼──────────────────────────────────┐
 │                    Gold (Statistics)                        │
 │  3 schemas: gold.baseline, gold.longitudinal,               │
 │             gold.occurrence                                 │
+│  Output: Python Polars code (human reviews before run)      │
 └──────────────────────────┬──────────────────────────────────┘
-                           │
+                           │ PydanticAI Platinum Agent
 ┌──────────────────────────▼──────────────────────────────────┐
 │                   Platinum (Deliverables)                   │
-│  Output: RTF, PDF, HTML, Slides                             │
+│  Output: PowerPoint slide decks (native charts, editable)   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Meta Schema (10 Tables)
+## PydanticAI Unified Architecture
+
+All layers use the same PydanticAI agent pattern:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    BaseAgent (agent/base.py)                │
+│  - Provider abstraction (DeepSeek, Zhipu)                   │
+│  - Tool registry (ALS lookup, Meta variables, Deps check)  │
+│  - Structured output via Pydantic models                    │
+└──────────────────────────┬──────────────────────────────────┘
+                           │
+       ┌───────────────────┼───────────────────┐
+       │                   │                   │
+┌──────▼──────┐     ┌──────▼──────┐     ┌──────▼──────┐
+│  MetaAgent  │     │SilverAgent  │     │ PlatinumAgent│
+│ (10 vars/   │     │(Polars code)│     │(Slide decks) │
+│  batch)     │     │             │     │             │
+└─────────────┘     └─────────────┘     └─────────────┘
+```
+
+### Shared Tools
+
+| Tool | Purpose |
+|------|---------|
+| `lookup_als(domain, keywords)` | Look up ALS fields for a domain |
+| `get_bronze_schema()` | Get Bronze layer tables/columns |
+| `get_meta_variables(schema)` | Get variables from meta tables |
+| `check_dependencies(var_names)` | Check if required variables exist |
+
+---
+
+## Meta Schema (9 Tables)
 
 ### Study Configuration
 | Table | Purpose |
 |-------|---------|
-| `meta.study_info` | Study 基本信息 |
-| `meta.visits` | 分析 Visit 定义 |
+| `meta.study_info` | Study basic information |
+| `meta.visits` | Analysis visit definitions |
+| `meta.form_classification` | Form → Domain/Schema mapping |
 
 ### Data Dictionary
 | Table | Purpose |
 |-------|---------|
-| `meta.bronze_dictionary` | Bronze 层数据字典（来自 ALS） |
-| `meta.silver_dictionary` | Silver 层数据字典（来自 Spec） |
-| `meta.gold_dictionary` | Gold 层数据字典（来自 Spec） |
-| `meta.platinum_dictionary` | Platinum 交付物定义 |
+| `meta.bronze_dictionary` | Bronze layer data dictionary (from ALS) |
+| `meta.silver_dictionary` | Silver layer data dictionary (from Meta) |
+| `meta.gold_dictionary` | Gold layer statistics definitions |
+| `meta.platinum_dictionary` | Platinum deliverable definitions |
 
-### Form & Variable Classification
+### Definitions
 | Table | Purpose |
 |-------|---------|
-| `meta.form_classification` | Form → Domain/Schema 映射 |
-| `meta.params` | Longitudinal 参数定义 |
-| `meta.attrs` | Occurrence 扩展字段定义 |
-
-### Dependencies
-| Table | Purpose |
-|-------|---------|
-| `meta.dependencies` | 变量依赖关系 |
+| `meta.params` | Longitudinal parameter definitions |
+| `meta.attrs` | Occurrence extended field definitions |
+| `meta.dependencies` | Variable dependency relationships |
 
 ---
 
@@ -74,9 +104,9 @@ PRISM is a clinical trial data warehouse built on DuckDB with AI-powered code ge
 
 ### Design Principle
 
-**按原始 Form 存储，保持完整 Traceability**
+**Store by original Form, maintain full Traceability**
 
-```
+```sql
 bronze.ae    -- Adverse Events
 bronze.cm    -- Concomitant Medications
 bronze.dm    -- Demographics
@@ -87,38 +117,9 @@ bronze.vs    -- Vital Signs
 
 ### Processing Rules
 
-1. **列名小写**：`AETERM` → `aeterm`
-2. **日期转换**：SAS date → DATE type
-3. **保留所有字段**：不做筛选
-4. **可选删除**：用户可指定删除不需要的列
-
-### Example
-
-```sql
-CREATE TABLE bronze.ae (
-    usubjid TEXT NOT NULL,
-    subjid TEXT,
-    aeterm TEXT,
-    aestdtc DATE,
-    aeendtc DATE,
-    aesoc TEXT,
-    aedecod TEXT,
-    aeout TEXT,
-    aeser TEXT,
-    ... (all AE fields)
-);
-```
-
-### Traceability
-
-```
-bronze_dictionary:
-  var_name | form_oid | schema      | var_label
-  ---------|----------|-------------|------------
-  aeterm   | ae       | occurrence  | Adverse Event
-  age      | dm       | baseline    | Age
-  sysbp    | vs       | longitudinal| Systolic BP
-```
+1. Column names: lowercase
+2. Date conversion: SAS date → DATE type
+3. Keep all fields: no filtering by default
 
 ---
 
@@ -128,108 +129,74 @@ bronze_dictionary:
 
 ### baseline
 - One row per subject
-- Derived from bronze baseline forms
+- Derived from baseline forms
 
 ### longitudinal
 - One row per subject per visit
-- Derived from bronze longitudinal forms
+- Derived from longitudinal forms
 
 ### occurrence
 - One row per event
 - Consolidated from AE, CM, MH, PR forms
-- Structure: `usubjid, subjid, domain, seq, term, startdt, enddt, coding_high, coding_low, flags JSON, attrs JSON`
+
+### Generation Workflow
+
+```bash
+# 1. Generate Polars code
+uv run prism silver generate --schema baseline --db study.duckdb -o generated/silver/
+
+# 2. Review generated code
+cat generated/silver/baseline.py
+
+# 3. Run after review
+uv run python generated/silver/baseline.py
+```
 
 ---
 
 ## Gold Layer
 
-### Gold Schema (3 Tables)
+3 schemas for statistical aggregations:
 
-| Table | Purpose |
-|-------|---------|
+| Schema | Purpose |
+|--------|---------|
 | `gold.baseline` | Group-level baseline statistics |
 | `gold.longitudinal` | Group-level longitudinal statistics |
 | `gold.occurrence` | Group-level occurrence statistics |
 
-### Gold Table Structure
+### Generation Workflow
 
-每行 = 一个 group + 一个 element + 一个 selection + 统计量JSON
+```bash
+# 1. Generate Polars code
+uv run prism gold generate --schema baseline --db study.duckdb -o generated/gold/
 
-```sql
--- gold.baseline
-deliverable_id, element_id, group_id, statistics(JSON)
+# 2. Review generated code
+cat generated/gold/baseline.py
 
--- gold.longitudinal  
-deliverable_id, element_id, group_id, visit, statistics(JSON)
-
--- gold.occurrence
-deliverable_id, element_id, group_id, selection, statistics(JSON)
-```
-
-示例数据：
-```json
-// gold.baseline - 连续变量
-{"n": 50, "mean": 45.2, "sd": 12.3, "median": 44.0}
-
-// gold.baseline - 分类变量
-{"n": 30, "pct": 60.0}
-
-// gold.occurrence - 事件统计
-{"n_subjects": 10, "n_events": 15, "pct": 20.0}
+# 3. Run after review
+uv run python generated/gold/baseline.py
 ```
 
 ---
 
-## Data Flow
+## Platinum Layer
 
-```
-1. ALS 解析
-   parse_als_to_db() → bronze tables, meta.bronze_dictionary
+### PowerPoint Generation
 
-2. Spec 解析
-   parse_spec_to_db() → meta.params, meta.silver_dictionary, meta.gold_dictionary
-
-3. Bronze 数据加载
-   load_sas_to_bronze() → bronze.* tables
-
-4. Silver 生成
-   SilverGenerator.generate() → silver.* tables
-
-5. Gold 生成
-   GoldEngine.generate() → gold.* tables
-
-6. Platinum 渲染
-   render_output() → RTF/PDF/HTML
+```bash
+# Generate slide deck from all deliverables
+uv run prism platinum generate --db study.duckdb -o report.pptx
 ```
 
----
+### Features
 
-## Agent System
-
-### Code Generation Flow
-
-```
-meta.silver_dictionary (transformation) ──▶ Template Match? ──▶ Yes ──▶ Jinja2 Template
-                                                 │
-                                                 No
-                                                 │
-                                                 ▼
-                                    DeepSeek LLM ──▶ Generated SQL/Python
-                                                 │
-                                                 ▼
-                                    Needs Review (flagged)
-```
-
-### Template Types
-
-| Template | Pattern | Example |
-|----------|---------|---------|
-| direct_copy | "Take", "Equal to" | `SELECT col AS target` |
-| coalesce | "Coalesce" | `COALESCE(col1, col2)` |
-| recode | "Recode", "Map" | `CASE WHEN...` |
-| date_diff | "Date diff" | `DATE_DIFF(day, d1, d2)` |
-| combine | "Combine", "Concat" | `CONCAT(a, b)` |
-| flag | "Flag", "Y/N" | `CASE WHEN cond THEN 'Y'` |
+| Feature | Description |
+|---------|-------------|
+| Title slides | Study title, protocol number |
+| Table slides | Demographics, efficacy, safety |
+| Figure slides | Native PPTX charts (line, bar, scatter) |
+| Listing slides | Data listings |
+| Combined output | All slides in one PPTX file |
 
 ---
 
@@ -239,33 +206,49 @@ meta.silver_dictionary (transformation) ──▶ Template Match? ──▶ Yes 
 src/prism/
 ├── core/
 │   ├── database.py      # DuckDB connection wrapper
-│   ├── schema.py        # Pydantic models
-│   └── config.py        # Path helpers
-│
-├── sql/
-│   ├── init_meta.sql    # Meta schema DDL
-│   └── init_bronze.sql  # Bronze schema template
+│   ├── models.py        # Pydantic models (single source of truth)
+│   └── schema.py        # Auto-generated DDL from Pydantic
 │
 ├── agent/
-│   ├── llm.py           # DeepSeek API wrapper
-│   └── templates/       # Jinja2 templates
+│   ├── base.py          # PydanticAI base agent + tools
+│   ├── provider.py      # LLM provider interface
+│   ├── deepseek.py      # DeepSeek implementation
+│   └── zhipu.py         # Zhipu implementation
 │
 ├── meta/
-│   ├── manager.py       # MetadataManager class
-│   └── als_parser.py    # ALS file parser
-│
-├── bronze/
-│   └── loader.py        # SAS/CSV import
+│   ├── agent.py         # PydanticAI agent for meta generation
+│   ├── generator.py     # Batch LLM generator
+│   ├── extractor.py     # Mock shell extraction
+│   ├── loader.py        # Load to meta tables
+│   ├── excel_writer.py  # Excel output
+│   ├── manager.py       # Metadata manager
+│   └── als_parser.py    # ALS parsing
 │
 ├── silver/
-│   └── generator.py     # SQL generation
+│   ├── agent.py         # PydanticAI agent for Silver
+│   ├── cli.py           # CLI commands
+│   └── engine.py        # Transformation engine
 │
 ├── gold/
-│   ├── engine.py        # Python script generation
+│   ├── agent.py         # PydanticAI agent for Gold
+│   ├── cli.py           # CLI commands
+│   ├── engine.py        # Statistics engine
 │   └── stats.py         # Statistical functions
 │
-└── platinum/
-    └── renderer.py      # Report rendering
+├── platinum/
+│   ├── agent.py         # PydanticAI agent for Platinum
+│   ├── cli.py           # CLI commands
+│   ├── renderer.py      # PPTX renderer (python-pptx)
+│   ├── charts.py        # Native chart helpers
+│   └── templates.py     # Slide layout constants
+│
+├── bronze/
+│   └── loader.py        # SAS/CSV/Excel import
+│
+└── transforms/
+    ├── registry.py      # Transform registration
+    ├── silver/          # Silver transformation files
+    └── gold/            # Gold transformation files
 ```
 
 ---
@@ -277,6 +260,33 @@ src/prism/
 | Database | DuckDB |
 | Language | Python 3.12 |
 | Data Models | Pydantic v2 |
+| LLM Agent | pydantic-ai |
+| LLM Provider | DeepSeek, Zhipu |
+| Data Processing | Polars |
+| Slide Generation | python-pptx |
 | Templates | Jinja2 |
-| LLM | DeepSeek API |
-| Stats | NumPy/Pandas |
+| Package Manager | uv |
+
+---
+
+## Data Flow
+
+```
+1. ALS Parsing
+   parse_als_to_db() → bronze tables, meta.bronze_dictionary
+
+2. Meta Generation
+   prism meta generate → meta.xlsx (silver_variables, params, etc.)
+   prism meta load → meta.* tables
+
+3. Silver Generation
+   SilverAgent → generated/silver/*.py (Polars code)
+   Human reviews → Run code → silver.* tables
+
+4. Gold Generation
+   GoldAgent → generated/gold/*.py (Polars code)
+   Human reviews → Run code → gold.* tables
+
+5. Platinum Generation
+   PlatinumAgent → report.pptx (slide deck)
+```
