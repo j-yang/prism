@@ -161,8 +161,8 @@ Field naming rules:
             )
 
         als_vars_json = json.dumps(
-            list(self.tools._als_dict.values())[:80], indent=2, ensure_ascii=False
-        )[:4000]
+            list(self.tools._als_dict.values()), indent=2, ensure_ascii=False
+        )
 
         all_silver_vars = []
         all_params = []
@@ -171,7 +171,7 @@ Field naming rules:
         batch_size = 10
         for i in range(0, len(elements_list), batch_size):
             batch = elements_list[i : i + batch_size]
-            elements_json = json.dumps(batch, indent=2, ensure_ascii=False)[:6000]
+            elements_json = json.dumps(batch, indent=2, ensure_ascii=False)
 
             prompt = TEMPLATE_BATCH_VARIABLES.format(
                 protocol_no=protocol_no,

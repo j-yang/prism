@@ -70,10 +70,10 @@ Field naming rules:
         Returns:
             BatchVariableResult with silver_variables, params, confidence_notes
         """
-        als_vars = list(self.tools._als_dict.values())[:80]
-        als_vars_json = json.dumps(als_vars, indent=2, ensure_ascii=False)[:4000]
+        als_vars = list(self.tools._als_dict.values())
+        als_vars_json = json.dumps(als_vars, indent=2, ensure_ascii=False)
 
-        elements_json = json.dumps(elements, indent=2, ensure_ascii=False)[:6000]
+        elements_json = json.dumps(elements, indent=2, ensure_ascii=False)
 
         prompt = f"""## Task: Generate Silver Variables from Mock Shell Elements
 
