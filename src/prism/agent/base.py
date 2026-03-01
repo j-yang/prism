@@ -284,7 +284,7 @@ class BaseAgent:
         agent = Agent(
             model,
             system_prompt=system_prompt,
-            result_type=result_type,
+            output_type=result_type,
         )
 
         self._agent = agent
@@ -305,7 +305,7 @@ class BaseAgent:
 
         try:
             result = self._agent.run_sync(prompt)
-            return result.data
+            return result.output
         except Exception as e:
             logger.error(f"Agent run failed: {e}")
             raise
