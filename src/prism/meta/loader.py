@@ -1,22 +1,22 @@
 """Spec Loader.
 
-Load generated specs into meta tables.
+Load generated meta definitions into meta tables.
 """
 
 from typing import List
 
 from prism.core.database import Database
-from prism.core.models import (
-    GeneratedSpec,
-)
+from prism.meta.definitions.models import MetaDefinitions
 
 
-def load_spec_to_meta(db: Database, spec: GeneratedSpec, study_id: str = None) -> dict:
-    """Load generated spec into meta tables.
+def load_spec_to_meta(
+    db: Database, spec: MetaDefinitions, study_id: str = None
+) -> dict:
+    """Load meta definitions into meta tables.
 
     Args:
         db: Database connection
-        spec: Generated specification
+        spec: Meta definitions
         study_id: Optional study identifier
 
     Returns:
@@ -71,7 +71,8 @@ def load_spec_to_meta(db: Database, spec: GeneratedSpec, study_id: str = None) -
             db.execute(
                 """
                 INSERT INTO meta.params 
-                (paramcd, parameter, category, unit, default_source_form, default_source_var)
+                (paramcd, parameter, category, unit, 
+                 default_source_form, default_source_var)
                 VALUES (?, ?, ?, ?, ?, ?)
                 ON CONFLICT (paramcd) DO UPDATE SET
                     parameter = EXCLUDED.parameter,
@@ -155,12 +156,12 @@ def load_spec_to_meta(db: Database, spec: GeneratedSpec, study_id: str = None) -
     return summary
 
 
-def load_specs_to_meta(db: Database, specs: List[GeneratedSpec]) -> dict:
-    """Load multiple specs into meta tables.
+def load_specs_to_meta(db: Database, specs: List[MetaDefinitions]) -> dict:
+    """Load multiple meta definitions into meta tables.
 
     Args:
         db: Database connection
-        specs: List of generated specifications
+        specs: List of meta definitions
 
     Returns:
         Combined summary

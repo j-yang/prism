@@ -86,5 +86,9 @@ class DerivationRuleSearcher:
         Returns:
             True if deliverable is relevant
         """
-        text = f"{deliverable.title} {' '.join(deliverable.columns)} {' '.join(deliverable.rows)}"
+        text = (
+            f"{deliverable.title} "
+            f"{' '.join(deliverable.columns)} "
+            f"{' '.join(deliverable.rows)}"
+        )
         return self._matches_keywords(text, keywords)

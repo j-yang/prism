@@ -163,7 +163,43 @@ prism/
 
 ## Meta Generation
 
-The `prism.meta` module generates clinical trial metadata from mock shell documents.
+The `prism.meta` module generates clinical trial metadata using a **two-step approach**:
+
+### Step 1: Mock Shell → Meta Definitions
+
+Use LLM to understand mock shell semantics and generate meta **definitions** (what variables are).
+
+**Input:**
+- Mock Shell (docx/xlsx)
+- Footnotes, Programming notes
+
+**Output:**
+- Silver Variable Definitions (var_name, var_label, schema, data_type, description)
+- Parameter Definitions
+- Gold Statistic Definitions
+- Platinum Deliverable Definitions
+
+**Implementation:**
+- `prism.meta.definitions.DefinitionAgent` - LLM-powered agent
+- Does NOT require ALS
+- Generates semantic definitions, not implementations
+
+### Step 2: Meta Definitions → Derivations (Future)
+
+Use LLM + ALS + SAP to generate **derivation rules** (how to transform data).
+
+**Input:**
+- Meta Definitions (from Step 1)
+- ALS (raw field mappings)
+- SAP (optional, with vector search)
+
+**Output:**
+- Bronze Dictionary (ALS structure)
+- Derivation Rules (text format)
+- Transformation Code (Polars)
+
+**Implementation:**
+- `prism.meta.derivations.DerivationAgent` - (Not yet implemented)
 
 ### LLM Providers
 
@@ -172,26 +208,20 @@ The `prism.meta` module generates clinical trial metadata from mock shell docume
 | DeepSeek (default) | `--provider deepseek` - Working, has balance |
 | Zhipu | `--provider zhipu` - GLM-4 model (needs balance top-up) |
 
-### Generation Modes
-
-| Mode | Command | Speed | Use Case |
-|------|---------|-------|----------|
-| Batch | `prism meta generate` (default) | Fast (~30s) | Daily use, full generation |
-| Debug | `prism meta generate --debug 14.3.1` | Slow (~2min) | Debug single deliverable |
-
 ### CLI Commands
+
 ```bash
-# Generate metadata (batch mode - recommended)
-uv run prism --provider deepseek meta generate --mock shell.docx --als als.xlsx -o meta.xlsx
-
-# Debug a specific deliverable
-uv run prism meta generate --mock shell.docx --als als.xlsx --debug 14.3.1 -v
-
-# List deliverables without generating
-uv run prism meta generate --mock shell.docx --als als.xlsx --list-only
+# Step 1: Generate meta definitions from mock shell
+uv run prism meta generate --mock shell.docx -o meta.xlsx
 
 # Generate for specific deliverables only
-uv run prism meta generate --mock shell.docx --als als.xlsx -d "14.1.2.1,14.3.1" -o meta.xlsx
+uv run prism meta generate --mock shell.docx -d "14.1.2.1,14.3.1" -o meta.xlsx
+
+# Debug a single deliverable
+uv run prism meta generate --mock shell.docx --debug 14.3.1 -v
+
+# List deliverables without generating
+uv run prism meta generate --mock shell.docx --list-only
 
 # Load metadata to meta tables
 uv run prism meta load --meta meta.xlsx --db study.duckdb
@@ -201,22 +231,27 @@ uv run prism meta extract --mock shell.docx -o shell.json
 ```
 
 ### Module Structure
-| File | Purpose |
-|------|---------|
-| `agent.py` | PydanticAI agent for meta generation (10 vars/batch) |
-| `generator.py` | Batch LLM generator (current implementation) |
+
+| Directory/File | Purpose |
+|----------------|---------|
+| `definitions/` | **Step 1**: Generate meta definitions from mock shell |
+| `definitions/agent.py` | DefinitionAgent - LLM理解Mock Shell |
+| `definitions/models.py` | MetaDefinitions, SilverVariableDefinition等 |
+| `definitions/templates.py` | LLM prompt templates |
+| `derivations/` | **Step 2**: Generate derivations (future) |
+| `derivations/agent.py` | DerivationAgent - 生成转换规则 (NotImplemented) |
 | `extractor.py` | Parse mock shell (docx/xlsx) to structured JSON |
-| `templates.py` | LLM prompt templates |
 | `loader.py` | Load metadata to meta tables |
 | `excel_writer.py` | Formatted Excel output |
-| `cli.py` | Command-line interface |
+| `als_parser.py` | ALS parsing |
 
 ### Output Excel Sheets
+
 | Sheet | Content |
 |-------|---------|
 | study_config | Population and visit definitions |
 | params | Longitudinal parameter definitions |
-| silver_variables | Silver layer variable specs |
+| silver_variables | Silver layer variable specs (with **description** column) |
 | platinum | Deliverable definitions |
 | gold_statistics | Statistics definitions |
 | review_needed | Items requiring human review |

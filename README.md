@@ -38,8 +38,8 @@ cp .env.example .env
 ### Option 1: CLI (Batch Mode)
 
 ```bash
-# 1. Generate metadata from mock shell
-uv run prism meta generate --mock shell.docx --als als.xlsx -o meta.xlsx
+# 1. Generate meta definitions from mock shell (Step 1)
+uv run prism meta generate --mock shell.docx -o meta.xlsx
 
 # 2. Load metadata to database
 uv run prism meta load --meta meta.xlsx --db study.duckdb

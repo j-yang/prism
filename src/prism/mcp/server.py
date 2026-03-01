@@ -85,7 +85,11 @@ def load_meta(meta_path: str, db_path: Optional[str] = None) -> str:
     """
     import pandas as pd
     from prism.core.database import Database
-    from prism.core.models import GeneratedSpec, ParamSpec, SilverVariableSpec
+    from prism.meta.definitions.models import (
+        MetaDefinitions,
+        ParamDefinition,
+        SilverVariableDefinition,
+    )
     from prism.meta.loader import load_specs_to_meta
     from prism.meta.schema import generate_meta_ddl
 
@@ -108,7 +112,7 @@ def load_meta(meta_path: str, db_path: Optional[str] = None) -> str:
         var_name = clean_value(row.get("var_name"))
         if var_name:
             silver_vars.append(
-                SilverVariableSpec(
+                SilverVariableDefinition(
                     var_name=var_name,
                     var_label=clean_value(row.get("var_label"))
                     or clean_value(row.get("label"))
@@ -128,7 +132,7 @@ def load_meta(meta_path: str, db_path: Optional[str] = None) -> str:
         paramcd = clean_value(row.get("paramcd"))
         if paramcd:
             params.append(
-                ParamSpec(
+                ParamDefinition(
                     paramcd=paramcd,
                     parameter=clean_value(row.get("parameter")) or "",
                     category=clean_value(row.get("category")),
@@ -136,7 +140,7 @@ def load_meta(meta_path: str, db_path: Optional[str] = None) -> str:
                 )
             )
 
-    spec = GeneratedSpec(silver_variables=silver_vars, params=params)
+    spec = MetaDefinitions(silver_variables=silver_vars, params=params)
     specs = [spec]
 
     with Database(db_path) as db:

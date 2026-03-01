@@ -11,7 +11,7 @@ import openpyxl
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
-from prism.core.models import GeneratedSpec
+from prism.meta.definitions.models import MetaDefinitions
 
 
 def get_value(obj: Any, key: str, default: Any = None) -> Any:
@@ -63,11 +63,11 @@ class MetaExcelWriter:
         self.wb = openpyxl.Workbook()
         self.wb.remove(self.wb.active)
 
-    def write_specs(self, specs: List[GeneratedSpec], study_info: dict = None):
-        """Write all specs to Excel sheets.
+    def write_specs(self, specs: List[MetaDefinitions], study_info: dict = None):
+        """Write all meta definitions to Excel sheets.
 
         Args:
-            specs: List of GeneratedSpec objects
+            specs: List of MetaDefinitions objects
             study_info: Optional study info dict
         """
         all_platinum = []
@@ -78,20 +78,11 @@ class MetaExcelWriter:
         confidence_notes = []
 
         for spec in specs:
-            if spec.platinum:
-                all_platinum.extend(spec.platinum)
+            all_platinum.extend(spec.platinum_deliverables)
             all_silver.extend(spec.silver_variables)
             all_gold.extend(spec.gold_statistics)
             all_params.extend(spec.params)
-            if hasattr(spec, "study_config") and spec.study_config:
-                study_config.update(spec.study_config)
-            deliverable_id = getattr(spec, "deliverable_id", "unknown")
-            confidence_notes.extend(
-                [
-                    {"deliverable": deliverable_id, "note": n}
-                    for n in spec.confidence_notes
-                ]
-            )
+            confidence_notes.extend(spec.confidence_notes)
 
         self._write_study_config(study_config, study_info or {})
         self._write_params(all_params)
@@ -191,6 +182,7 @@ class MetaExcelWriter:
                 "var_label",
                 "schema",
                 "data_type",
+                "description",
                 "source_vars",
                 "transformation",
                 "transformation_type",
@@ -221,6 +213,7 @@ class MetaExcelWriter:
                         var_label,
                         get_value(v, "schema", ""),
                         get_value(v, "data_type", ""),
+                        get_value(v, "description", ""),
                         source_vars,
                         transformation,
                         get_value(v, "transformation_type", "direct"),
@@ -370,12 +363,12 @@ class MetaExcelWriter:
 
 
 def write_meta_excel(
-    specs: List[GeneratedSpec], output_path: str, study_info: dict = None
+    specs: List[MetaDefinitions], output_path: str, study_info: dict = None
 ) -> str:
-    """Convenience function to write specs to Excel.
+    """Convenience function to write meta definitions to Excel.
 
     Args:
-        specs: List of GeneratedSpec objects
+        specs: List of MetaDefinitions objects
         output_path: Output file path
         study_info: Optional study info dict
 

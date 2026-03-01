@@ -10,7 +10,7 @@ from typing import Dict, List, Optional
 from jinja2 import Template
 
 from prism.core.database import Database
-from prism.core.models import SilverVariableSpec
+from prism.meta.definitions.models import SilverVariableDefinition
 from prism.transforms import list_transforms
 
 logger = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ class SilverEngine:
 
     def generate_transform_file(
         self,
-        var: SilverVariableSpec,
+        var: SilverVariableDefinition,
         output_dir: str = "generated/transforms/silver",
     ) -> Optional[str]:
         """Generate Python transformation file for a variable.
@@ -74,7 +74,7 @@ def derive_{{ var_name }}(df: pl.DataFrame) -> pl.DataFrame:
 
     def generate_all_transforms(
         self,
-        variables: List[SilverVariableSpec],
+        variables: List[SilverVariableDefinition],
         output_dir: str = "generated/transforms/silver",
     ) -> Dict[str, str]:
         """Generate transformation files for all derived variables.

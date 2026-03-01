@@ -8,14 +8,14 @@ import json
 from pathlib import Path
 
 from prism.core.database import Database
+from prism.meta.definitions.agent import DefinitionAgent
 from prism.meta.excel_writer import write_meta_excel
 from prism.meta.extractor import extract_mock_shell
-from prism.meta.generator import MetaGenerator
 from prism.meta.loader import load_specs_to_meta
 
 
 def cmd_generate(args):
-    """Generate metadata from mock shell."""
+    """Generate meta definitions from mock shell."""
     print(f"Extracting mock shell: {args.mock}")
 
     context = extract_mock_shell(args.mock)
@@ -26,26 +26,25 @@ def cmd_generate(args):
             print(f"  {d.deliverable_id}: {d.title}")
         return
 
-    print(f"Loading ALS: {args.als}")
-
     provider_name = args.provider or "deepseek"
 
-    generator = MetaGenerator(
-        provider=provider_name,
-        als_path=args.als,
-    )
+    agent = DefinitionAgent(provider=provider_name)
 
     if args.debug:
         print(f"Debugging deliverable: {args.debug}")
-        specs = [generator.debug_deliverable(context, args.debug, verbose=args.verbose)]
+        deliverable_ids = [args.debug]
     else:
-        print("Generating metadata...")
+        print("Generating meta definitions...")
         deliverable_ids = None
         if args.deliverables:
             deliverable_ids = [d.strip() for d in args.deliverables.split(",")]
-        specs = generator.generate_for_context(context, deliverable_ids)
 
-    print(f"Generated {len(specs)} specs")
+    definitions = agent.generate_definitions(context, deliverable_ids)
+
+    print(f"Generated {len(definitions.silver_variables)} silver variables")
+    print(f"Generated {len(definitions.params)} params")
+    print(f"Generated {len(definitions.gold_statistics)} gold statistics")
+    print(f"Generated {len(definitions.platinum_deliverables)} deliverables")
 
     study_info = {
         "protocol_no": context.protocol_no,
@@ -53,31 +52,32 @@ def cmd_generate(args):
     }
 
     if args.format == "excel":
-        output_path = args.output or "meta_generated.xlsx"
-        saved_path = write_meta_excel(specs, output_path, study_info)
+        output_path = args.output or "meta_definitions.xlsx"
+        saved_path = write_meta_excel([definitions], output_path, study_info)
         print(f"Excel saved to: {saved_path}")
     else:
-        output_path = args.output or "meta_generated.json"
+        output_path = args.output or "meta_definitions.json"
         output_data = {
             "study_title": context.study_title,
             "protocol_no": context.protocol_no,
-            "specs": [
-                {
-                    "silver_variables": [vars(v) for v in s.silver_variables],
-                    "params": [vars(p) for p in s.params],
-                    "confidence_notes": s.confidence_notes,
-                }
-                for s in specs
+            "silver_variables": [v.model_dump() for v in definitions.silver_variables],
+            "params": [p.model_dump() for p in definitions.params],
+            "gold_statistics": [g.model_dump() for g in definitions.gold_statistics],
+            "platinum_deliverables": [
+                d.model_dump() for d in definitions.platinum_deliverables
             ],
+            "confidence_notes": definitions.confidence_notes,
         }
         Path(output_path).write_text(
             json.dumps(output_data, indent=2, ensure_ascii=False), encoding="utf-8"
         )
         print(f"JSON saved to: {output_path}")
 
-    review_count = sum(len(s.confidence_notes) for s in specs)
-    if review_count > 0:
-        print(f"\n{review_count} items need review (see review_needed sheet in Excel)")
+    if definitions.confidence_notes:
+        print(
+            f"\n{len(definitions.confidence_notes)} items need review "
+            f"(see review_needed sheet in Excel)"
+        )
 
 
 def cmd_load(args):
@@ -96,20 +96,33 @@ def cmd_load(args):
         silver_df = pd.read_excel(meta_path, sheet_name="silver_variables")
         params_df = pd.read_excel(meta_path, sheet_name="params")
 
-        from prism.core.models import GeneratedSpec, ParamSpec, SilverVariableSpec
+        from prism.meta.definitions.models import (
+            MetaDefinitions,
+            ParamDefinition,
+            SilverVariableDefinition,
+        )
 
         silver_vars = []
         for _, row in silver_df.iterrows():
             var_name = clean_value(row.get("var_name"))
             if var_name:
+                used_in = clean_value(row.get("used_in"))
+                if used_in and isinstance(used_in, str):
+                    used_in = [x.strip() for x in used_in.split(",")]
+                else:
+                    used_in = []
+
                 silver_vars.append(
-                    SilverVariableSpec(
+                    SilverVariableDefinition(
                         var_name=var_name,
                         var_label=clean_value(row.get("var_label"))
                         or clean_value(row.get("label"))
                         or "",
                         schema=clean_value(row.get("schema")) or "baseline",
                         data_type=clean_value(row.get("data_type")),
+                        description=clean_value(row.get("description")) or "",
+                        used_in=used_in,
+                        confidence=clean_value(row.get("confidence")) or "medium",
                         source_vars=clean_value(row.get("source_vars")),
                         transformation=clean_value(row.get("transformation"))
                         or clean_value(row.get("derivation")),
@@ -122,22 +135,29 @@ def cmd_load(args):
         for _, row in params_df.iterrows():
             paramcd = clean_value(row.get("paramcd"))
             if paramcd:
+                used_in = clean_value(row.get("used_in"))
+                if used_in and isinstance(used_in, str):
+                    used_in = [x.strip() for x in used_in.split(",")]
+                else:
+                    used_in = []
+
                 params.append(
-                    ParamSpec(
+                    ParamDefinition(
                         paramcd=paramcd,
                         parameter=clean_value(row.get("parameter")) or "",
                         category=clean_value(row.get("category")),
                         unit=clean_value(row.get("unit")),
+                        used_in=used_in,
                     )
                 )
 
-        spec = GeneratedSpec(silver_variables=silver_vars, params=params)
-        specs = [spec]
+        definitions = MetaDefinitions(silver_variables=silver_vars, params=params)
+        specs = [definitions]
     else:
         data = json.loads(meta_path.read_text())
-        from prism.core.models import GeneratedSpec
+        from prism.meta.definitions.models import MetaDefinitions
 
-        specs = [GeneratedSpec(**s) for s in data.get("specs", [])]
+        specs = [MetaDefinitions(**data)]
 
     db_path = args.db or args.meta.replace(".xlsx", ".duckdb").replace(
         ".json", ".duckdb"
@@ -179,7 +199,9 @@ def cmd_extract(args):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="PRISM Meta Generator - Generate clinical trial metadata from mock shells"
+        description=(
+            "PRISM Meta Generator - Generate clinical trial metadata from mock shells"
+        )
     )
     parser.add_argument(
         "--provider",
@@ -196,7 +218,11 @@ def main():
     gen_parser.add_argument(
         "--mock", required=True, help="Path to mock shell (docx/xlsx)"
     )
-    gen_parser.add_argument("--als", required=True, help="Path to ALS Excel file")
+    gen_parser.add_argument(
+        "--als",
+        required=False,
+        help="Path to ALS Excel file (optional, for future derivation phase)",
+    )
     gen_parser.add_argument("--output", "-o", help="Output file path")
     gen_parser.add_argument(
         "--format", choices=["excel", "json"], default="excel", help="Output format"
