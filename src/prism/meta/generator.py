@@ -218,62 +218,73 @@ Field naming rules:
         )
 
     def _generate_requirements_batch(self, batch: List[Dict]) -> List[Dict]:
-        """Phase 1: Generate variable requirements from elements.
-
+        """Phase 1: Generate variable requirements using rules (no LLM, no ALS).
+        
         Args:
             batch: List of elements
-
+            
         Returns:
-            List of variable requirements (var_name, var_label, schema, data_type)
+            List of variable requirements
         """
-        prompt = f"""## Task: Analyze Mock Shell Elements
-
-Extract variable requirements from these elements:
-
-```json
-{json.dumps(batch, indent=2, ensure_ascii=False)}
-```
-
-## Output Schema
-
-Generate JSON with this structure:
-
-```json
-{{
-  "requirements": [
-    {{
-      "var_name": "snake_case_name",
-      "var_label": "Human readable label",
-      "schema": "baseline|occurrence|longitudinal",
-      "data_type": "TEXT|INTEGER|FLOAT|DATE",
-      "description": "Brief description"
-    }}
-  ]
-}}
-```
-
-## Rules
-
-1. var_name: Convert label to snake_case (e.g., "Age (years)" → "age_years")
-2. var_label: Use original label from element
-3. schema: 
-   - baseline: Subject-level, one-time (demographics, baseline characteristics)
-   - occurrence: Event-based, multiple records (AEs, medications)
-   - longitudinal: Repeated measures over time (lab values, vital signs)
-4. data_type:
-   - TEXT: Categorical, flags, codes
-   - INTEGER: Counts, ages
-   - FLOAT: Measurements, scores
-   - DATE: Dates
-
-Output ONLY valid JSON, no markdown.
-"""
-
-        class RequirementsResponse(BaseModel):
-            requirements: List[Dict]
-
-        result = self.run(prompt, result_type=RequirementsResponse)
-        return result.requirements if result else []
+        requirements = []
+        for elem in batch:
+            label = elem.get("label", "")
+            req = {
+                "var_name": self._to_snake_case(label),
+                "var_label": self._clean_label(label),
+                "schema": self._infer_schema(elem),
+                "data_type": self._infer_data_type(label),
+                "description": elem.get("context", ""),
+                "element_type": elem.get("type", ""),
+                "used_in": elem.get("used_in", []),
+            }
+            requirements.append(req)
+        return requirements
+    
+    def _to_snake_case(self, label: str) -> str:
+        """Convert label to snake_case."""
+        label = re.sub(r"\[([a-z])\]", "", label)
+        label = label.lower()
+        label = re.sub(r"[^a-z0-9]+", "_", label)
+        label = label.strip("_")
+        return label
+    
+    def _clean_label(self, label: str) -> str:
+        """Clean label by removing footnote markers."""
+        return re.sub(r"\[([a-z])\]", "", label).strip()
+    
+    def _infer_schema(self, elem: Dict) -> str:
+        """Infer schema from element content."""
+        label = elem.get("label", "").lower()
+        context = elem.get("context", "").lower()
+        
+        if any(kw in label for kw in ["ae", "adverse", "sae", "medication", "conmed", "cm"]):
+            return "occurrence"
+        elif any(kw in label for kw in ["visit", "over time", "longitudinal", "by visit"]):
+            return "longitudinal"
+        elif any(kw in context for kw in ["listing"]):
+            if any(kw in label for kw in ["ae", "adverse", "medication"]):
+                return "occurrence"
+            return "baseline"
+        else:
+            return "baseline"
+    
+    def _infer_data_type(self, label: str) -> str:
+        """Infer data type from label."""
+        label_lower = label.lower()
+        
+        if any(kw in label_lower for kw in ["date", "dtc", "datetime"]):
+            return "DATE"
+        elif any(kw in label_lower for kw in ["age", "count", "number", "n", "no."]):
+            if "age" in label_lower and "range" not in label_lower:
+                return "INTEGER"
+            return "TEXT"
+        elif any(kw in label_lower for kw in ["score", "value", "duration", "days", "months", "years"]):
+            if "duration" in label_lower or "days" in label_lower:
+                return "INTEGER"
+            return "FLOAT"
+        else:
+            return "TEXT"
 
     def _derive_variables_batch(
         self, requirements: List[Dict], protocol_no: str, study_title: str
