@@ -31,7 +31,7 @@ def cmd_generate(args):
     provider_name = args.provider or "deepseek"
 
     generator = MetaGenerator(
-        provider_name=provider_name,
+        provider=provider_name,
         als_path=args.als,
     )
 

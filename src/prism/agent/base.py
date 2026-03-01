@@ -42,6 +42,9 @@ class ToolRegistry:
         if not path:
             return {}
 
+        if als_path:
+            self.als_path = als_path
+
         if self._als_dict and als_path is None:
             return self._als_dict
 
