@@ -84,9 +84,10 @@ class MockShellExtractor:
         children = list(body.iterchildren())
 
         deliverables_by_element = {}
+        deliverables_by_para_idx = {}
         current_section = None
 
-        for para in doc.paragraphs:
+        for para_idx, para in enumerate(doc.paragraphs):
             text = para.text.strip()
             if not text:
                 continue
@@ -118,7 +119,9 @@ class MockShellExtractor:
                     )
 
                 deliverables_by_element[para._element] = deliverable
+                deliverables_by_para_idx[para_idx] = deliverable
 
+        self._extract_notes_and_footnotes(doc, deliverables_by_para_idx)
         self._extract_tables_by_element(doc, children, deliverables_by_element)
 
         seen_keys = {}
@@ -133,6 +136,51 @@ class MockShellExtractor:
 
         for deliverable in seen_keys.values():
             self.context.deliverables.append(deliverable)
+
+    def _extract_notes_and_footnotes(
+        self, doc: Document, deliverables_by_para_idx: dict
+    ):
+        """Extract programming notes and footnotes, associate with deliverables."""
+        footnote_pattern = re.compile(r"\[([a-z])\]\s*(.+)")
+
+        last_deliverable = None
+
+        for para_idx, para in enumerate(doc.paragraphs):
+            text = para.text.strip()
+            if not text:
+                continue
+
+            is_programming_note = text.lower().startswith("programming note:")
+            is_note = text.lower().startswith("note:")
+            footnote_match = footnote_pattern.match(text)
+
+            if is_programming_note:
+                note_content = (
+                    text.replace("Programming note:", "")
+                    .replace("programming note:", "")
+                    .strip()
+                )
+                if note_content:
+                    self.context.all_programming_notes.append(note_content)
+                    if last_deliverable:
+                        last_deliverable.programming_notes.append(note_content)
+
+            elif is_note:
+                note_content = text.replace("Note:", "").replace("note:", "").strip()
+                if note_content:
+                    if last_deliverable:
+                        last_deliverable.programming_notes.append(note_content)
+
+            elif footnote_match:
+                footnote_key = footnote_match.group(1)
+                footnote_content = footnote_match.group(2).strip()
+                if footnote_content:
+                    self.context.all_footnotes[footnote_key] = footnote_content
+                    if last_deliverable:
+                        last_deliverable.footnotes[footnote_key] = footnote_content
+
+            if para_idx in deliverables_by_para_idx:
+                last_deliverable = deliverables_by_para_idx[para_idx]
 
     def _extract_tables_by_element(
         self, doc: Document, children: list, deliverables_by_element: dict

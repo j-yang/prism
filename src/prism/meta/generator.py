@@ -12,6 +12,7 @@ from typing import Dict, List, Optional
 from pydantic import BaseModel
 
 from prism.agent.base import BaseAgent
+from prism.core.cache import CacheManager
 from prism.core.models import (
     GeneratedSpec,
     GoldStatisticSpec,
@@ -19,7 +20,9 @@ from prism.core.models import (
     PlatinumDeliverableSpec,
     SilverVariableSpec,
 )
+from prism.meta.als_filter import ALSFilter
 from prism.meta.extractor import Deliverable, MockShellContext
+from prism.meta.rule_searcher import DerivationRuleSearcher
 from prism.meta.templates import TEMPLATE_BATCH_VARIABLES, TEMPLATE_GOLD_BATCH
 
 
@@ -41,9 +44,24 @@ class MetaGenerator(BaseAgent):
         provider: str = "deepseek",
         als_path: Optional[str] = None,
         db_path: Optional[str] = None,
+        mock_context: Optional[MockShellContext] = None,
+        cache_db: Optional[str] = None,
     ):
         super().__init__(provider=provider, db_path=db_path, als_path=als_path)
         self.tools.load_als_dict(als_path)
+
+        self.mock_context = mock_context
+        self.cache = CacheManager(cache_db)
+
+        if mock_context:
+            self.rule_searcher = DerivationRuleSearcher(mock_context, self.cache)
+        else:
+            self.rule_searcher = None
+
+        if self.tools._als_dict:
+            self.als_filter = ALSFilter(self.tools._als_dict)
+        else:
+            self.als_filter = None
 
     def _get_system_prompt(self) -> str:
         return """You are a clinical trial metadata expert.
@@ -148,7 +166,12 @@ Field naming rules:
         protocol_no: str = "",
         study_title: str = "",
     ) -> GeneratedSpec:
-        """Generate all silver variables and params in multiple LLM calls."""
+        """Generate all silver variables and params in multiple LLM calls.
+
+        Two-phase approach:
+        1. Analyze elements → generate variable requirements (no ALS needed)
+        2. Search rules + filter ALS + generate code
+        """
         elements_list = []
         for key, elem in elements.items():
             elements_list.append(
@@ -160,10 +183,6 @@ Field naming rules:
                 }
             )
 
-        als_vars_json = json.dumps(
-            list(self.tools._als_dict.values()), indent=2, ensure_ascii=False
-        )
-
         all_silver_vars = []
         all_params = []
         all_notes = []
@@ -171,34 +190,205 @@ Field naming rules:
         batch_size = 10
         for i in range(0, len(elements_list), batch_size):
             batch = elements_list[i : i + batch_size]
-            elements_json = json.dumps(batch, indent=2, ensure_ascii=False)
 
-            prompt = TEMPLATE_BATCH_VARIABLES.format(
-                protocol_no=protocol_no,
-                study_title=study_title,
-                elements_json=elements_json,
-                als_vars_json=als_vars_json,
-            )
-            print(
-                f"  Batch {i // batch_size + 1}: {len(batch)} elements, "
-                f"prompt size {len(prompt)} chars"
-            )
+            # Phase 1: Generate variable requirements (no ALS needed)
+            requirements = self._generate_requirements_batch(batch)
 
-            result = self.run(prompt, result_type=GeneratedSpec)
+            # Phase 2: Search rules + filter ALS + generate code
+            if requirements:
+                result = self._derive_variables_batch(
+                    requirements, protocol_no, study_title
+                )
 
-            if result:
-                all_silver_vars.extend(result.silver_variables)
-                all_params.extend(result.params)
-                all_notes.extend(result.confidence_notes)
-                print(f"    Generated {len(result.silver_variables)} variables")
-            else:
-                print("    No response or validation failed")
+                if result:
+                    all_silver_vars.extend(result.silver_variables)
+                    all_params.extend(result.params)
+                    all_notes.extend(result.confidence_notes)
+                    print(
+                        f"  Batch {i // batch_size + 1}: "
+                        f"Generated {len(result.silver_variables)} variables"
+                    )
+                else:
+                    print("    No response or validation failed")
 
         return GeneratedSpec(
             silver_variables=all_silver_vars,
             params=all_params,
             confidence_notes=all_notes,
         )
+
+    def _generate_requirements_batch(self, batch: List[Dict]) -> List[Dict]:
+        """Phase 1: Generate variable requirements from elements.
+
+        Args:
+            batch: List of elements
+
+        Returns:
+            List of variable requirements (var_name, var_label, schema, data_type)
+        """
+        prompt = f"""## Task: Analyze Mock Shell Elements
+
+Extract variable requirements from these elements:
+
+```json
+{json.dumps(batch, indent=2, ensure_ascii=False)}
+```
+
+## Output Schema
+
+Generate JSON with this structure:
+
+```json
+{{
+  "requirements": [
+    {{
+      "var_name": "snake_case_name",
+      "var_label": "Human readable label",
+      "schema": "baseline|occurrence|longitudinal",
+      "data_type": "TEXT|INTEGER|FLOAT|DATE",
+      "description": "Brief description"
+    }}
+  ]
+}}
+```
+
+## Rules
+
+1. var_name: Convert label to snake_case (e.g., "Age (years)" → "age_years")
+2. var_label: Use original label from element
+3. schema: 
+   - baseline: Subject-level, one-time (demographics, baseline characteristics)
+   - occurrence: Event-based, multiple records (AEs, medications)
+   - longitudinal: Repeated measures over time (lab values, vital signs)
+4. data_type:
+   - TEXT: Categorical, flags, codes
+   - INTEGER: Counts, ages
+   - FLOAT: Measurements, scores
+   - DATE: Dates
+
+Output ONLY valid JSON, no markdown.
+"""
+
+        class RequirementsResponse(BaseModel):
+            requirements: List[Dict]
+
+        result = self.run(prompt, result_type=RequirementsResponse)
+        return result.requirements if result else []
+
+    def _derive_variables_batch(
+        self, requirements: List[Dict], protocol_no: str, study_title: str
+    ) -> Optional[GeneratedSpec]:
+        """Phase 2: Derive variables with rules and ALS mapping.
+
+        Args:
+            requirements: List of variable requirements
+            protocol_no: Protocol number
+            study_title: Study title
+
+        Returns:
+            GeneratedSpec with silver_variables
+        """
+        # Search for derivation rules
+        all_keywords = set()
+        for req in requirements:
+            keywords = (
+                self.als_filter.extract_keywords(req) if self.als_filter else set()
+            )
+            all_keywords.update(keywords)
+
+        derivation_rules = []
+        if self.rule_searcher and all_keywords:
+            derivation_rules = self.rule_searcher.search_mock_notes(list(all_keywords))
+
+        # Filter ALS fields
+        if self.als_filter:
+            relevant_als = self.als_filter.filter_for_requirements(requirements)
+            als_vars_json = json.dumps(relevant_als, indent=2, ensure_ascii=False)
+            als_count = len(relevant_als)
+            total_count = len(self.tools._als_dict)
+            reduction = 100 * (1 - als_count / total_count) if total_count > 0 else 0
+            print(
+                f"    ALS filtering: {als_count}/{total_count} fields "
+                f"({reduction:.1f}% reduction)"
+            )
+        else:
+            als_vars_json = json.dumps(
+                list(self.tools._als_dict.values()), indent=2, ensure_ascii=False
+            )
+
+        # Build prompt
+        requirements_json = json.dumps(requirements, indent=2, ensure_ascii=False)
+        rules_json = json.dumps(derivation_rules[:5], indent=2, ensure_ascii=False)
+
+        prompt = f"""## Task: Generate Silver Variables with ALS Mapping
+
+### Study Information
+- Protocol: {protocol_no}
+- Title: {study_title}
+
+### Variable Requirements
+```json
+{requirements_json}
+```
+
+### Derivation Rules (from Mock Shell)
+```json
+{rules_json}
+```
+
+### Available ALS Fields
+```json
+{als_vars_json}
+```
+
+---
+
+## Output Schema
+
+Generate JSON with this structure:
+
+```json
+{{
+  "silver_variables": [
+    {{
+      "var_name": "snake_case_name",
+      "var_label": "Human readable label",
+      "schema": "baseline|occurrence|longitudinal",
+      "data_type": "TEXT|INTEGER|FLOAT|DATE",
+      "source_vars": "DM.AGE, DM.SEX",
+      "transformation": "Python code or empty",
+      "transformation_type": "direct|python",
+      "param_ref": "",
+      "description": "",
+      "confidence": "high|medium|low"
+    }}
+  ],
+  "params": [
+    {{
+      "paramcd": "CODE",
+      "parameter": "Full parameter name",
+      "category": "Efficacy|Safety|PK|PD",
+      "unit": "unit",
+      "default_source_form": "",
+      "default_source_var": ""
+    }}
+  ],
+  "confidence_notes": ["Items needing review"]
+}}
+```
+
+## Instructions
+
+1. For each variable requirement, find the best ALS field mapping
+2. Use derivation rules if available (prioritize Mock Shell rules)
+3. Generate Polars transformation code if needed
+4. Set confidence level based on mapping quality
+
+Output ONLY valid JSON, no markdown.
+"""
+
+        result = self.run(prompt, result_type=GeneratedSpec)
+        return result
 
     def generate_gold_batch(
         self,
