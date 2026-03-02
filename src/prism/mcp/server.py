@@ -13,66 +13,6 @@ mcp = FastMCP("prism")
 
 
 @mcp.tool()
-def generate_meta(
-    mock_path: str,
-    als_path: str,
-    output_path: str,
-    deliverables: Optional[str] = None,
-) -> str:
-    """Generate metadata from mock shell and ALS.
-
-    Args:
-        mock_path: Path to mock shell file (docx/xlsx)
-        als_path: Path to ALS Excel file
-        output_path: Output Excel file path
-        deliverables: Optional comma-separated deliverable IDs (e.g., "14.1.1,14.3.1")
-
-    Returns:
-        Summary of generated metadata
-    """
-    from prism.meta.extractor import extract_mock_shell
-    from prism.meta.generator import MetaGenerator
-    from prism.meta.excel_writer import write_meta_excel
-
-    if not Path(mock_path).exists():
-        return f"Error: Mock shell not found: {mock_path}"
-
-    if not Path(als_path).exists():
-        return f"Error: ALS file not found: {als_path}"
-
-    context = extract_mock_shell(mock_path)
-
-    deliverable_ids = None
-    if deliverables:
-        deliverable_ids = [d.strip() for d in deliverables.split(",")]
-
-    generator = MetaGenerator(als_path=als_path)
-    specs = generator.generate_for_context(context, deliverable_ids)
-
-    study_info = {
-        "protocol_no": context.protocol_no,
-        "study_title": context.study_title,
-    }
-
-    write_meta_excel(specs, output_path, study_info)
-
-    total_vars = sum(len(s.silver_variables) for s in specs)
-    total_params = sum(len(s.params) for s in specs)
-    review_count = sum(len(s.confidence_notes) for s in specs)
-
-    result = f"Generated metadata:\n"
-    result += f"  Silver variables: {total_vars}\n"
-    result += f"  Params: {total_params}\n"
-    result += f"  Items needing review: {review_count}\n"
-    result += f"  Output: {output_path}"
-
-    if review_count > 0:
-        result += f"\n\nReview the 'review_needed' sheet in the Excel file."
-
-    return result
-
-
-@mcp.tool()
 def load_meta(meta_path: str, db_path: Optional[str] = None) -> str:
     """Load generated metadata into DuckDB meta tables.
 
@@ -118,7 +58,11 @@ def load_meta(meta_path: str, db_path: Optional[str] = None) -> str:
                     or clean_value(row.get("label"))
                     or "",
                     schema=clean_value(row.get("schema")) or "baseline",
-                    data_type=clean_value(row.get("data_type")),
+                    data_type=clean_value(row.get("data_type")) or "TEXT",
+                    description=clean_value(row.get("description"))
+                    or clean_value(row.get("var_label"))
+                    or "",
+                    confidence=clean_value(row.get("confidence")) or "medium",
                     source_vars=clean_value(row.get("source_vars")),
                     transformation=clean_value(row.get("transformation"))
                     or clean_value(row.get("derivation")),
@@ -227,14 +171,14 @@ def generate_gold(
         return f"Error: Database not found: {db_path}"
 
     agent = GoldAgent(db_path=db_path)
-    stats = agent.generate_schema_statistics(schema)
+    transforms = agent.generate_schema_transforms(schema)
 
-    if not stats.statistics:
+    if not transforms.transforms:
         return f"No statistics generated for {schema} schema"
 
-    output_path = agent.save_python_file(stats, output_dir)
+    output_path = agent.save_python_file(transforms, output_dir)
 
-    result = f"Generated {len(stats.statistics)} statistics for {schema}:\n"
+    result = f"Generated {len(transforms.transforms)} statistics for {schema}:\n"
     result += f"  Output: {output_path}"
 
     return result
