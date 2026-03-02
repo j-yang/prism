@@ -24,6 +24,7 @@ def load_meta(meta_path: str, db_path: Optional[str] = None) -> str:
         Summary of loaded data
     """
     import pandas as pd
+
     from prism.core.database import Database
     from prism.meta.definitions.models import (
         MetaDefinitions,
@@ -144,7 +145,7 @@ def generate_silver(
     result += f"  Output: {output_path}"
 
     if low_conf > 0:
-        result += f"\n\nReview transforms marked with WARNING comments."
+        result += "\n\nReview transforms marked with WARNING comments."
 
     return result
 
@@ -301,8 +302,8 @@ def get_meta_variables(db_path: str, schema: str = "baseline") -> str:
 
 
 @mcp.tool()
-def list_deliverables(mock_path: str) -> str:
-    """List all deliverables from mock shell.
+def list_mock_deliverables(mock_path: str) -> str:
+    """List all deliverables from mock shell file.
 
     Args:
         mock_path: Path to mock shell file (docx/xlsx)
@@ -326,6 +327,405 @@ def list_deliverables(mock_path: str) -> str:
         output += f"    {d.title}\n\n"
 
     return output
+
+
+@mcp.tool()
+def extract_mock_shell(mock_path: str, output_path: Optional[str] = None) -> str:
+    """Extract mock shell to JSON for inspection.
+
+    Args:
+        mock_path: Path to mock shell file (docx/xlsx)
+        output_path: Optional path to save JSON (default: return as string)
+
+    Returns:
+        Extracted mock shell structure as JSON string
+    """
+    import json
+
+    from prism.meta.extractor import extract_mock_shell as extract
+
+    if not Path(mock_path).exists():
+        return f"Error: Mock shell not found: {mock_path}"
+
+    context = extract(mock_path)
+
+    result = {
+        "study_title": context.study_title,
+        "protocol_no": context.protocol_no,
+        "deliverables": [
+            {
+                "deliverable_id": d.deliverable_id,
+                "deliverable_type": d.deliverable_type,
+                "title": d.title,
+                "population": d.population,
+            }
+            for d in context.deliverables
+        ],
+    }
+
+    json_str = json.dumps(result, indent=2, ensure_ascii=False)
+
+    if output_path:
+        Path(output_path).write_text(json_str)
+        return (
+            f"Extracted to {output_path}\n\nDeliverables: {len(context.deliverables)}"
+        )
+
+    return json_str
+
+
+@mcp.tool()
+def list_db_deliverables(db_path: str, deliverable_type: Optional[str] = None) -> str:
+    """List deliverables from meta.platinum_dictionary table.
+
+    Args:
+        db_path: Path to DuckDB database
+        deliverable_type: Filter by type (table/figure/listing)
+
+    Returns:
+        List of deliverables with ID, type, title, population
+    """
+    import duckdb
+
+    if not Path(db_path).exists():
+        return f"Error: Database not found: {db_path}"
+
+    try:
+        con = duckdb.connect(db_path, read_only=True)
+
+        query = (
+            "SELECT deliverable_id, deliverable_type, title, population "
+            "FROM meta.platinum_dictionary"
+        )
+        params = []
+
+        if deliverable_type:
+            query += " WHERE deliverable_type = ?"
+            params.append(deliverable_type)
+
+        query += " ORDER BY deliverable_id"
+
+        rows = con.execute(query, params).fetchall()
+        con.close()
+
+        if not rows:
+            return "No deliverables found in meta.platinum_dictionary"
+
+        output = f"Deliverables ({len(rows)}):\n\n"
+        for row in rows:
+            deliv_id, deliv_type, title, population = row
+            output += f"  {deliv_id} [{deliv_type}]\n"
+            output += f"    {title[:60]}\n"
+            if population:
+                output += f"    Population: {population}\n"
+            output += "\n"
+
+        return output
+
+    except Exception as e:
+        return f"Error querying database: {e}"
+
+
+@mcp.tool()
+def get_variable_details(db_path: str, var_name: str) -> str:
+    """Get complete definition of a variable from meta.silver_dictionary.
+
+    Args:
+        db_path: Path to DuckDB database
+        var_name: Variable name to query
+
+    Returns:
+        Variable details including transformation, source vars, etc.
+    """
+    import duckdb
+
+    if not Path(db_path).exists():
+        return f"Error: Database not found: {db_path}"
+
+    try:
+        con = duckdb.connect(db_path, read_only=True)
+
+        row = con.execute(
+            "SELECT var_name, var_label, description, data_type, schema, "
+            "source_vars, transformation, transformation_type, used_in, confidence "
+            "FROM meta.silver_dictionary WHERE var_name = ?",
+            [var_name],
+        ).fetchone()
+
+        con.close()
+
+        if not row:
+            return f"Variable not found: {var_name}"
+
+        (
+            var_name,
+            var_label,
+            description,
+            data_type,
+            schema,
+            source_vars,
+            transformation,
+            transformation_type,
+            used_in,
+            confidence,
+        ) = row
+
+        output = f"Variable: {var_name}\n\n"
+        output += f"  Label: {var_label}\n"
+        output += f"  Description: {description}\n"
+        output += f"  Schema: {schema}\n"
+        output += f"  Data Type: {data_type}\n"
+        output += f"  Confidence: {confidence}\n"
+
+        if source_vars:
+            output += f"\n  Source Variables:\n    {source_vars}\n"
+
+        if transformation:
+            output += (
+                f"\n  Transformation ({transformation_type}):\n    {transformation}\n"
+            )
+
+        if used_in:
+            output += f"\n  Used in Deliverables:\n    {used_in}\n"
+
+        return output
+
+    except Exception as e:
+        return f"Error querying database: {e}"
+
+
+@mcp.tool()
+def list_silver_transforms() -> str:
+    """List registered Silver layer transforms.
+
+    Returns:
+        List of registered transform names
+    """
+    from prism.transforms import list_transforms
+
+    transforms = list_transforms()
+
+    if not transforms:
+        return "No transforms registered"
+
+    silver_transforms = [t for t in transforms if not t.endswith("_gold")]
+
+    if not silver_transforms:
+        return "No Silver transforms registered"
+
+    output = f"Silver transforms ({len(silver_transforms)}):\n\n"
+    for name in sorted(silver_transforms):
+        output += f"  - {name}\n"
+
+    return output
+
+
+@mcp.tool()
+def get_transform_code(transform_name: str) -> str:
+    """Get source code of a registered transform function.
+
+    Args:
+        transform_name: Name of the transform to retrieve
+
+    Returns:
+        Source code of the transform function
+    """
+    import inspect
+
+    from prism.transforms import get_transform
+
+    transform = get_transform(transform_name)
+
+    if not transform:
+        return f"Transform not found: {transform_name}"
+
+    try:
+        source = inspect.getsource(transform)
+        return f"Transform: {transform_name}\n\n{source}"
+    except Exception as e:
+        return f"Error getting source code: {e}"
+
+
+@mcp.tool()
+def list_gold_transforms() -> str:
+    """List registered Gold layer transforms (suffix: _gold).
+
+    Returns:
+        List of registered Gold transform names
+    """
+    from prism.transforms import list_transforms
+
+    transforms = list_transforms()
+
+    gold_transforms = [t for t in transforms if t.endswith("_gold")]
+
+    if not gold_transforms:
+        return "No Gold transforms registered"
+
+    output = f"Gold transforms ({len(gold_transforms)}):\n\n"
+    for name in sorted(gold_transforms):
+        output += f"  - {name}\n"
+
+    return output
+
+
+@mcp.tool()
+def generate_platinum(
+    db_path: str,
+    deliverable_ids: Optional[str] = None,
+    deliverable_type: Optional[str] = None,
+    output_path: str = "generated/platinum/report.pptx",
+) -> str:
+    """Generate PowerPoint slide deck from deliverables.
+
+    Args:
+        db_path: Path to DuckDB database
+        deliverable_ids: Comma-separated deliverable IDs (optional)
+        deliverable_type: Filter by type (table/figure/listing)
+        output_path: Output PPTX file path
+
+    Returns:
+        Summary of generated slide deck
+    """
+    import duckdb
+
+    from prism.platinum.agent import PlatinumAgent
+    from prism.platinum.renderer import PPTXRenderer
+
+    if not Path(db_path).exists():
+        return f"Error: Database not found: {db_path}"
+
+    try:
+        con = duckdb.connect(db_path, read_only=True)
+
+        study_info_rows = con.execute("SELECT * FROM meta.study_info").fetchall()
+
+        study_info = {}
+        if study_info_rows:
+            cols = [
+                desc[0]
+                for desc in con.execute(
+                    "SELECT column_name FROM information_schema.columns "
+                    "WHERE table_schema = 'meta' AND table_name = 'study_info'"
+                ).fetchall()
+            ]
+            row = study_info_rows[0]
+            study_info = dict(zip(cols, row))
+
+        study_info.setdefault("study_title", "Clinical Study Report")
+        study_info.setdefault("protocol_no", "")
+
+        deliverables_query = "SELECT * FROM meta.platinum_dictionary"
+        params = []
+
+        if deliverable_ids:
+            deliv_ids = [d.strip() for d in deliverable_ids.split(",")]
+            placeholders = ",".join("?" * len(deliv_ids))
+            deliverables_query += f" WHERE deliverable_id IN ({placeholders})"
+            params = deliv_ids
+
+        if deliverable_type:
+            if "WHERE" in deliverables_query:
+                deliverables_query += " AND deliverable_type = ?"
+            else:
+                deliverables_query += " WHERE deliverable_type = ?"
+            params.append(deliverable_type)
+
+        deliverables_rows = con.execute(deliverables_query, params).fetchall()
+
+        if not deliverables_rows:
+            con.close()
+            return "No deliverables found in meta.platinum_dictionary"
+
+        cols = [
+            desc[0]
+            for desc in con.execute(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema = 'meta' AND table_name = 'platinum_dictionary'"
+            ).fetchall()
+        ]
+
+        deliverables = [dict(zip(cols, row)) for row in deliverables_rows]
+        con.close()
+
+    except Exception as e:
+        return f"Error reading database: {e}"
+
+    agent = PlatinumAgent(db_path=db_path)
+
+    try:
+        slide_deck = agent.generate_slide_deck(study_info, deliverables)
+    except Exception as e:
+        return f"Error generating slides: {e}"
+
+    try:
+        renderer = PPTXRenderer()
+        renderer.render_slide_deck(slide_deck)
+        saved_path = renderer.save(output_path)
+    except Exception as e:
+        return f"Error rendering PPTX: {e}"
+
+    result = "Generated slide deck:\n"
+    result += f"  Slides: {len(slide_deck.slides)}\n"
+    result += f"  Deliverables: {len(deliverables)}\n"
+    result += f"  Output: {saved_path}"
+
+    return result
+
+
+@mcp.tool()
+def preview_platinum_deliverable(db_path: str, deliverable_id: str) -> str:
+    """Preview slide content for a single deliverable as JSON.
+
+    Args:
+        db_path: Path to DuckDB database
+        deliverable_id: Deliverable ID to preview
+
+    Returns:
+        JSON representation of slide content
+    """
+    import duckdb
+
+    from prism.platinum.agent import PlatinumAgent
+
+    if not Path(db_path).exists():
+        return f"Error: Database not found: {db_path}"
+
+    try:
+        con = duckdb.connect(db_path, read_only=True)
+
+        deliverables_rows = con.execute(
+            "SELECT * FROM meta.platinum_dictionary WHERE deliverable_id = ?",
+            [deliverable_id],
+        ).fetchall()
+
+        if not deliverables_rows:
+            con.close()
+            return f"Deliverable not found: {deliverable_id}"
+
+        cols = [
+            desc[0]
+            for desc in con.execute(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_schema = 'meta' AND table_name = 'platinum_dictionary'"
+            ).fetchall()
+        ]
+
+        deliverable = dict(zip(cols, deliverables_rows[0]))
+        con.close()
+
+    except Exception as e:
+        return f"Error querying database: {e}"
+
+    agent = PlatinumAgent(db_path=db_path)
+
+    try:
+        result = agent.generate_deliverable_slides(deliverable)
+        import json
+
+        return json.dumps(result.model_dump(), indent=2, default=str)
+    except Exception as e:
+        return f"Error generating preview: {e}"
 
 
 def main():

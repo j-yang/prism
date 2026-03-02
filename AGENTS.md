@@ -198,19 +198,36 @@ OpenCode will:
 3. Generate metadata using Claude Opus 4.6
 4. Validate and save results
 
-### CLI Commands (Limited)
+### MCP Tools
 
-PRISM provides limited CLI utilities:
+All operations are done through MCP tools in OpenCode:
 
-```bash
-# Load metadata to database
-uv run prism meta load --meta meta.xlsx --db study.duckdb
+#### Meta Tools
+- `load_meta(meta_path, db_path?)` - Load metadata to database
+- `extract_mock_shell(mock_path, output_path?)` - Extract mock shell to JSON
+- `list_mock_deliverables(mock_path)` - List deliverables from mock shell
+- `list_db_deliverables(db_path, type?)` - List deliverables from database
+- `get_variable_details(db_path, var_name)` - Get variable transformation details
 
-# Extract mock shell to JSON (for debugging)
-uv run prism meta extract --mock shell.docx -o shell.json
-```
+#### Silver Tools
+- `generate_silver(schema, db_path, als_path?, output_dir?)` - Generate Silver transforms
+- `list_silver_transforms()` - List registered Silver transforms
+- `get_transform_code(transform_name)` - Get transform source code
+- `get_meta_variables(db_path, schema)` - Get variables from meta tables
 
-**Note:** Metadata generation is done through OpenCode, Agent Skills, not CLI.
+#### Gold Tools
+- `generate_gold(schema, db_path, output_dir?)` - Generate Gold statistics
+- `list_gold_transforms()` - List registered Gold transforms
+
+#### Platinum Tools
+- `generate_platinum(db_path, ids?, type?, output?)` - Generate PPTX slide deck
+- `preview_platinum_deliverable(db_path, deliverable_id)` - Preview deliverable slides
+
+#### Utility Tools
+- `lookup_als_field(als_path, domain?, keywords?)` - Look up ALS fields
+- `get_bronze_schema(db_path)` - Get Bronze layer schema
+
+**Total:** 15 MCP tools available
 
 ### Module Structure
 

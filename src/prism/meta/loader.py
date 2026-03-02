@@ -123,7 +123,7 @@ def load_spec_to_meta(
             summary["errors"].append(f"gold.{stat.element_id}: {e}")
 
     # Load platinum deliverables
-    for platinum in spec.platinum:
+    for platinum in spec.platinum_deliverables:
         try:
             import json
 

@@ -1,6 +1,5 @@
 from .config import get_sql_path, get_template_path
 from .database import Database, get_connection, init_database
-
 from .models import (
     BronzeVariable,
     DataType,
@@ -18,7 +17,6 @@ from .models import (
     TransformationType,
     Visit,
 )
-
 from .schema import (
     Complexity,
     Flag,

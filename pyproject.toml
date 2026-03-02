@@ -27,7 +27,6 @@ dependencies = [
 ]
 
 [project.scripts]
-prism = "prism.cli:main"
 prism-mcp = "prism.mcp.server:main"
 
 [project.optional-dependencies]
