@@ -163,87 +163,68 @@ prism/
 
 ## Meta Generation
 
-The `prism.meta` module generates clinical trial metadata using a **two-step approach**:
+PRISM uses OpenCode Agent Skills to generate clinical trial metadata from mock shells.
 
-### Step 1: Mock Shell → Meta Definitions
+### Architecture
 
-Use LLM to understand mock shell semantics and generate meta **definitions** (what variables are).
+**Agent Skills + MCP Tools:**
 
-**Input:**
-- Mock Shell (docx/xlsx)
-- Footnotes, Programming notes
+PRISM uses a two-layer architecture:
+- **MCP Tools** - Provide low-level operations (extract, validate, save)
+- **Agent Skills** - Orchestrate workflows (how to use tools together)
 
-**Output:**
-- Silver Variable Definitions (var_name, var_label, schema, data_type, description)
-- Parameter Definitions
-- Gold Statistic Definitions
-- Platinum Deliverable Definitions
+**Available Skills:**
+- `prism-meta-generation` - Generate metadata from mock shells
 
-**Implementation:**
-- `prism.meta.definitions.DefinitionAgent` - LLM-powered agent
-- Does NOT require ALS
-- Generates semantic definitions, not implementations
+**Available MCP Tools:**
+- `extract_mock_shell` - Extract mock shell data
+- `validate_meta_definitions` - Validate metadata format
+- `save_meta_definitions` - Save metadata to Excel
+- `update_meta_definitions` - Update existing metadata
+- `get_als_fields` - Query ALS fields (for derivations)
+- `list_deliverables` - List deliverables from mock shell
+- `load_meta_to_db` - Load metadata to database
 
-### Step 2: Meta Definitions → Derivations (Future)
+### Usage
 
-Use LLM + ALS + SAP to generate **derivation rules** (how to transform data).
+In OpenCode, simply say:
+```
+Generate metadata for this mock shell: path/to/shell.docx
+```
 
-**Input:**
-- Meta Definitions (from Step 1)
-- ALS (raw field mappings)
-- SAP (optional, with vector search)
+OpenCode will:
+1. Load the `prism-meta-generation` skill
+2. Call MCP tools as needed
+3. Generate metadata using Claude Opus 4.6
+4. Validate and save results
 
-**Output:**
-- Bronze Dictionary (ALS structure)
-- Derivation Rules (text format)
-- Transformation Code (Polars)
+### CLI Commands (Limited)
 
-**Implementation:**
-- `prism.meta.derivations.DerivationAgent` - (Not yet implemented)
-
-### LLM Providers
-
-| Provider | Usage |
-|----------|-------|
-| DeepSeek (default) | `--provider deepseek` - Working, has balance |
-| Zhipu | `--provider zhipu` - GLM-4 model (needs balance top-up) |
-
-### CLI Commands
+PRISM provides limited CLI utilities:
 
 ```bash
-# Step 1: Generate meta definitions from mock shell
-uv run prism meta generate --mock shell.docx -o meta.xlsx
-
-# Generate for specific deliverables only
-uv run prism meta generate --mock shell.docx -d "14.1.2.1,14.3.1" -o meta.xlsx
-
-# Debug a single deliverable
-uv run prism meta generate --mock shell.docx --debug 14.3.1 -v
-
-# List deliverables without generating
-uv run prism meta generate --mock shell.docx --list-only
-
-# Load metadata to meta tables
+# Load metadata to database
 uv run prism meta load --meta meta.xlsx --db study.duckdb
 
-# Extract mock shell to JSON
+# Extract mock shell to JSON (for debugging)
 uv run prism meta extract --mock shell.docx -o shell.json
 ```
+
+**Note:** Metadata generation is done through OpenCode, Agent Skills, not CLI.
 
 ### Module Structure
 
 | Directory/File | Purpose |
 |----------------|---------|
-| `definitions/` | **Step 1**: Generate meta definitions from mock shell |
-| `definitions/agent.py` | DefinitionAgent - LLM理解Mock Shell |
-| `definitions/models.py` | MetaDefinitions, SilverVariableDefinition等 |
-| `definitions/templates.py` | LLM prompt templates |
-| `derivations/` | **Step 2**: Generate derivations (future) |
-| `derivations/agent.py` | DerivationAgent - 生成转换规则 (NotImplemented) |
-| `extractor.py` | Parse mock shell (docx/xlsx) to structured JSON |
+| `.opencode/skills/` | OpenCode Agent Skills |
+| `prism-meta-generation/` | Generate metadata from mock shells |
+| `definitions/` | Meta definition models |
+| `derivations/` | Derivation rules (future) |
+| `extractor.py` | Parse mock shell to structured JSON |
 | `loader.py` | Load metadata to meta tables |
 | `excel_writer.py` | Formatted Excel output |
 | `als_parser.py` | ALS parsing |
+| `mcp/server.py` | MCP server with tools |
 
 ### Output Excel Sheets
 

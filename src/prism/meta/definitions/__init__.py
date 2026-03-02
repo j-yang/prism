@@ -1,10 +1,9 @@
 """Meta Definition Generation.
 
-This module generates meta definitions from mock shells using LLM.
+This module provides models for meta definitions generated from mock shells.
 Definitions describe WHAT variables are, not HOW to derive them.
 """
 
-from .agent import DefinitionAgent, ExtractedElement
 from .models import (
     GoldStatisticDefinition,
     MetaDefinitions,
@@ -14,8 +13,6 @@ from .models import (
 )
 
 __all__ = [
-    "DefinitionAgent",
-    "ExtractedElement",
     "MetaDefinitions",
     "SilverVariableDefinition",
     "ParamDefinition",

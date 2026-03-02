@@ -5,7 +5,6 @@ from prism.meta.loader import load_spec_to_meta, load_specs_to_meta
 from prism.meta.manager import MetadataManager
 
 from .definitions import (
-    DefinitionAgent,
     GoldStatisticDefinition,
     MetaDefinitions,
     ParamDefinition,
@@ -21,7 +20,6 @@ __all__ = [
     "write_meta_excel",
     "load_spec_to_meta",
     "load_specs_to_meta",
-    "DefinitionAgent",
     "MetaDefinitions",
     "SilverVariableDefinition",
     "ParamDefinition",
