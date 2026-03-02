@@ -35,31 +35,15 @@ cp .env.example .env
 
 ## Quick Start
 
-### Option 1: CLI (Batch Mode)
-
-```bash
-# 1. Generate meta definitions from mock shell (Step 1)
-uv run prism meta generate --mock shell.docx -o meta.xlsx
-
-# 2. Load metadata to database
-uv run prism meta load --meta meta.xlsx --db study.duckdb
-
-# 3. Generate Silver transformations
-uv run prism silver generate --schema baseline --db study.duckdb
-
-# 4. Generate Gold statistics
-uv run prism gold generate --schema baseline --db study.duckdb
-
-# 5. Generate PowerPoint slide deck
-uv run prism platinum generate --db study.duckdb -o report.pptx
-```
-
-### Option 2: MCP Server (Interactive Mode)
-
 PRISM provides an MCP Server for use with OpenCode, Claude Desktop, and other MCP-compatible AI tools.
 
 **Setup:**
 ```bash
+# Clone and setup
+git clone <repo-url>
+cd prism
+uv sync
+
 # Configure OpenCode
 cat > ~/.config/opencode/config.json << 'EOF'
 {
@@ -76,93 +60,55 @@ EOF
 opencode
 ```
 
-**Usage:**
+**Usage Examples:**
 ```
 User: 帮我列出some_study的deliverables
 
-OpenCode: [调用 list_deliverables tool]
+OpenCode: [调用 list_mock_deliverables tool]
          Found 34 deliverables:
          - 14.1.1 CAR-T Treatment Summary
          - 14.1.2.1 Baseline Characteristics (IIM Cohort)
          ...
 
-User: 生成metadata
+User: 提取mock shell到JSON
 
-OpenCode: [调用 generate_meta tool]
-         生成了45个变量
-         输出：meta.xlsx
+OpenCode: [调用 extract_mock_shell tool]
+         Extracted to mock_extracted.json
+         Deliverables: 34
+
+User: 加载metadata到数据库
+
+OpenCode: [调用 load_meta tool]
+         Loaded to study.duckdb:
+           Silver variables: 45
+           Params: 12
+
+User: 生成Silver transforms
+
+OpenCode: [调用 generate_silver tool]
+         Generated 23 transforms for baseline:
+           High confidence: 18
+           Medium confidence: 5
+
+User: 生成PPTX
+
+OpenCode: [调用 generate_platinum tool]
+         Generated slide deck:
+           Slides: 67
+           Deliverables: 34
 ```
 
-**Available MCP Tools:**
-- `list_deliverables` - List deliverables from mock shell
-- `lookup_als_field` - Query ALS fields by domain/keywords
-- `get_bronze_schema` - Get Bronze layer table structure
-- `get_meta_variables` - Get variables from meta tables
-- `generate_meta` - Generate metadata (requires LLM)
-- `load_meta` - Load metadata to DuckDB
-- `generate_silver` - Generate Silver Polars code (requires LLM)
-- `generate_gold` - Generate Gold statistics code (requires LLM)
+**Available MCP Tools (15):**
 
-See [MCP_GUIDE.md](MCP_GUIDE.md) for detailed usage.
+| Category | Tools |
+|----------|-------|
+| **Meta** | `load_meta`, `extract_mock_shell`, `list_mock_deliverables`, `list_db_deliverables`, `get_variable_details` |
+| **Silver** | `generate_silver`, `list_silver_transforms`, `get_transform_code`, `get_meta_variables` |
+| **Gold** | `generate_gold`, `list_gold_transforms` |
+| **Platinum** | `generate_platinum`, `preview_platinum_deliverable` |
+| **Utility** | `lookup_als_field`, `get_bronze_schema` |
 
-## CLI Commands
-
-### Meta (Metadata Generation)
-
-```bash
-# Generate metadata from mock shell
-uv run prism meta generate --mock shell.docx --als als.xlsx -o meta.xlsx
-
-# List deliverables
-uv run prism meta generate --mock shell.docx --als als.xlsx --list-only
-
-# Debug specific deliverable
-uv run prism meta generate --mock shell.docx --als als.xlsx --debug 14.1.1 -v
-
-# Load to database
-uv run prism meta load --meta meta.xlsx --db study.duckdb
-```
-
-### Silver (Transformations)
-
-```bash
-# Generate Polars transformations for baseline schema
-uv run prism silver generate --schema baseline --db study.duckdb
-
-# Generate for longitudinal schema
-uv run prism silver generate --schema longitudinal --db study.duckdb
-
-# Generate for occurrence schema
-uv run prism silver generate --schema occurrence --db study.duckdb
-```
-
-### Gold (Statistics)
-
-```bash
-# Generate statistical aggregations
-uv run prism gold generate --schema baseline --db study.duckdb
-uv run prism gold generate --schema longitudinal --db study.duckdb
-uv run prism gold generate --schema occurrence --db study.duckdb
-```
-
-### Platinum (Slide Decks)
-
-```bash
-# Generate PowerPoint from all deliverables
-uv run prism platinum generate --db study.duckdb -o report.pptx
-
-# Generate for specific deliverables
-uv run prism platinum generate --db study.duckdb -d "14.1.1,14.2.1"
-
-# Filter by type
-uv run prism platinum generate --db study.duckdb --type table
-
-# List deliverables
-uv run prism platinum list --db study.duckdb
-
-# Preview slide content
-uv run prism platinum preview --db study.duckdb --deliverable-id 14.1.1
-```
+See [AGENTS.md](AGENTS.md) for detailed tool documentation.
 
 ## Project Structure
 
@@ -262,9 +208,8 @@ uv run --extra dev mypy src/prism/
 
 ## Documentation
 
-- **AGENTS.md** - Coding agent guidelines
+- **AGENTS.md** - Coding agent guidelines and MCP tools reference
 - **ARCHITECTURE.md** - Detailed architecture design
-- **CLI_CHEATSHEET.md** - CLI command reference
 
 ## License
 
