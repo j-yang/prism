@@ -1,0 +1,2315 @@
+{
+  "study_title": "An Open-Label Study to Assess the Safety and Efficacy of GC012F in Patients with Autoimmune Diseases",
+  "protocol_no": "",
+  "deliverables": [
+    {
+      "deliverable_id": "14.1.1",
+      "deliverable_type": "listing",
+      "title": "CAR-T Treatment Summary (Enrolled Subjects)",
+      "population": "",
+      "schema": "baseline",
+      "columns": [
+        "Subject Identifier",
+        "Treatment Group",
+        "Cohort",
+        "Date of Sign / Re-sign Informed Consent (ICF Version, Protocol Version) To team：可能签了不止一次ICF",
+        "Apheresis Date",
+        "Lymphodepletion Date",
+        "Infusion Date",
+        "End of DLT Date"
+      ],
+      "rows": [
+        "E1301001",
+        "E1301002",
+        "E1301003",
+        "E1301004"
+      ],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": [
+        [
+          "Subject Identifier",
+          "Treatment Group",
+          "Cohort",
+          "Date of Sign / Re-sign Informed Consent (ICF Version, Protocol Version) To team：可能签了不止一次ICF",
+          "Apheresis Date",
+          "Lymphodepletion Date",
+          "Infusion Date",
+          "End of DLT Date"
+        ],
+        [
+          "E1301001",
+          "3.0×105 CAR-T cell/kg",
+          "SSc",
+          "xxxx-xx-xx (x, x) /  xxxx-xx-xx (x, x) / …",
+          "XX-XX-XX",
+          "XX-XX-XX",
+          "XX-XX-XX",
+          "XX-XX-XX"
+        ],
+        [
+          "E1301002",
+          "3.0×105 CAR-T cell/kg",
+          "IIM",
+          "xxxx-xx-xx (x, x) /  xxxx-xx-xx (x, x) / …",
+          "XX-XX-XX",
+          "XX-XX-XX",
+          "XX-XX-XX",
+          "XX-XX-XX"
+        ],
+        [
+          "E1301003",
+          "3.0×105 CAR-T cell/kg",
+          "SSc",
+          "xxxx-xx-xx (x, x) /  xxxx-xx-xx (x, x) / …",
+          "XX-XX-XX",
+          "XX-XX-XX",
+          "XX-XX-XX",
+          "XX-XX-XX"
+        ],
+        [
+          "E1301004",
+          "3.0×105 CAR-T cell/kg",
+          "SSc",
+          "xxxx-xx-xx (x, x) /  xxxx-xx-xx (x, x) / …",
+          "XX-XX-XX",
+          "XX-XX-XX",
+          "XX-XX-XX",
+          "XX-XX-XX"
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "deliverable_id": "14.1.2.1",
+      "deliverable_type": "listing",
+      "title": "Baseline Characteristics (<<IIM Cohort>> Full Analysis Set)",
+      "population": "IIM Cohort",
+      "schema": "baseline",
+      "columns": [
+        "Subject Identifier",
+        "E1301001",
+        "E1301002",
+        "E1301003",
+        "E1301004",
+        "<<…>>"
+      ],
+      "rows": [
+        "<<Treatment Group>>",
+        "Age (years)",
+        "Sex",
+        "Follow-up duration (months)",
+        "Disease duration (years)",
+        "Disease subtype",
+        "Interstitial lung disease",
+        "PGA (measured length, cm)",
+        "PtGA (measured length, cm)",
+        "MMT-8 (total score)",
+        "HAQ-DI (total score)",
+        "Concomitant Glucocorticoid",
+        "MDIextend damage score"
+      ],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": [
+        [
+          "Subject Identifier",
+          "E1301001",
+          "E1301002",
+          "E1301003",
+          "E1301004",
+          "<<…>>"
+        ],
+        [
+          "<<Treatment Group>>",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          ""
+        ],
+        [
+          "Age (years)",
+          "xxx",
+          "xxx",
+          "xxx",
+          "xxx",
+          ""
+        ],
+        [
+          "Sex",
+          "Female",
+          "Female",
+          "Female",
+          "Female",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "Follow-up duration (months)",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          ""
+        ],
+        [
+          "Disease duration (years)",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          ""
+        ],
+        [
+          "Disease subtype",
+          "DM",
+          "PM",
+          "DM",
+          "PM",
+          ""
+        ],
+        [
+          "Interstitial lung disease",
+          "Y",
+          "Y",
+          "N",
+          "N",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "PGA (measured length, cm)",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          ""
+        ],
+        [
+          "PtGA (measured length, cm)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          ""
+        ],
+        [
+          "MMT-8 (total score)",
+          "xx",
+          "xx",
+          "xx",
+          "",
+          ""
+        ],
+        [
+          "HAQ-DI (total score)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          ""
+        ],
+        [
+          "",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "Concomitant Glucocorticoid",
+          "Y",
+          "N",
+          "N",
+          "N",
+          ""
+        ],
+        [
+          "MDIextend damage score",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "deliverable_id": "14.1.2.2",
+      "deliverable_type": "listing",
+      "title": "Baseline Characteristics (<<SSc Cohort>> Full Analysis Set)",
+      "population": "SSc Cohort",
+      "schema": "baseline",
+      "columns": [
+        "Subject Identifier",
+        "E1301001",
+        "E1301002",
+        "E1301003",
+        "E1301004",
+        "<<…>>"
+      ],
+      "rows": [
+        "<<Treatment Group>>",
+        "Age (years)",
+        "Sex",
+        "Follow-up duration (months)",
+        "Disease duration (years)",
+        "Interstitial lung disease",
+        "PGA (measured length, cm)",
+        "PtGA (measured length, cm)",
+        "mRSS (total score)",
+        "HAQ-DI (total score)"
+      ],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": [
+        [
+          "Subject Identifier",
+          "E1301001",
+          "E1301002",
+          "E1301003",
+          "E1301004",
+          "<<…>>"
+        ],
+        [
+          "<<Treatment Group>>",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          ""
+        ],
+        [
+          "Age (years)",
+          "xxx",
+          "xxx",
+          "xxx",
+          "xxx",
+          ""
+        ],
+        [
+          "Sex",
+          "Female",
+          "Female",
+          "Female",
+          "Female",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "Follow-up duration (months)",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          ""
+        ],
+        [
+          "Disease duration (years)",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          ""
+        ],
+        [
+          "Interstitial lung disease",
+          "Y",
+          "Y",
+          "N",
+          "N",
+          ""
+        ],
+        [
+          "PGA (measured length, cm)",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          ""
+        ],
+        [
+          "PtGA (measured length, cm)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          ""
+        ],
+        [
+          "mRSS (total score)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "HAQ-DI (total score)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "deliverable_id": "14.1.3.2",
+      "deliverable_type": "listing",
+      "title": "Baseline Lab Values (<<SSc Cohort>> Full Analysis Set)",
+      "population": "SSc Cohort",
+      "schema": "baseline",
+      "columns": [
+        "Subject Identifier",
+        "E1301001",
+        "E1301002",
+        "E1301003",
+        "E1301004",
+        "<<…>>"
+      ],
+      "rows": [
+        "<<Treatment Group>>",
+        "hs-CRP (<<unit>>)",
+        "ESR (<<unit>>)",
+        "ANA (<<unit>>)",
+        "Anti-Scl-70 (<<unit>>)",
+        "anti-RNAP III (<<unit>>)",
+        "<<…>>",
+        "<<…>>",
+        "<<…>>"
+      ],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": [
+        [
+          "Subject Identifier",
+          "E1301001",
+          "E1301002",
+          "E1301003",
+          "E1301004",
+          "<<…>>"
+        ],
+        [
+          "<<Treatment Group>>",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          ""
+        ],
+        [
+          "hs-CRP (<<unit>>)",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          ""
+        ],
+        [
+          "ESR (<<unit>>)",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          ""
+        ],
+        [
+          "ANA (<<unit>>)",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          ""
+        ],
+        [
+          "Anti-Scl-70 (<<unit>>)",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          ""
+        ],
+        [
+          "anti-RNAP III (<<unit>>)",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          ""
+        ],
+        [
+          "<<…>>",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          ""
+        ],
+        [
+          "<<…>>",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          "xx.x",
+          ""
+        ],
+        [
+          "<<…>>",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "deliverable_id": "14.1.4.1",
+      "deliverable_type": "listing",
+      "title": "Disease Related Treatment Prior to Apheresis (<<IIM Cohort>> Full Analysis Set)",
+      "population": "IIM Cohort",
+      "schema": "baseline",
+      "columns": [
+        "Subject Identifier",
+        "E1301001",
+        "E1301002",
+        "E1301003",
+        "E1301004",
+        "<<…>>"
+      ],
+      "rows": [
+        "<<Treatment Group>>",
+        "ATC #1",
+        "<<Generic drug name 1>>",
+        "<<Generic drug name 2>>",
+        "<<…>>",
+        "<<…>>"
+      ],
+      "footnotes": {},
+      "programming_notes": [
+        "Listing is sorted in alphabetical order for ATC classification and generic drug name.",
+        "Listing is sorted in alphabetical order for ATC classification and generic drug name."
+      ],
+      "table_data": [
+        [
+          "Subject Identifier",
+          "E1301001",
+          "E1301002",
+          "E1301003",
+          "E1301004",
+          "<<…>>"
+        ],
+        [
+          "<<Treatment Group>>",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          ""
+        ],
+        [
+          "ATC #1",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "<<Generic drug name 1>>",
+          "-",
+          "",
+          "",
+          "-",
+          "+"
+        ],
+        [
+          "<<Generic drug name 2>>",
+          "+*",
+          "",
+          "",
+          "-",
+          "-"
+        ],
+        [
+          "<<…>>",
+          "",
+          "",
+          "",
+          "+",
+          ""
+        ],
+        [
+          "<<…>>",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "deliverable_id": "14.1.4.2",
+      "deliverable_type": "listing",
+      "title": "Disease Related Treatment Prior to Apheresis (<<SSc Cohort>> Full Analysis Set)\t14",
+      "population": "SSc Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.1.5.1",
+      "deliverable_type": "listing",
+      "title": "Bridging Therapy (<<IIM Cohort>> Full Analysis Set)",
+      "population": "IIM Cohort",
+      "schema": "baseline",
+      "columns": [
+        "Subject Identifier",
+        "E1301001",
+        "E1301002",
+        "E1301003",
+        "E1301004",
+        "<<…>>"
+      ],
+      "rows": [
+        "<<Treatment Group>>",
+        "ATC #1",
+        "Dexamethasone Sodium Phosphate, IV",
+        "Methylprednisolone, oral",
+        "<<Generic drug name 2>><<Route>>",
+        "ATC #1",
+        "<<Generic drug name 1>><<Route>>",
+        "<<Generic drug name 2>><<Route>>",
+        "<<…>>",
+        "<<…>>"
+      ],
+      "footnotes": {},
+      "programming_notes": [
+        "Listing is sorted in alphabetical order for ATC classification and generic drug name."
+      ],
+      "table_data": [
+        [
+          "Subject Identifier",
+          "E1301001",
+          "E1301002",
+          "E1301003",
+          "E1301004",
+          "<<…>>"
+        ],
+        [
+          "<<Treatment Group>>",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          ""
+        ],
+        [
+          "ATC #1",
+          "+",
+          "-",
+          "-",
+          "+",
+          "+"
+        ],
+        [
+          "Dexamethasone Sodium Phosphate, IV",
+          "-",
+          "",
+          "",
+          "-",
+          "+"
+        ],
+        [
+          "Methylprednisolone, oral",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "<<Generic drug name 2>><<Route>>",
+          "+",
+          "",
+          "",
+          "-",
+          "-"
+        ],
+        [
+          "ATC #1",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "<<Generic drug name 1>><<Route>>",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "<<Generic drug name 2>><<Route>>",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "<<…>>",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "<<…>>",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "deliverable_id": "14.1.5.2",
+      "deliverable_type": "listing",
+      "title": "Bridging Therapy (<<SSc Cohort>> Full Analysis Set)",
+      "population": "SSc Cohort",
+      "schema": "baseline",
+      "columns": [
+        "Subject Identifier",
+        "E1301001",
+        "E1301002",
+        "E1301003",
+        "E1301004",
+        "<<…>>"
+      ],
+      "rows": [
+        "<<Treatment Group>>",
+        "ATC #1",
+        "Dexamethasone Sodium Phosphate, IV",
+        "Methylprednisolone, oral",
+        "<<Generic drug name 2>><<Route>>",
+        "ATC #1",
+        "<<Generic drug name 1>><<Route>>",
+        "<<Generic drug name 2>><<Route>>",
+        "<<…>>",
+        "<<…>>"
+      ],
+      "footnotes": {},
+      "programming_notes": [
+        "Listing is sorted in alphabetical order for ATC classification and generic drug name."
+      ],
+      "table_data": [
+        [
+          "Subject Identifier",
+          "E1301001",
+          "E1301002",
+          "E1301003",
+          "E1301004",
+          "<<…>>"
+        ],
+        [
+          "<<Treatment Group>>",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          "3.0×105 CAR-T cell/kg",
+          ""
+        ],
+        [
+          "ATC #1",
+          "+",
+          "-",
+          "-",
+          "+",
+          "+"
+        ],
+        [
+          "Dexamethasone Sodium Phosphate, IV",
+          "-",
+          "",
+          "",
+          "-",
+          "+"
+        ],
+        [
+          "Methylprednisolone, oral",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "<<Generic drug name 2>><<Route>>",
+          "+",
+          "",
+          "",
+          "-",
+          "-"
+        ],
+        [
+          "ATC #1",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "<<Generic drug name 1>><<Route>>",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "<<Generic drug name 2>><<Route>>",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "<<…>>",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "<<…>>",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "deliverable_id": "14.2.1",
+      "deliverable_type": "figure",
+      "title": "Line Plot of PhGA Overtime (<<IIM Cohort>> Full Analysis Set)\t18",
+      "population": "IIM Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.2",
+      "deliverable_type": "figure",
+      "title": "Line Plot of PtGA Overtime (<<IIM Cohort>> Full Analysis Set)\t19",
+      "population": "IIM Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.3",
+      "deliverable_type": "figure",
+      "title": "Line Plot of MMT-8 Overtime (<<IIM Cohort>> Full Analysis Set)\t20",
+      "population": "IIM Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.4",
+      "deliverable_type": "figure",
+      "title": "Line Plot of MDAAT Overtime (<<IIM Cohort>> Full Analysis Set)\t21",
+      "population": "IIM Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.5",
+      "deliverable_type": "figure",
+      "title": "Line Plot of CDASI Overtime (<<IIM Cohort>> Full Analysis Set)\t22",
+      "population": "IIM Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.6",
+      "deliverable_type": "figure",
+      "title": "Line Plot of MDI Overtime (<<IIM Cohort>> Full Analysis Set)\t23",
+      "population": "IIM Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.7",
+      "deliverable_type": "figure",
+      "title": "Line Plot of CK Overtime (<<IIM Cohort>> Full Analysis Set)\t24",
+      "population": "IIM Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.8",
+      "deliverable_type": "figure",
+      "title": "Line Plot of FVC Overtime (<<IIM Cohort>> Full Analysis Set)\t25",
+      "population": "IIM Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.9",
+      "deliverable_type": "figure",
+      "title": "Line Plot of ppFVC Overtime (<<IIM Cohort>> Full Analysis Set)\t26",
+      "population": "IIM Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.10",
+      "deliverable_type": "figure",
+      "title": "Line Plot of TIS Overtime (<<IIM Cohort>> Full Analysis Set)\t27",
+      "population": "IIM Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.11",
+      "deliverable_type": "figure",
+      "title": "Line Plot of mRSS Overtime (<<SSc Cohort>> Full Analysis Set)\t28",
+      "population": "SSc Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.12",
+      "deliverable_type": "figure",
+      "title": "Line Plot of FVC Overtime (<<SSc Cohort>> Full Analysis Set)\t29",
+      "population": "SSc Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.13",
+      "deliverable_type": "figure",
+      "title": "Line Plot of DLCO Overtime (<<SSc Cohort>> Full Analysis Set)\t30",
+      "population": "SSc Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.14",
+      "deliverable_type": "figure",
+      "title": "Line Plot of ppFVC Overtime (<<SSc Cohort>> Full Analysis Set)\t31",
+      "population": "SSc Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.15",
+      "deliverable_type": "figure",
+      "title": "Line Plot of PhGA Overtime (<<SSc Cohort>> Full Analysis Set)\t32",
+      "population": "SSc Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.16",
+      "deliverable_type": "figure",
+      "title": "Line Plot of PtGA Overtime (<<SSc Cohort>> Full Analysis Set)\t33",
+      "population": "SSc Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.17",
+      "deliverable_type": "figure",
+      "title": "Line Plot of HAQ-DI Overtime (<<SSc Cohort>> Full Analysis Set)\t34",
+      "population": "SSc Cohort",
+      "schema": "",
+      "columns": [],
+      "rows": [],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": []
+    },
+    {
+      "deliverable_id": "14.2.1",
+      "deliverable_type": "listing",
+      "title": "Individual Efficacy Response Data (<<IIM Cohort>> Full Analysis Set)",
+      "population": "IIM Cohort",
+      "schema": "baseline",
+      "columns": [
+        "<<Page by Subject identifier>>",
+        "<<Page by Subject identifier>>",
+        "<<Page by Subject identifier>>",
+        "<<Page by Subject identifier>>",
+        "<<Page by Subject identifier>>",
+        "<<Page by Subject identifier>>"
+      ],
+      "rows": [
+        "Variable",
+        "PhGA (measured length, cm)",
+        "PtGA (measured length, cm)",
+        "MMT-8 score (points)",
+        "Extramuscular global assessment (cm)",
+        "Extended damage score (points)",
+        "CK (U/liter)",
+        "FVC (units)",
+        "ppFVC (units)",
+        "TIS (points)"
+      ],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": [
+        [
+          "<<Page by Subject identifier>>",
+          "<<Page by Subject identifier>>",
+          "<<Page by Subject identifier>>",
+          "<<Page by Subject identifier>>",
+          "<<Page by Subject identifier>>",
+          "<<Page by Subject identifier>>"
+        ],
+        [
+          "Variable",
+          "Screening",
+          "Baseline",
+          "D28",
+          "D56",
+          "<<Analysis vist>>"
+        ],
+        [
+          "PhGA (measured length, cm)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "PtGA (measured length, cm)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "MMT-8 score (points)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "Extramuscular global assessment (cm)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "Extended damage score (points)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "CK (U/liter)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "FVC (units)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "ppFVC (units)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "TIS (points)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ]
+      ]
+    },
+    {
+      "deliverable_id": "14.2.2",
+      "deliverable_type": "listing",
+      "title": "Individual Efficacy Response Data (<<SSc Cohort>> Full Analysis Set)",
+      "population": "SSc Cohort",
+      "schema": "baseline",
+      "columns": [
+        "<<Page by Subject identifier>>",
+        "<<Page by Subject identifier>>",
+        "<<Page by Subject identifier>>",
+        "<<Page by Subject identifier>>",
+        "<<Page by Subject identifier>>",
+        "<<Page by Subject identifier>>"
+      ],
+      "rows": [
+        "Variable",
+        "mRSS score (points)",
+        "FVC (units)",
+        "ppFVC (units)",
+        "DLCO (units)",
+        "rCRISS",
+        "PhGA (measured length, cm)",
+        "PtGA (measured length, cm)",
+        "HAQ-DI score (points)"
+      ],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": [
+        [
+          "<<Page by Subject identifier>>",
+          "<<Page by Subject identifier>>",
+          "<<Page by Subject identifier>>",
+          "<<Page by Subject identifier>>",
+          "<<Page by Subject identifier>>",
+          "<<Page by Subject identifier>>"
+        ],
+        [
+          "Variable",
+          "Screening",
+          "Baseline",
+          "D28",
+          "D56",
+          "<<Analysis vist>>"
+        ],
+        [
+          "mRSS score (points)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "FVC (units)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "ppFVC (units)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "DLCO (units)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "rCRISS",
+          "Y",
+          "Y",
+          "N",
+          "N",
+          "N"
+        ],
+        [
+          "PhGA (measured length, cm)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "PtGA (measured length, cm)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "HAQ-DI score (points)",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "deliverable_id": "14.3.1",
+      "deliverable_type": "table",
+      "title": "Overall Summary of Adverse Events - <<After Cell Infusion>> (Safety Set)",
+      "population": "Safety Set",
+      "schema": "occurrence",
+      "columns": [
+        "",
+        "<<IIM cohort>>",
+        "<<SSc cohort>>",
+        "Total"
+      ],
+      "rows": [
+        "Any AE",
+        "Any AE related to CART therapy [a]",
+        "Any AE of CTCAE grade 3 or 4",
+        "Any AE related to CART therapy of CTCAE grade 3 or 4",
+        "Any SAE",
+        "Any SAE related to CART therapy",
+        "Any SAE with outcome death",
+        "Any AE leading to interruption of CART therapy",
+        "Any AE leading to study withdrawal",
+        "Any CRS",
+        "Any ICANS",
+        "Any AESI",
+        "CRS",
+        "neurotoxicity",
+        "Any grade of newly diagnosed malignancy",
+        "Serious infection",
+        "Immune effector cell-associated HLH-like syndrome",
+        "Any DLT"
+      ],
+      "footnotes": {
+        "a": "Related is defined as reasonable possibility that the AE was caused by investigational product, as assessed by investigator. The causality will be judged \"related\" when the causality is missing."
+      },
+      "programming_notes": [],
+      "table_data": [
+        [
+          "",
+          "<<IIM cohort>>",
+          "<<SSc cohort>>",
+          "Total"
+        ],
+        [
+          "",
+          "N=xxx",
+          "N=xxx",
+          "N=xxx"
+        ],
+        [
+          "",
+          "n (%)",
+          "n (%)",
+          "n (%)"
+        ],
+        [
+          "Any AE",
+          "xxx (xx.x)",
+          "xx (xx.x)",
+          "xx (xx.x)"
+        ],
+        [
+          "Any AE related to CART therapy [a]",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "Any AE of CTCAE grade 3 or 4",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "Any AE related to CART therapy of CTCAE grade 3 or 4",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "Any SAE",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "Any SAE related to CART therapy",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "Any SAE with outcome death",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "Any AE leading to interruption of CART therapy",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "Any AE leading to study withdrawal",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "Any CRS",
+          "x (x.x)",
+          "x (x.x)",
+          "x (x.x)"
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "Any ICANS",
+          "x (x.x)",
+          "x (x.x)",
+          "x (x.x)"
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "Any AESI",
+          "x (x.x)",
+          "x (x.x)",
+          "x (x.x)"
+        ],
+        [
+          "CRS",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "neurotoxicity",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "Any grade of newly diagnosed malignancy",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "Serious infection",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "Immune effector cell-associated HLH-like syndrome",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "Any DLT",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "deliverable_id": "14.3.2",
+      "deliverable_type": "table",
+      "title": "Adverse Events by System Organ Class and Preferred Term - <<After Cell Infusion>> (Safety Set)",
+      "population": "Safety Set",
+      "schema": "occurrence",
+      "columns": [
+        "System organ class",
+        "<<IIM cohort>>",
+        "<<SSc cohort>>",
+        "Total"
+      ],
+      "rows": [
+        "Preferred term",
+        "(MedDRA version xx.x)",
+        "Any AE",
+        "<<System organ class A>>",
+        "<<Preferred term 1>>",
+        "<<Preferred term 2>>",
+        "<<…>>",
+        "<<System organ class B>>",
+        "<<Preferred term 1>>",
+        "<<Preferred term 2>>",
+        "<<…>>",
+        "<<…>>"
+      ],
+      "footnotes": {},
+      "programming_notes": [
+        "Subjects with multiple occurrences are counted once per system organ class and preferred term regardless of the number of occurrences. The table is sorted by international order for system organ class and by decreasing number of subjects for preferred term based on the total number of subjects. They will be sorted alphabetically when they have the same total frequency within the same level."
+      ],
+      "table_data": [
+        [
+          "System organ class",
+          "<<IIM cohort>>",
+          "<<SSc cohort>>",
+          "Total"
+        ],
+        [
+          "Preferred term",
+          "N=xxx",
+          "N=xxx",
+          "N=xxx"
+        ],
+        [
+          "(MedDRA version xx.x)",
+          "n (%)",
+          "n (%)",
+          "n (%)"
+        ],
+        [
+          "Any AE",
+          "xxx (xx.x)",
+          "xx (xx.x)",
+          "xx (xx.x)"
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "<<System organ class A>>",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "<<Preferred term 1>>",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "<<Preferred term 2>>",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "<<…>>",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "<<System organ class B>>",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "<<Preferred term 1>>",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "<<Preferred term 2>>",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "<<…>>",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "<<…>>",
+          "x (x.x)",
+          "xx (xx.x)",
+          "x (x.x)"
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "deliverable_id": "14.3.1",
+      "deliverable_type": "listing",
+      "title": "Adverse Events (Safety Set)",
+      "population": "Safety Set",
+      "schema": "occurrence",
+      "columns": [
+        "<<Page by Subject identifier + study cohort>>",
+        "<<Page by Subject identifier + study cohort>>",
+        "<<Page by Subject identifier + study cohort>>",
+        "<<Page by Subject identifier + study cohort>>",
+        "<<Page by Subject identifier + study cohort>>",
+        "<<Page by Subject identifier + study cohort>>",
+        "<<Page by Subject identifier + study cohort>>",
+        "<<Page by Subject identifier + study cohort>>",
+        "<<Page by Subject identifier + study cohort>>",
+        "<<Page by Subject identifier + study cohort>>",
+        "<<Page by Subject identifier + study cohort>>",
+        "<<Page by Subject identifier + study cohort>>",
+        "<<Page by Subject identifier + study cohort>>",
+        "<<Page by Subject identifier + study cohort>>"
+      ],
+      "rows": [
+        "Analysis phase [a]",
+        "Before cell infusion",
+        "After cell infusion"
+      ],
+      "footnotes": {
+        "b": "Study Day = (date of event – CAR-T cell infusion date +1) if the event date is on or later than reference start date, Study Day = (date of event – CAR-T cell infusion date) if the event date is earlier than CAR-T cell infusion date. Study day at end is missing if it is ongoing at the data cut-off.",
+        "c": "Duration (days) = End date or Date of  when the AE is ongoing – Start date +1"
+      },
+      "programming_notes": [
+        "Multiple records will be listed if the AE has undergone an AE change. An AE change includes the change of the CTCAE grade, the causality, and the action taken."
+      ],
+      "table_data": [
+        [
+          "<<Page by Subject identifier + study cohort>>",
+          "<<Page by Subject identifier + study cohort>>",
+          "<<Page by Subject identifier + study cohort>>",
+          "<<Page by Subject identifier + study cohort>>",
+          "<<Page by Subject identifier + study cohort>>",
+          "<<Page by Subject identifier + study cohort>>",
+          "<<Page by Subject identifier + study cohort>>",
+          "<<Page by Subject identifier + study cohort>>",
+          "<<Page by Subject identifier + study cohort>>",
+          "<<Page by Subject identifier + study cohort>>",
+          "<<Page by Subject identifier + study cohort>>",
+          "<<Page by Subject identifier + study cohort>>",
+          "<<Page by Subject identifier + study cohort>>",
+          "<<Page by Subject identifier + study cohort>>"
+        ],
+        [
+          "Analysis phase [a]",
+          "Within 28 days after cell infusion",
+          "Preferred term | (MedDRA version x.x)/Reported term",
+          "Start date",
+          "Study day at start/Study day at end [b]",
+          "Duration (Days) [c]",
+          "",
+          "Serious event",
+          "AE possibly related to CART therapy [d]",
+          "Outcome",
+          "Concomitant or additional treatment given",
+          "CTCAE grade [e]",
+          "Action taken with CART therapy",
+          "DLT"
+        ],
+        [
+          "Before cell infusion",
+          "Y/N",
+          "Xxxxxxxx/ Xxxxxxxxx",
+          "yyyy-mm-dd",
+          "-4/44*",
+          "NC",
+          "",
+          "Y/N",
+          "Y/N",
+          "xxxx",
+          "Y/N",
+          "Xxxxx",
+          "Dose not changed/Dose not changed",
+          "Y/N"
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "After cell infusion",
+          "Y/N",
+          "Xxxxxxxx/ Xxxxxxxxx",
+          "yyyy-mm-dd",
+          "",
+          "NC",
+          "",
+          "Y/N",
+          "Y/N",
+          "xxxx",
+          "Y/N",
+          "Xxxxx",
+          "Dose not changed",
+          "Y/N"
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "deliverable_id": "14.3.2",
+      "deliverable_type": "listing",
+      "title": "Cytokine Release Syndrome (Safety Set)",
+      "population": "Safety Set",
+      "schema": "baseline",
+      "columns": [
+        "Subject identifier",
+        "Cohort",
+        "Preferred term | (MedDRA version x.x)/Reported term",
+        "Start date (study day) [a]",
+        "End date (study day) [a]",
+        "Duration (Days) [b]",
+        "ASTCT grade [c]",
+        "Any prophylaxis treatment",
+        "Tocilizumab used",
+        "Glucocorticoids used"
+      ],
+      "rows": [
+        "E0001001",
+        "E0001002",
+        "E0001003",
+        "E0001004"
+      ],
+      "footnotes": {
+        "a": "Study Day = (date of event – CAR-T cell infusion date +1) if the event date is on or later than reference start date, Study Day = (date of event – CAR-T cell infusion date) if the event date is earlier than CAR-T cell infusion date. Study day at end is missing if it is ongoing at the data cut-off.",
+        "b": "Duration (days) = End date or Date of  when the AE is ongoing – Start date +1",
+        "c": "The severity of cytokine release syndromes are analysed according to American Society of Transplantation and Cellular Therapy (ASTCT) grading criteria in 2019, grade 1-5."
+      },
+      "programming_notes": [],
+      "table_data": [
+        [
+          "Subject identifier",
+          "Cohort",
+          "Preferred term | (MedDRA version x.x)/Reported term",
+          "Start date (study day) [a]",
+          "End date (study day) [a]",
+          "Duration (Days) [b]",
+          "ASTCT grade [c]",
+          "Any prophylaxis treatment",
+          "Tocilizumab used",
+          "Glucocorticoids used"
+        ],
+        [
+          "E0001001",
+          "IIM",
+          "xx",
+          "yyyy-mm-dd (xx)",
+          "yyyy-mm-dd (xx)",
+          "6",
+          "xx",
+          "Y/N",
+          "Y/N",
+          "Y/N"
+        ],
+        [
+          "E0001002",
+          "IIM",
+          "xx",
+          "yyyy-mm-dd (xx)",
+          "yyyy-mm-dd (xx)",
+          "3",
+          "xx",
+          "Y/N",
+          "Y/N",
+          "Y/N"
+        ],
+        [
+          "E0001003",
+          "IIM",
+          "xx",
+          "yyyy-mm-dd (xx)",
+          "yyyy-mm-dd (xx)",
+          "8",
+          "xx",
+          "Y/N",
+          "Y/N",
+          "Y/N"
+        ],
+        [
+          "E0001004",
+          "SSc",
+          "xx",
+          "yyyy-mm-dd (xx)",
+          "yyyy-mm-dd (xx)",
+          "10",
+          "xx",
+          "Y/N",
+          "Y/N",
+          "Y/N"
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "deliverable_id": "14.3.3",
+      "deliverable_type": "listing",
+      "title": "Immune Effector Cell-associated Neurotoxicity Syndrome (Safety set)",
+      "population": "Safety Set",
+      "schema": "baseline",
+      "columns": [
+        "Subject identifier",
+        "Cohort",
+        "Preferred term | (MedDRA version x.x)/Reported term",
+        "Start date (study day) [a]",
+        "End date (study day) [a]",
+        "Duration (Days) [b]",
+        "ASTCT grade [c]",
+        "Any prophylaxis treatment",
+        "Tocilizumab used",
+        "Glucocorticoids used"
+      ],
+      "rows": [
+        "E0001001",
+        "E0001002",
+        "E0001003",
+        "E0001004"
+      ],
+      "footnotes": {
+        "a": "Study Day = (date of event – CAR-T cell infusion date +1) if the event date is on or later than reference start date, Study Day = (date of event – CAR-T cell infusion date) if the event date is earlier than CAR-T cell infusion date. Study day at end is missing if it is ongoing at the data cut-off.",
+        "b": "Duration (days) = End date or Date of  when the AE is ongoing – Start date +1",
+        "c": "The severity of immune effector cell-associated neurotoxicity syndromes are analysed according to American Society of Transplantation and Cellular Therapy (ASTCT) grading criteria in 2019, grade 1-5."
+      },
+      "programming_notes": [],
+      "table_data": [
+        [
+          "Subject identifier",
+          "Cohort",
+          "Preferred term | (MedDRA version x.x)/Reported term",
+          "Start date (study day) [a]",
+          "End date (study day) [a]",
+          "Duration (Days) [b]",
+          "ASTCT grade [c]",
+          "Any prophylaxis treatment",
+          "Tocilizumab used",
+          "Glucocorticoids used"
+        ],
+        [
+          "E0001001",
+          "IIM",
+          "xx",
+          "yyyy-mm-dd (xx)",
+          "yyyy-mm-dd (xx)",
+          "6",
+          "xx",
+          "Y/N",
+          "Y/N",
+          "Y/N"
+        ],
+        [
+          "E0001002",
+          "IIM",
+          "xx",
+          "yyyy-mm-dd (xx)",
+          "yyyy-mm-dd (xx)",
+          "3",
+          "xx",
+          "Y/N",
+          "Y/N",
+          "Y/N"
+        ],
+        [
+          "E0001003",
+          "IIM",
+          "xx",
+          "yyyy-mm-dd (xx)",
+          "yyyy-mm-dd (xx)",
+          "8",
+          "xx",
+          "Y/N",
+          "Y/N",
+          "Y/N"
+        ],
+        [
+          "E0001004",
+          "SSc",
+          "xx",
+          "yyyy-mm-dd (xx)",
+          "yyyy-mm-dd (xx)",
+          "10",
+          "xx",
+          "Y/N",
+          "Y/N",
+          "Y/N"
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "deliverable_id": "14.3.4",
+      "deliverable_type": "listing",
+      "title": "Treatment for CRS/ICANS (Safety set)",
+      "population": "Safety Set",
+      "schema": "occurrence",
+      "columns": [
+        "Subject identifier",
+        "Cohort",
+        "Preferred name (WHODrug Global mmyyyy)",
+        "Start date (study day) [a]",
+        "End date (study day) [a]",
+        "Duration (Days) [b]",
+        "Ongoing at data cut-off",
+        "Dose (unit)",
+        "Frequency",
+        "Medication reason category",
+        "Adverse event preferred term"
+      ],
+      "rows": [
+        "E0001001",
+        "E0001002",
+        "E0001003",
+        "E0001004"
+      ],
+      "footnotes": {
+        "a": "Study Day = (date of event – CAR-T cell infusion date +1) if the event date is on or later than reference start date, Study Day = (date of event – CAR-T cell infusion date) if the event date is earlier than CAR-T cell infusion date. Study day at end is missing if it is ongoing at the data cut-off.",
+        "b": "Duration (days) = End date or Date of  when the AE is ongoing – Start date +1"
+      },
+      "programming_notes": [],
+      "table_data": [
+        [
+          "Subject identifier",
+          "Cohort",
+          "Preferred name (WHODrug Global mmyyyy)",
+          "Start date (study day) [a]",
+          "End date (study day) [a]",
+          "Duration (Days) [b]",
+          "Ongoing at data cut-off",
+          "Dose (unit)",
+          "Frequency",
+          "Medication reason category",
+          "Adverse event preferred term"
+        ],
+        [
+          "E0001001",
+          "IIM",
+          "xx",
+          "yyyy-mm-dd (xx)",
+          "yyyy-mm-dd (xx)",
+          "6",
+          "N",
+          "xx (mg)",
+          "xx",
+          "Prophylaxis",
+          ""
+        ],
+        [
+          "E0001002",
+          "IIM",
+          "xx",
+          "yyyy-mm-dd (xx)",
+          "yyyy-mm-dd (xx)",
+          "3",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "E0001003",
+          "IIM",
+          "xx",
+          "yyyy-mm-dd (xx)",
+          "yyyy-mm-dd (xx)",
+          "8",
+          "Y",
+          "xx (mg/m2)",
+          "",
+          "Adverse event",
+          ""
+        ],
+        [
+          "E0001004",
+          "SSc",
+          "xx",
+          "yyyy-mm-dd (xx)",
+          "yyyy-mm-dd (xx)",
+          "10",
+          "Y",
+          "xx (mL)",
+          "",
+          "Adverse event",
+          ""
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "deliverable_id": "14.3.5",
+      "deliverable_type": "listing",
+      "title": "Individual Laboratory Measurement (Safety set)",
+      "population": "Safety Set",
+      "schema": "baseline",
+      "columns": [
+        "Subject identifier",
+        "Cohort",
+        "Parameter",
+        "Any Abnormal",
+        "Screening",
+        "Apheresis",
+        "Baseline",
+        "D0",
+        "D4",
+        "<<Analysis vist>>"
+      ],
+      "rows": [
+        "E0001001",
+        "E0001002",
+        "E0001003",
+        "E0001004"
+      ],
+      "footnotes": {},
+      "programming_notes": [],
+      "table_data": [
+        [
+          "Subject identifier",
+          "Cohort",
+          "Parameter",
+          "Any Abnormal",
+          "Screening",
+          "Apheresis",
+          "Baseline",
+          "D0",
+          "D4",
+          "<<Analysis vist>>"
+        ],
+        [
+          "E0001001",
+          "IIM",
+          "xx (unit)",
+          "Y",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx*",
+          "xx"
+        ],
+        [
+          "E0001002",
+          "IIM",
+          "xx (unit)",
+          "Y",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "E0001003",
+          "IIM",
+          "xx (unit)",
+          "N",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "E0001004",
+          "SSc",
+          "xx (unit)",
+          "N",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx",
+          "xx"
+        ],
+        [
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ]
+      ]
+    }
+  ],
+  "sections": {
+    "14.1": {
+      "title": "General Information",
+      "deliverables": [
+        "14.1.1",
+        "14.1.2.1",
+        "14.1.2.2",
+        "14.1.3.2",
+        "14.1.4.1",
+        "14.1.5.1",
+        "14.1.5.2"
+      ]
+    },
+    "14.2": {
+      "title": "Efficacy Overviews",
+      "deliverables": [
+        "14.2.1",
+        "14.2.2",
+        "14.2.3",
+        "14.2.4",
+        "14.2.5",
+        "14.2.6",
+        "14.2.7",
+        "14.2.8",
+        "14.2.9",
+        "14.2.10",
+        "14.2.11",
+        "14.2.12",
+        "14.2.13",
+        "14.2.14",
+        "14.2.15",
+        "14.2.16",
+        "14.2.17",
+        "14.2.1",
+        "14.2.2"
+      ]
+    },
+    "14.3": {
+      "title": "Safety Overviews",
+      "deliverables": [
+        "14.3.1",
+        "14.3.2",
+        "14.3.1",
+        "14.3.2",
+        "14.3.3",
+        "14.3.4",
+        "14.3.5"
+      ]
+    },
+    "14.4": {
+      "title": "Pharmacokinetics Part\t52",
+      "deliverables": []
+    },
+    "14.5": {
+      "title": "Pharmacodynamics Part\t53",
+      "deliverables": []
+    },
+    "14.6": {
+      "title": "ADA\t54",
+      "deliverables": []
+    }
+  },
+  "all_footnotes": {
+    "a": "Study Day = (date of event – CAR-T cell infusion date +1) if the event date is on or later than reference start date, Study Day = (date of event – CAR-T cell infusion date) if the event date is earlier than CAR-T cell infusion date. Study day at end is missing if it is ongoing at the data cut-off.",
+    "b": "Duration (days) = End date or Date of  when the AE is ongoing – Start date +1",
+    "c": "The severity of immune effector cell-associated neurotoxicity syndromes are analysed according to American Society of Transplantation and Cellular Therapy (ASTCT) grading criteria in 2019, grade 1-5."
+  },
+  "all_programming_notes": [
+    "Listing is sorted in alphabetical order for ATC classification and generic drug name.",
+    "Listing is sorted in alphabetical order for ATC classification and generic drug name.",
+    "Listing is sorted in alphabetical order for ATC classification and generic drug name.",
+    "Listing is sorted in alphabetical order for ATC classification and generic drug name.",
+    "Subjects with multiple occurrences are counted once per system organ class and preferred term regardless of the number of occurrences. The table is sorted by international order for system organ class and by decreasing number of subjects for preferred term based on the total number of subjects. They will be sorted alphabetically when they have the same total frequency within the same level.",
+    "Multiple records will be listed if the AE has undergone an AE change. An AE change includes the change of the CTCAE grade, the causality, and the action taken."
+  ]
+}

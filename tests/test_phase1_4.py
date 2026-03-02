@@ -9,7 +9,7 @@ from datetime import datetime
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from prism import (
+from olympus import (
     Database,
     init_database,
     MetadataManager,
@@ -113,12 +113,12 @@ def test_sas_import_mock():
 
         mock_dm_data.columns = [col.lower() for col in mock_dm_data.columns]
 
-        from prism.init_bronze import convert_dates_in_dataframe
+        from olympus.init_bronze import convert_dates_in_dataframe
 
         date_columns = {"brthdat": "date"}
         mock_dm_data = convert_dates_in_dataframe(mock_dm_data, date_columns)
 
-        from prism.init_bronze import insert_to_bronze
+        from olympus.init_bronze import insert_to_bronze
 
         try:
             count = insert_to_bronze(mock_dm_data, "dm", db, mode="append")

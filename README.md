@@ -1,10 +1,10 @@
-# PRISM
+# Olympus
 
 Clinical Trial Data Pipeline with AI-powered Code Generation.
 
 ## Overview
 
-PRISM implements a Medallion architecture for clinical trial data with unified PydanticAI agents:
+Olympus implements a Medallion architecture for clinical trial data with unified PydanticAI agents:
 
 ```
 ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌───────────┐
@@ -35,7 +35,7 @@ cp .env.example .env
 
 ## Quick Start
 
-PRISM provides an MCP Server for use with OpenCode, Claude Desktop, and other MCP-compatible AI tools.
+Olympus provides an MCP Server for use with OpenCode, Claude Desktop, and other MCP-compatible AI tools.
 
 **Setup:**
 ```bash
@@ -50,7 +50,7 @@ cat > ~/.config/opencode/config.json << 'EOF'
   "mcpServers": {
     "prism": {
       "command": "uv",
-      "args": ["--directory", "/path/to/prism", "run", "prism-mcp"]
+      "args": ["--directory", "/path/to/prism", "run", "olympus-mcp"]
     }
   }
 }

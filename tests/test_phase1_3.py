@@ -8,7 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-from prism import Database, init_database, MetadataManager, parse_als_to_db
+from olympus import Database, init_database, MetadataManager, parse_als_to_db
 
 
 def test_phase_1_3():

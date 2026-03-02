@@ -10,13 +10,13 @@
 ```json
 {
   "mcpServers": {
-    "prism": {
+    "olympus": {
       "command": "uv",
       "args": [
         "--directory",
-        "/Users/jimmyyang/projects/prism",
+        "/Users/jimmyyang/projects/olympus",
         "run",
-        "prism-mcp"
+        "olympus-mcp"
       ],
       "env": {}
     }
@@ -43,7 +43,7 @@ opencode
 /mcp
 ```
 
-应该能看到PRISM的tools。
+应该能看到Olympus的tools。
 
 ## 可用的MCP Tools
 

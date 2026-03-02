@@ -1,8 +1,8 @@
-# PRISM Architecture
+# Olympus Architecture
 
 ## Overview
 
-PRISM is a clinical trial data warehouse built on DuckDB with unified PydanticAI agents for code generation.
+Olympus is a clinical trial data warehouse built on DuckDB with unified PydanticAI agents for code generation.
 
 ## Architecture
 
@@ -143,7 +143,7 @@ bronze.vs    -- Vital Signs
 
 ```bash
 # 1. Generate Polars code
-uv run prism silver generate --schema baseline --db study.duckdb -o generated/silver/
+uv run olympus silver generate --schema baseline --db study.duckdb -o generated/silver/
 
 # 2. Review generated code
 cat generated/silver/baseline.py
@@ -168,7 +168,7 @@ uv run python generated/silver/baseline.py
 
 ```bash
 # 1. Generate Polars code
-uv run prism gold generate --schema baseline --db study.duckdb -o generated/gold/
+uv run olympus gold generate --schema baseline --db study.duckdb -o generated/gold/
 
 # 2. Review generated code
 cat generated/gold/baseline.py
@@ -185,7 +185,7 @@ uv run python generated/gold/baseline.py
 
 ```bash
 # Generate slide deck from all deliverables
-uv run prism platinum generate --db study.duckdb -o report.pptx
+uv run olympus platinum generate --db study.duckdb -o report.pptx
 ```
 
 ### Features
@@ -203,7 +203,7 @@ uv run prism platinum generate --db study.duckdb -o report.pptx
 ## File Organization
 
 ```
-src/prism/
+src/olympus/
 ├── core/
 │   ├── database.py      # DuckDB connection wrapper
 │   ├── models.py        # Pydantic models (single source of truth)
@@ -276,8 +276,8 @@ src/prism/
    parse_als_to_db() → bronze tables, meta.bronze_dictionary
 
 2. Meta Generation
-   prism meta generate → meta.xlsx (silver_variables, params, etc.)
-   prism meta load → meta.* tables
+   olympus meta generate → meta.xlsx (silver_variables, params, etc.)
+   olympus meta load → meta.* tables
 
 3. Silver Generation
    SilverAgent → generated/silver/*.py (Polars code)

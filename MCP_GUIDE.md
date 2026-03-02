@@ -39,13 +39,13 @@ Add PRISM to your OpenCode configuration:
 // ~/.config/opencode/config.json
 {
   "mcpServers": {
-    "prism": {
+    "olympus": {
       "command": "uv",
       "args": [
         "--directory",
-        "/Users/YOUR_USERNAME/projects/prism",
+        "/Users/YOUR_USERNAME/projects/olympus",
         "run",
-        "prism-mcp"
+        "olympus-mcp"
       ]
     }
   }
@@ -60,13 +60,13 @@ Add PRISM to your Claude Desktop configuration:
 // ~/Library/Application Support/Claude/claude_desktop_config.json
 {
   "mcpServers": {
-    "prism": {
+    "olympus": {
       "command": "uv",
       "args": [
         "--directory",
-        "/Users/YOUR_USERNAME/projects/prism",
+        "/Users/YOUR_USERNAME/projects/olympus",
         "run",
-        "prism-mcp"
+        "olympus-mcp"
       ]
     }
   }
@@ -184,7 +184,7 @@ OpenCode / Claude Desktop / VS Code
          ↓
 ┌─────────────────────────────┐
 │   PRISM MCP Server          │
-│   (prism-mcp command)       │
+│   (olympus-mcp command)       │
 │                             │
 │   Tools:                    │
 │   - generate_meta           │
@@ -212,10 +212,10 @@ OpenCode / Claude Desktop / VS Code
 
 ### MCP Server not found
 
-Make sure `prism-mcp` is in your PATH:
+Make sure `olympus-mcp` is in your PATH:
 
 ```bash
-uv run which prism-mcp
+uv run which olympus-mcp
 ```
 
 ### Import errors

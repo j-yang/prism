@@ -5,7 +5,7 @@ Tests for ALS Parser
 import pytest
 from pathlib import Path
 
-from prism.meta.als_parser import (
+from olympus.meta.als_parser import (
     get_domain_for_form,
     classify_forms,
     get_domain_field_mapping,

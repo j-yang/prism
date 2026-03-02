@@ -5,7 +5,7 @@ import sys
 
 sys.path.insert(0, "src")
 
-from prism.mcp.server import (
+from olympus.mcp.server import (
     list_deliverables,
     lookup_als_field,
     get_bronze_schema,

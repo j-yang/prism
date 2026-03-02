@@ -1,8 +1,8 @@
 """Test new PydanticAI features with 128K context."""
 
-from prism.agent.base import ToolRegistry
-from prism.meta.generator import MetaGenerator
-from prism.meta.extractor import extract_mock_shell
+from olympus.agent.base import ToolRegistry
+from olympus.meta.generator import MetaGenerator
+from olympus.meta.extractor import extract_mock_shell
 
 
 def test_als_loading():
@@ -33,7 +33,7 @@ def test_mcp_server():
     print("Test 2: MCP Server Tools")
     print("=" * 60)
 
-    from prism.mcp.server import mcp
+    from olympus.mcp.server import mcp
 
     tools = mcp._tool_manager._tools
     print(f"✓ MCP server has {len(tools)} tools:")
@@ -75,7 +75,7 @@ def test_pydantic_ai():
 
     print(f"✓ PydanticAI version: {pydantic_ai.__version__}")
 
-    from prism.agent.base import BaseAgent
+    from olympus.agent.base import BaseAgent
 
     print(f"✓ BaseAgent imports successfully")
     print(f"✓ Using output_type (not result_type)")

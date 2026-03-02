@@ -1,16 +1,62 @@
-# AGENTS.md - Coding Agent Guidelines for PRISM
+# AGENTS.md - Coding Agent Guidelines for Olympus
 
-This document provides guidelines for AI coding agents working in the PRISM repository.
+This document provides guidelines for AI coding agents working in the Olympus repository.
 
 ---
 
 ## Project Overview
 
-PRISM is a clinical trial data warehouse built on DuckDB implementing a Medallion architecture:
+Olympus is a clinical trial data warehouse built on DuckDB implementing a Medallion architecture:
 - **Bronze**: Raw EDC data imported from SAS/CSV/Excel
 - **Silver**: Subject-level analysis-ready data (baseline, longitudinal, occurrence schemas)
 - **Gold**: Group-level statistical aggregations
 - **Platinum**: Report rendering (RTF/PDF/HTML)
+
+---
+
+## OpenCode Agents (Greek Gods)
+
+Olympus uses specialized OpenCode agents named after Greek gods. Each agent focuses on a specific domain:
+
+### Athena - Meta Guardian 🦉
+
+**Role:** Goddess of wisdom, strategy, and metadata management
+
+**Responsibilities:**
+- Generate metadata from mock shells (Word/Excel documents)
+- Manage metadata definitions and validations
+- Load metadata to DuckDB database
+- Ensure standards compliance (CDISC, SDTM)
+
+**MCP Tools:**
+- `extract_mock_shell` - Extract mock shell to JSON
+- `load_meta` - Load metadata to DuckDB
+- `list_mock_deliverables` - List deliverables from mock
+- `list_db_deliverables` - List deliverables from database
+- `get_variable_details` - Query variable details
+
+**Usage:**
+```
+User: Generate metadata from examples/some_study/shell.docx
+
+Athena: [Uses extract_mock_shell tool]
+        Found 34 deliverables...
+        [Generates metadata with proper definitions]
+        Saved to meta.xlsx
+```
+
+**Agent File:** `~/.config/opencode/agents/athena.md`
+
+**Hand Off:**
+- Code generation → Ares (@ares)
+- Code review → Apollo (@apollo)
+- Database queries → Zeus (@zeus)
+
+### Future Agents
+
+- **Ares** - Code Warrior (Silver/Gold code generation)
+- **Apollo** - Code Oracle (Code review and optimization)
+- **Zeus** - Data Sovereign (Database operations)
 
 ---
 
@@ -30,9 +76,9 @@ uv run pytest -x               # Stop on first failure
 
 ### Linting and Formatting
 ```bash
-uv run --extra dev black src/prism/                       # Format code
-uv run --extra dev ruff check src/prism/                  # Lint code
-uv run --extra dev mypy src/prism/                        # Type check
+uv run --extra dev black src/olympus/                       # Format code
+uv run --extra dev ruff check src/olympus/                  # Lint code
+uv run --extra dev mypy src/olympus/                        # Type check
 ```
 
 ### Database Utilities
@@ -56,7 +102,7 @@ from typing import Dict, List, Optional
 import duckdb
 import pandas as pd
 
-from prism.core.database import Database
+from olympus.core.database import Database
 ```
 
 ### Naming Conventions
@@ -113,7 +159,7 @@ All metadata is stored in the `meta` schema:
 |-------|---------|
 | `meta.dependencies` | 变量依赖关系 |
 
-**DDL Location**: Auto-generated from `src/prism/core/models.py` via `src/prism/meta/schema.py`
+**DDL Location**: Auto-generated from `src/olympus/core/models.py` via `src/olympus/meta/schema.py`
 
 ### Data Layer Conventions
 | Layer | Schema Pattern | Row Granularity |
@@ -137,8 +183,8 @@ All metadata is stored in the `meta` schema:
 ## File Organization
 
 ```
-prism/
-├── src/prism/               # Main source code
+olympus/
+├── src/olympus/               # Main source code
 │   ├── core/                # Database, schema, config, models
 │   ├── agent/               # LLM providers (zhipu, deepseek) + PydanticAI base
 │   ├── meta/                # Metadata generation and management
@@ -163,18 +209,18 @@ prism/
 
 ## Meta Generation
 
-PRISM uses OpenCode Agent Skills to generate clinical trial metadata from mock shells.
+Olympus uses OpenCode Agent Skills to generate clinical trial metadata from mock shells.
 
 ### Architecture
 
 **Agent Skills + MCP Tools:**
 
-PRISM uses a two-layer architecture:
+Olympus uses a two-layer architecture:
 - **MCP Tools** - Provide low-level operations (extract, validate, save)
 - **Agent Skills** - Orchestrate workflows (how to use tools together)
 
 **Available Skills:**
-- `prism-meta-generation` - Generate metadata from mock shells
+- `olympus-meta-generation` - Generate metadata from mock shells
 
 **Available MCP Tools:**
 - `extract_mock_shell` - Extract mock shell data
@@ -193,7 +239,7 @@ Generate metadata for this mock shell: path/to/shell.docx
 ```
 
 OpenCode will:
-1. Load the `prism-meta-generation` skill
+1. Load the `olympus-meta-generation` skill
 2. Call MCP tools as needed
 3. Generate metadata using Claude Opus 4.6
 4. Validate and save results
@@ -234,7 +280,7 @@ All operations are done through MCP tools in OpenCode:
 | Directory/File | Purpose |
 |----------------|---------|
 | `.opencode/skills/` | OpenCode Agent Skills |
-| `prism-meta-generation/` | Generate metadata from mock shells |
+| `olympus-meta-generation/` | Generate metadata from mock shells |
 | `definitions/` | Meta definition models |
 | `derivations/` | Derivation rules (future) |
 | `extractor.py` | Parse mock shell to structured JSON |
@@ -258,9 +304,9 @@ All operations are done through MCP tools in OpenCode:
 
 ## PydanticAI Architecture
 
-PRISM uses PydanticAI for unified LLM-based generation across Meta, Silver, and Gold layers.
+Olympus uses PydanticAI for unified LLM-based generation across Meta, Silver, and Gold layers.
 
-### Base Agent (`src/prism/agent/base.py`)
+### Base Agent (`src/olympus/agent/base.py`)
 - Shared infrastructure for all agents
 - Tool registry: ALS lookup, Bronze schema, Meta variables, Dependency check
 - Provider abstraction: DeepSeek, Zhipu
