@@ -198,7 +198,7 @@ def generate_meta_ddl() -> str:
     parts = [
         "-- ============================================================================",
         "-- PRISM Meta Schema (Auto-generated from Pydantic Models)",
-        "-- Do not edit manually - regenerate with: prism meta generate-ddl",
+        "-- Do not edit manually - regenerate with: olympus meta generate-ddl",
         "-- ============================================================================",
         "",
         "CREATE SCHEMA IF NOT EXISTS meta;",

@@ -189,7 +189,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'src'))
 
 import pandas as pd
 import numpy as np
-from prism import Database
+from olympus import Database
 from olympus.gold.stats import desc_stats_continuous, desc_stats_categorical, format_stat
 
 def main():
@@ -292,7 +292,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'src'))
 
 import pandas as pd
-from prism import Database
+from olympus import Database
 
 def main():
     db = Database("study.duckdb")
@@ -378,7 +378,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'src'))
 
 import pandas as pd
-from prism import Database
+from olympus import Database
 
 def main():
     db = Database("study.duckdb")
@@ -455,7 +455,7 @@ if __name__ == '__main__':
 - stat_display: 格式化显示值
 
 ## 要求
-1. 使用 prism.Database 连接数据库
+1. 使用 olympus.Database 连接数据库
 2. 从 silver.{schema} 读取数据
 3. 按 trta 分组计算统计
 4. 清空旧数据后插入新数据
@@ -467,7 +467,7 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'src'))
 
-from prism import Database
+from olympus import Database
 
 def main():
     db = Database("study.duckdb")
@@ -508,7 +508,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'src'))
 
-from prism import Database
+from olympus import Database
 
 def main():
     db = Database("study.duckdb")

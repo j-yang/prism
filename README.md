@@ -25,7 +25,7 @@ Olympus implements a Medallion architecture for clinical trial data with unified
 ```bash
 # Clone and setup
 git clone <repo-url>
-cd prism
+cd olympus
 uv sync
 
 # Set up environment variables
@@ -41,16 +41,16 @@ Olympus provides an MCP Server for use with OpenCode, Claude Desktop, and other 
 ```bash
 # Clone and setup
 git clone <repo-url>
-cd prism
+cd olympus
 uv sync
 
 # Configure OpenCode
 cat > ~/.config/opencode/config.json << 'EOF'
 {
   "mcpServers": {
-    "prism": {
+    "olympus": {
       "command": "uv",
-      "args": ["--directory", "/path/to/prism", "run", "olympus-mcp"]
+      "args": ["--directory", "/path/to/olympus", "run", "olympus-mcp"]
     }
   }
 }
@@ -113,8 +113,8 @@ See [AGENTS.md](AGENTS.md) for detailed tool documentation.
 ## Project Structure
 
 ```
-prism/
-├── src/prism/
+olympus/
+├── src/olympus/
 │   ├── core/           # Database, schema models, Pydantic models
 │   ├── agent/          # LLM providers (zhipu, deepseek) + PydanticAI base
 │   ├── meta/           # Metadata generation (agent, generator, loader)
@@ -197,13 +197,13 @@ export ZHIPU_API_KEY=your_key_here
 uv run pytest tests/ -v
 
 # Format code
-uv run --extra dev black src/prism/
+uv run --extra dev black src/olympus/
 
 # Lint code
-uv run --extra dev ruff check src/prism/
+uv run --extra dev ruff check src/olympus/
 
 # Type check
-uv run --extra dev mypy src/prism/
+uv run --extra dev mypy src/olympus/
 ```
 
 ## Documentation

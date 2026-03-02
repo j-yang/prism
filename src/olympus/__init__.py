@@ -1,5 +1,5 @@
 """
-PRISM - Clinical Trial Data Pipeline
+Olympus - Clinical Trial Data Platform
 
 A Medallion-architecture data warehouse with AI-powered code generation.
 """
