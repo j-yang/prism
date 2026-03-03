@@ -108,7 +108,8 @@ class SilverAgent(BaseAgent):
         derived_vars = [
             v
             for v in variables
-            if v.get("transformation_type") == "python" or v.get("transformation")
+            if v.get("derivation_type") in ["calculated", "conditional", "complex"]
+            or v.get("derivation_logic")
         ]
 
         if not derived_vars:
@@ -158,21 +159,30 @@ Return JSON matching this structure:
 ---
 
 ## Rules
-
-1. **var_name**: Must match the variable name from input
-2. **code**: Complete Python function with:
+1. **var_name**: Must match variable name from input
+2. **derivation_logic**: Natural language description of business logic
+   - Read carefully and understand what transformation is needed
+   - Translate to Polars code
+   - Handle edge cases appropriately
+3. **code**: Complete Python function with:
    - Function name: `derive_{{var_name}}`
    - Takes `df: pl.DataFrame` as input
    - Returns `pl.DataFrame` with new column added
    - Use `.with_columns()` pattern
-3. **source_vars**: List of columns read from input DataFrame
-4. **dependencies**: List of other derived variables this depends on
-5. **confidence**:
+4. **source_vars**: List of columns read from input DataFrame
+5. **dependencies**: List of other derived variables this depends on
+6. **confidence**:
    - "high" = straightforward transformation
    - "medium" = reasonable assumptions made
    - "low" = uncertain, needs review
 
-Generate transforms for ALL variables in the input list.
+7. **derivation_type**: 
+   - "direct" = no derivation_logic
+   - "conditional" = if-then logic
+   - "calculated" = math formula
+   - "complex" = multi-step logic
+
+Generate transforms for ALL variables with derivation_logic in the input list.
 """
 
         return self.run(prompt, result_type=SchemaTransforms)

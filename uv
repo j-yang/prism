@@ -1,0 +1,14 @@
+error: unexpected argument '--extra' found
+
+  tip: to pass '--extra' as a value, use '-- --extra'
+
+Usage: ruff check <FILES>...
+
+For more information, try '--help'.
+error: unexpected argument '--extra' found
+
+  tip: to pass '--extra' as a value, use '-- --extra'
+
+Usage: ruff check <FILES>...
+
+For more information, try '--help'.

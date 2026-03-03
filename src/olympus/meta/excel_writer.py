@@ -184,8 +184,8 @@ class MetaExcelWriter:
                 "data_type",
                 "description",
                 "source_vars",
-                "transformation",
-                "transformation_type",
+                "derivation_type",
+                "derivation_logic",
                 "param_ref",
                 "confidence",
                 "used_in",
@@ -204,9 +204,6 @@ class MetaExcelWriter:
                 if isinstance(used_in, list):
                     used_in = ", ".join(str(x) for x in used_in)
                 var_label = get_value(v, "var_label", "") or get_value(v, "label", "")
-                transformation = get_value(v, "transformation", "") or get_value(
-                    v, "derivation", ""
-                )
                 rows.append(
                     [
                         var_name,
@@ -215,8 +212,8 @@ class MetaExcelWriter:
                         get_value(v, "data_type", ""),
                         get_value(v, "description", ""),
                         source_vars,
-                        transformation,
-                        get_value(v, "transformation_type", "direct"),
+                        get_value(v, "derivation_type", "direct"),
+                        get_value(v, "derivation_logic", ""),
                         get_value(v, "param_ref", ""),
                         get_value(v, "confidence", "medium"),
                         used_in,

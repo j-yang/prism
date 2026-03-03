@@ -37,15 +37,15 @@ def load_spec_to_meta(
                 """
                 INSERT INTO meta.silver_dictionary 
                 (var_name, var_label, schema, data_type, source_vars, 
-                 transformation, transformation_type, param_ref, description)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                  derivation_type, derivation_logic, param_ref, description)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT (var_name) DO UPDATE SET
                     var_label = EXCLUDED.var_label,
                     schema = EXCLUDED.schema,
                     data_type = EXCLUDED.data_type,
                     source_vars = EXCLUDED.source_vars,
-                    transformation = EXCLUDED.transformation,
-                    transformation_type = EXCLUDED.transformation_type,
+                    derivation_type = EXCLUDED.derivation_type,
+                    derivation_logic = EXCLUDED.derivation_logic,
                     param_ref = EXCLUDED.param_ref,
                     description = EXCLUDED.description
                 """,
@@ -55,8 +55,8 @@ def load_spec_to_meta(
                     var.schema,
                     var.data_type,
                     var.source_vars,
-                    var.transformation,
-                    var.transformation_type,
+                    var.derivation_type,
+                    var.derivation_logic,
                     var.param_ref,
                     var.description,
                 ],

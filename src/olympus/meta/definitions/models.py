@@ -23,8 +23,10 @@ class SilverVariableDefinition(BaseModel):
     confidence: str = Field("medium", description="high|medium|low")
 
     source_vars: Optional[str] = None
-    transformation: Optional[str] = None
-    transformation_type: str = "direct"
+    derivation_type: str = Field(
+        "direct", description="direct|conditional|calculated|complex"
+    )
+    derivation_logic: Optional[str] = None
     param_ref: Optional[str] = None
 
 
